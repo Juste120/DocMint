@@ -1,0 +1,18 @@
+# Build output
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+
+# Claude Code local settings (may contain machine-specific or private data)
+.claude/settings.local.json
+
+# Secrets must never be committed
+*.gpg
+*.asc
+.env
