@@ -1,0 +1,7 @@
+<html><body>
+<p>F:{{ amount | fcfa }}</p>
+<p>M:{{ price | money("EUR") }}</p>
+<p>D:{{ day | date }}</p>
+<p>P:{{ day | date("dd/MM/yyyy") }}</p>
+<p>S:{{ lines | sum("amount") | fcfa }}</p>
+</body></html>

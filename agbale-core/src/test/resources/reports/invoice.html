@@ -1,0 +1,16 @@
+{% extends "layouts/base" %}
+{% block title %}Facture {{ number }}{% endblock %}
+{% block content %}
+  <h1>Facture {{ number }}</h1>
+  <p>Client : {{ customer.name }}</p>
+  <table>
+    <thead><tr><th>Désignation</th><th>Montant</th></tr></thead>
+    <tbody>
+    {% for line in lines %}
+      <tr><td>{{ line.label }}</td><td>{{ line.amount | fcfa }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if discount is not null %}<p>Remise : {{ discount | fcfa }}</p>{% endif %}
+  <p>Total : {{ lines | sum("amount") | fcfa }}</p>
+{% endblock %}

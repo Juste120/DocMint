@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SpotBugs exclusions. Every entry must be justified. -->
+<FindBugsFilter>
+  <!-- Records and immutable value types expose defensive copies or unmodifiable views;
+       EI_EXPOSE_REP findings on Spring-managed beans and properties are false positives. -->
+  <Match>
+    <Package name="~io\.github\.juste120\.agbale\.spring.*"/>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
+  <!-- Demo application is never published. -->
+  <Match>
+    <Package name="~io\.github\.juste120\.agbale\.demo.*"/>
+  </Match>
+</FindBugsFilter>
