@@ -20,7 +20,8 @@ public record RenderRequest(
    * @throws NullPointerException if data is null
    */
   public RenderRequest {
-    Objects.requireNonNull(data, "data must not be null: pass an empty Map if the template needs no data");
+    Objects.requireNonNull(
+        data, "data must not be null: pass an empty Map if the template needs no data");
     format = format == null ? OutputFormat.PDF : format;
     options = options == null ? RenderOptions.defaults() : options;
   }

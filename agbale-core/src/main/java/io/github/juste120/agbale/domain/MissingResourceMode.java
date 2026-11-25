@@ -1,9 +1,9 @@
 package io.github.juste120.agbale.domain;
 
 /**
- * What to do when a template references an allowed resource (image, stylesheet, font) that
- * cannot be found or read. A <em>refused</em> resource (forbidden scheme or host) always fails,
- * whatever this mode.
+ * What to do when a template references an allowed resource (image, stylesheet, font) that cannot
+ * be found or read. A <em>refused</em> resource (forbidden scheme or host) always fails, whatever
+ * this mode.
  */
 public enum MissingResourceMode {
 

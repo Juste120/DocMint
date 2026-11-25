@@ -82,6 +82,14 @@ public final class PebbleTemplateEngine implements TemplateEngine {
       throw translate(e, name);
     } catch (IOException e) {
       throw new RenderException("Cannot write the HTML of template '" + name + "'.", e);
+    } catch (StackOverflowError e) {
+      // A template that extends or includes itself (directly or through others) recurses forever.
+      throw new RenderException(
+          "Template '"
+              + name
+              + "' recurses without end: a template probably extends or includes itself, directly"
+              + " or through another template. Check its 'extends', 'include' and 'import' tags.",
+          null);
     } catch (RuntimeException e) {
       AgbaleException agbale = findAgbaleCause(e);
       if (agbale != null) {

@@ -71,7 +71,8 @@ public final class Agbale {
   public byte[] pdf(String templateName, Object data, Locale locale) {
     Objects.requireNonNull(locale, "locale");
     RenderRequest request =
-        RenderRequest.of(templateName, data).withOptions(RenderOptions.defaults().withLocale(locale));
+        RenderRequest.of(templateName, data)
+            .withOptions(RenderOptions.defaults().withLocale(locale));
     return render(request).content();
   }
 

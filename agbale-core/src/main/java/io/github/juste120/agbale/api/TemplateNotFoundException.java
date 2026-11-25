@@ -46,12 +46,14 @@ public final class TemplateNotFoundException extends AgbaleException {
             .append(quote(root))
             .append("'.");
     if (available.isEmpty()) {
-      message.append(" No template was found there: put your .html files in src/main/resources/")
+      message
+          .append(" No template was found there: put your .html files in src/main/resources/")
           .append(quote(root))
           .append("/ or configure another templates path.");
     } else {
       message.append(" Available templates: ");
-      message.append(String.join(", ", available.subList(0, Math.min(MAX_LISTED, available.size()))));
+      message.append(
+          String.join(", ", available.subList(0, Math.min(MAX_LISTED, available.size()))));
       if (available.size() > MAX_LISTED) {
         message.append(", … (").append(available.size() - MAX_LISTED).append(" more)");
       }

@@ -136,8 +136,8 @@ public final class AgbaleBuilder {
   }
 
   /**
-   * Sets what happens when an allowed resource cannot be found ({@link MissingResourceMode#FAIL}
-   * by default). Refused resources always fail.
+   * Sets what happens when an allowed resource cannot be found ({@link MissingResourceMode#FAIL} by
+   * default). Refused resources always fail.
    *
    * @param mode the mode
    * @return this builder
@@ -159,8 +159,8 @@ public final class AgbaleBuilder {
   }
 
   /**
-   * Sets the class loader used to find templates, images and fonts (by default the thread
-   * context class loader at build time).
+   * Sets the class loader used to find templates, images and fonts (by default the thread context
+   * class loader at build time).
    *
    * @param loader the class loader
    * @return this builder

@@ -79,8 +79,7 @@ class OnePdfLineTest {
 
   @Test
   void advancedApiReturnsMetadata() {
-    RenderResponse response =
-        agbale.render(RenderRequest.of("invoice", Fixtures.invoice()));
+    RenderResponse response = agbale.render(RenderRequest.of("invoice", Fixtures.invoice()));
 
     assertThat(response.mediaType()).isEqualTo("application/pdf");
     assertThat(response.fileName()).isEqualTo("invoice.pdf");

@@ -12,9 +12,9 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * {@code {{ amount | money("EUR") }}} formats an amount in a currency, following the locale of
- * the render (French by default: {@code 1 234,50 €}). An optional second argument overrides the
- * locale: {@code money("USD", "en-US")}.
+ * {@code {{ amount | money("EUR") }}} formats an amount in a currency, following the locale of the
+ * render (French by default: {@code 1 234,50 €}). An optional second argument overrides the locale:
+ * {@code money("USD", "en-US")}.
  */
 final class MoneyFilter implements Filter {
 

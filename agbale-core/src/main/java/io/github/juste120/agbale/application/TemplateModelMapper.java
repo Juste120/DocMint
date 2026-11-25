@@ -30,13 +30,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * Converts the data given by the developer (record, object with getters, map) into the template
  * model: an immutable tree made only of maps, lists and simple values.
  *
- * <p>This is a security boundary: templates never receive a reference to an arbitrary Java
- * object, so they cannot call its methods or navigate to sensitive classes ({@code Class}, {@code
+ * <p>This is a security boundary: templates never receive a reference to an arbitrary Java object,
+ * so they cannot call its methods or navigate to sensitive classes ({@code Class}, {@code
  * ClassLoader}, services). Allowed leaf values are {@code String}, {@code Boolean}, JDK numbers,
  * {@code java.time} values and {@code null}; enums become their name.
  *
- * <p>The properties of the root object become top-level variables. A root that is a collection,
- * an array or a simple value is exposed under the variable {@value #DATA_VARIABLE}.
+ * <p>The properties of the root object become top-level variables. A root that is a collection, an
+ * array or a simple value is exposed under the variable {@value #DATA_VARIABLE}.
  */
 public final class TemplateModelMapper {
 

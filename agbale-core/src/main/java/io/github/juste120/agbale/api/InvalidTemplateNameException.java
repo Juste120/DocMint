@@ -2,7 +2,9 @@ package io.github.juste120.agbale.api;
 
 import java.io.Serial;
 
-/** Thrown when a template name is invalid, for example when it tries to leave the templates folder. */
+/**
+ * Thrown when a template name is invalid, for example when it tries to leave the templates folder.
+ */
 public final class InvalidTemplateNameException extends RenderException {
 
   @Serial private static final long serialVersionUID = 1L;

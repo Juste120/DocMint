@@ -57,13 +57,19 @@ final class SumFilter implements Filter {
       if (!(current instanceof Map<?, ?> map)) {
         throw new PebbleException(
             null,
-            "the 'sum' filter cannot read property '" + path + "' of a " + current.getClass().getSimpleName(),
+            "the 'sum' filter cannot read property '"
+                + path
+                + "' of a "
+                + current.getClass().getSimpleName(),
             line,
             self.getName());
       }
       if (!map.containsKey(key)) {
         throw new PebbleException(
-            null, "the 'sum' filter found no property '" + path + "' in a list item", line, self.getName());
+            null,
+            "the 'sum' filter found no property '" + path + "' in a list item",
+            line,
+            self.getName());
       }
       current = map.get(key);
     }

@@ -5,9 +5,9 @@ import java.io.Serial;
 /**
  * Root of every error raised by Agbale.
  *
- * <p>Each subtype has a stable {@link #code() code} (for example {@code
- * AGBALE_TEMPLATE_NOT_FOUND}) that applications and HTTP clients can rely on. Messages explain
- * what to do next; they never contain absolute paths, stack traces or data values.
+ * <p>Each subtype has a stable {@link #code() code} (for example {@code AGBALE_TEMPLATE_NOT_FOUND})
+ * that applications and HTTP clients can rely on. Messages explain what to do next; they never
+ * contain absolute paths, stack traces or data values.
  */
 public abstract class AgbaleException extends RuntimeException {
 
@@ -48,7 +48,8 @@ public abstract class AgbaleException extends RuntimeException {
       return "null";
     }
     StringBuilder safe = new StringBuilder();
-    value.codePoints()
+    value
+        .codePoints()
         .filter(cp -> !Character.isISOControl(cp))
         .limit(100)
         .forEach(safe::appendCodePoint);

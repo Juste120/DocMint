@@ -6,8 +6,8 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 /**
- * Creates PDF pages and stops the layout as soon as the page limit is exceeded or the render
- * thread is interrupted (render time limit), instead of producing a huge document first.
+ * Creates PDF pages and stops the layout as soon as the page limit is exceeded or the render thread
+ * is interrupted (render time limit), instead of producing a huge document first.
  */
 final class PageLimitingSupplier implements PageSupplier {
 

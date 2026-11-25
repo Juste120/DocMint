@@ -8,10 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Sends OpenHTMLtoPDF's internal logs to SLF4J at DEBUG (warnings) and TRACE (information)
- * level, under {@code io.github.juste120.agbale.pdf.engine}. Without it the engine prints INFO
- * lines on the console for every document. Problems that matter (refused or missing resources)
- * are reported by Agbale itself.
+ * Sends OpenHTMLtoPDF's internal logs to SLF4J at DEBUG (warnings) and TRACE (information) level,
+ * under {@code io.github.juste120.agbale.pdf.engine}. Without it the engine prints INFO lines on
+ * the console for every document. Problems that matter (refused or missing resources) are reported
+ * by Agbale itself.
  */
 final class Slf4jXrLogger implements XRLogger {
 

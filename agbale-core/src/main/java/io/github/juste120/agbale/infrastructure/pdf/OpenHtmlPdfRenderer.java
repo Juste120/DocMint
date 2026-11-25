@@ -87,7 +87,6 @@ public final class OpenHtmlPdfRenderer implements DocumentRenderer {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
 
     PdfRendererBuilder builder = new PdfRendererBuilder();
-    builder.useFastMode();
     builder.withProducer("Agbale");
     builder.withW3cDocument(toW3c(html, defaultCss, guard.baseUri()), guard.baseUri());
     builder.useUriResolver(guard.uriResolver());

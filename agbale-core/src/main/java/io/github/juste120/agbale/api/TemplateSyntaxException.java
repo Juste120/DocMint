@@ -22,7 +22,8 @@ public final class TemplateSyntaxException extends AgbaleException {
    * @param detail what is wrong
    * @param cause the parser error
    */
-  public TemplateSyntaxException(String templateName, Integer line, String detail, Throwable cause) {
+  public TemplateSyntaxException(
+      String templateName, Integer line, String detail, Throwable cause) {
     super(
         CODE,
         "Syntax error in template '"

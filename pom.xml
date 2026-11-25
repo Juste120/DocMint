@@ -86,7 +86,8 @@
     <jacoco-maven-plugin.version>0.8.16</jacoco-maven-plugin.version>
     <spotbugs-maven-plugin.version>4.10.5.0</spotbugs-maven-plugin.version>
     <spotless-maven-plugin.version>3.12.0</spotless-maven-plugin.version>
-    <google-java-format.version>1.37.0</google-java-format.version>
+    <!-- 1.36+ needs commonmark, which Spotless 3.12 does not put on its class path (see ADR-0009). -->
+    <google-java-format.version>1.35.0</google-java-format.version>
     <central-publishing-maven-plugin.version>0.12.0</central-publishing-maven-plugin.version>
     <dependency-check-maven.version>13.0.0</dependency-check-maven.version>
 
@@ -305,11 +306,10 @@
         <version>${spotless-maven-plugin.version}</version>
         <configuration>
           <java>
+            <!-- google-java-format also sorts imports and removes unused ones. -->
             <googleJavaFormat>
               <version>${google-java-format.version}</version>
             </googleJavaFormat>
-            <removeUnusedImports/>
-            <importOrder/>
             <trimTrailingWhitespace/>
             <endWithNewline/>
           </java>

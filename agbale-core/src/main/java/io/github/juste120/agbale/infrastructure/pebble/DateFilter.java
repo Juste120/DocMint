@@ -86,7 +86,10 @@ final class DateFilter implements Filter {
         return text.length() <= 10 ? LocalDate.parse(text) : LocalDateTime.parse(text);
       } catch (DateTimeParseException e) {
         throw new PebbleException(
-            e, "the 'date' filter cannot parse '" + text + "' as an ISO-8601 date", line, self.getName());
+            e,
+            "the 'date' filter cannot parse '" + text + "' as an ISO-8601 date",
+            line,
+            self.getName());
       }
     }
     throw new PebbleException(

@@ -56,8 +56,8 @@ public record ResourceLimits(long maxTemplateBytes, int maxPages, Duration maxRe
   }
 
   /**
-   * Returns the maximum number of characters of the HTML produced by the template engine,
-   * derived from the template size limit. It stops runaway loops before the PDF step.
+   * Returns the maximum number of characters of the HTML produced by the template engine, derived
+   * from the template size limit. It stops runaway loops before the PDF step.
    *
    * @return the maximum rendered HTML size, in characters
    */

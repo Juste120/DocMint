@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 /**
  * Reads templates from the class path, below a root folder such as {@code reports}.
  *
- * <p>Only validated {@link TemplateName}s are accepted, so a lookup can never leave the root.
- * Files are read with a size limit and decoded as UTF-8.
+ * <p>Only validated {@link TemplateName}s are accepted, so a lookup can never leave the root. Files
+ * are read with a size limit and decoded as UTF-8.
  */
 public final class ClasspathTemplateResolver implements TemplateResolver {
 

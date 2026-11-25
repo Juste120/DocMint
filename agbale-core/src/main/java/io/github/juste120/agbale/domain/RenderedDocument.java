@@ -48,7 +48,12 @@ public record RenderedDocument(byte[] content, OutputFormat format, int pageCoun
 
   @Override
   public String toString() {
-    return "RenderedDocument[format=" + format + ", pageCount=" + pageCount
-        + ", size=" + content.length + "]";
+    return "RenderedDocument[format="
+        + format
+        + ", pageCount="
+        + pageCount
+        + ", size="
+        + content.length
+        + "]";
   }
 }

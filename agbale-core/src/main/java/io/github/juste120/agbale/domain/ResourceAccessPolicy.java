@@ -109,7 +109,9 @@ public record ResourceAccessPolicy(Set<String> allowedHosts) {
         || bare.startsWith(".")
         || bare.endsWith(".")) {
       throw new IllegalArgumentException(
-          "invalid allowed host '" + host + "': use a host name such as 'cdn.example.com' or"
+          "invalid allowed host '"
+              + host
+              + "': use a host name such as 'cdn.example.com' or"
               + " '*.example.com', without scheme, port or path");
     }
     return value;

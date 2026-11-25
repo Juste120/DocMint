@@ -16,7 +16,8 @@ final class DefaultStylesheet {
   private DefaultStylesheet() {}
 
   static String css(PageSettings settings) {
-    String size = settings.size().name() + " " + settings.orientation().name().toLowerCase(Locale.ROOT);
+    String size =
+        settings.size().name() + " " + settings.orientation().name().toLowerCase(Locale.ROOT);
     String page =
         String.format(
             Locale.ROOT,

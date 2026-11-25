@@ -15,9 +15,9 @@ import java.util.List;
 /**
  * Pebble {@link Loader} backed by the {@link TemplateResolver} port.
  *
- * <p>Every name used by a template ({@code extends}, {@code include}, {@code import}) goes
- * through {@link TemplateName} validation, so no template can reach a file outside the templates
- * root. Names are always relative to the root; {@code ./} and {@code ../} are refused.
+ * <p>Every name used by a template ({@code extends}, {@code include}, {@code import}) goes through
+ * {@link TemplateName} validation, so no template can reach a file outside the templates root.
+ * Names are always relative to the root; {@code ./} and {@code ../} are refused.
  */
 final class ResolverLoader implements Loader<String> {
 

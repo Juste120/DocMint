@@ -1,5 +1,6 @@
 package io.github.juste120.agbale.infrastructure.pdf;
 
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.FSFontUseCase;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.FontStyle;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import io.github.juste120.agbale.domain.FontDefinition;
@@ -8,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Fonts embedded in every PDF.
@@ -16,8 +19,9 @@ import java.util.List;
  * <p>Noto Sans (SIL Open Font License 1.1) is always available. It covers French and the Latin
  * letters of Ewe and other West African languages (ɖ, ɛ, ƒ, ɣ, ŋ, ɔ, ʋ). It is registered under
  * {@code Noto Sans} and the generic families {@code sans-serif}, {@code serif} and {@code
- * monospace}, so that text never falls back to the PDF standard fonts, which cannot encode these
- * letters. The output is therefore identical with or without fonts installed on the system.
+ * monospace}, and used as fallback font, so that text never falls back to the PDF standard fonts,
+ * which cannot encode these letters. The output is therefore identical with or without fonts
+ * installed on the system.
  *
  * <p>Font files are read once and kept in memory.
  */
@@ -27,8 +31,7 @@ public final class FontRegistry {
   public static final String DEFAULT_FAMILY = "Noto Sans";
 
   private static final String BASE = "io/github/juste120/agbale/fonts/";
-  private static final List<String> DEFAULT_ALIASES =
-      List.of(DEFAULT_FAMILY, "sans-serif", "serif", "monospace");
+  private static final List<String> GENERIC_FAMILIES = List.of("sans-serif", "serif", "monospace");
   private static final List<LoadedFont> BUILT_IN = builtIn();
 
   private final List<LoadedFont> custom;
@@ -59,12 +62,16 @@ public final class FontRegistry {
 
   void registerOn(PdfRendererBuilder builder) {
     for (LoadedFont font : BUILT_IN) {
-      for (String alias : DEFAULT_ALIASES) {
-        font.registerAs(builder, alias);
+      // Also a fallback font: used for unknown families (e.g. 'Arial' on a server without it)
+      // and for characters missing from another font, instead of the PDF standard fonts.
+      font.registerAs(
+          builder, DEFAULT_FAMILY, EnumSet.of(FSFontUseCase.DOCUMENT, FSFontUseCase.FALLBACK_PRE));
+      for (String alias : GENERIC_FAMILIES) {
+        font.registerAs(builder, alias, EnumSet.of(FSFontUseCase.DOCUMENT));
       }
     }
     for (LoadedFont font : custom) {
-      font.registerAs(builder, font.family());
+      font.registerAs(builder, font.family(), EnumSet.of(FSFontUseCase.DOCUMENT));
     }
   }
 
@@ -94,13 +101,14 @@ public final class FontRegistry {
   }
 
   private record LoadedFont(String family, int weight, boolean italic, byte[] bytes) {
-    void registerAs(PdfRendererBuilder builder, String alias) {
+    void registerAs(PdfRendererBuilder builder, String alias, Set<FSFontUseCase> useCases) {
       builder.useFont(
           () -> new ByteArrayInputStream(bytes),
           alias,
           weight,
           italic ? FontStyle.ITALIC : FontStyle.NORMAL,
-          true);
+          true,
+          useCases);
     }
   }
 }

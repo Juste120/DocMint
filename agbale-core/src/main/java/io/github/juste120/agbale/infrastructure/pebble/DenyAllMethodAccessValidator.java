@@ -6,10 +6,9 @@ import java.lang.reflect.Method;
 /**
  * Refuses every method call from templates.
  *
- * <p>Templates only receive maps, lists and simple values (see the template model mapper), and
- * read them through Pebble's map and list resolvers, which never invoke methods. Denying all
- * method access is a second, independent barrier: {@code {{ x.getClass() }}} or any other call
- * fails.
+ * <p>Templates only receive maps, lists and simple values (see the template model mapper), and read
+ * them through Pebble's map and list resolvers, which never invoke methods. Denying all method
+ * access is a second, independent barrier: {@code {{ x.getClass() }}} or any other call fails.
  */
 final class DenyAllMethodAccessValidator implements MethodAccessValidator {
 

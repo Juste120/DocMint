@@ -6,10 +6,10 @@ import java.util.regex.Pattern;
 /**
  * A validated, normalised template name such as {@code invoice} or {@code layouts/base}.
  *
- * <p>Validation is the first barrier against path traversal: a name can only designate a file
- * below the configured templates root. Accepted names are made of segments separated by
- * {@code /}; each segment contains letters, digits, {@code _} or {@code -}, optionally separated
- * by single dots. The {@code .html} extension is optional and removed during normalisation.
+ * <p>Validation is the first barrier against path traversal: a name can only designate a file below
+ * the configured templates root. Accepted names are made of segments separated by {@code /}; each
+ * segment contains letters, digits, {@code _} or {@code -}, optionally separated by single dots.
+ * The {@code .html} extension is optional and removed during normalisation.
  *
  * @param value the normalised name, without the {@code .html} extension
  */
@@ -19,7 +19,8 @@ public record TemplateName(String value) {
   public static final int MAX_LENGTH = 200;
 
   private static final String EXTENSION = ".html";
-  private static final Pattern SEGMENT = Pattern.compile("[\\p{L}\\p{N}_-]+(\\.[\\p{L}\\p{N}_-]+)*");
+  private static final Pattern SEGMENT =
+      Pattern.compile("[\\p{L}\\p{N}_-]+(\\.[\\p{L}\\p{N}_-]+)*");
 
   /**
    * Creates a template name, validating it.

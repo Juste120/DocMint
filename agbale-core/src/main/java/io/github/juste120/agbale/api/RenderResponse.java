@@ -51,7 +51,14 @@ public record RenderResponse(byte[] content, String mediaType, String fileName, 
 
   @Override
   public String toString() {
-    return "RenderResponse[mediaType=" + mediaType + ", fileName=" + fileName
-        + ", pageCount=" + pageCount + ", size=" + content.length + "]";
+    return "RenderResponse[mediaType="
+        + mediaType
+        + ", fileName="
+        + fileName
+        + ", pageCount="
+        + pageCount
+        + ", size="
+        + content.length
+        + "]";
   }
 }

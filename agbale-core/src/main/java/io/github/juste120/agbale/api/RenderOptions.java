@@ -6,8 +6,7 @@ import java.util.Locale;
  * Per-render options of the advanced API.
  *
  * @param locale the locale for dates and amounts, or {@code null} for the configured default
- * @param fileName the suggested file name of the result, or {@code null} for {@code
- *     <template>.pdf}
+ * @param fileName the suggested file name of the result, or {@code null} for {@code <template>.pdf}
  */
 public record RenderOptions(Locale locale, String fileName) {
 

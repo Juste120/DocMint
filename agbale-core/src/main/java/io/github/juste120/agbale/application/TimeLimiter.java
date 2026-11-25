@@ -16,9 +16,9 @@ import java.util.function.Supplier;
 /**
  * Runs a task with a maximum duration on a daemon thread.
  *
- * <p>On timeout the task is cancelled (interrupted). The JVM cannot force a busy thread to stop,
- * so the other limits (pages, rendered size) bound the work that may still run after the caller
- * has received its error.
+ * <p>On timeout the task is cancelled (interrupted). The JVM cannot force a busy thread to stop, so
+ * the other limits (pages, rendered size) bound the work that may still run after the caller has
+ * received its error.
  */
 final class TimeLimiter {
 

@@ -3,8 +3,8 @@ package io.github.juste120.agbale.domain;
 import java.util.Objects;
 
 /**
- * Default page layout applied by Agbale's print stylesheet. Template CSS can override every
- * value with a standard {@code @page} rule.
+ * Default page layout applied by Agbale's print stylesheet. Template CSS can override every value
+ * with a standard {@code @page} rule.
  *
  * @param size the page size
  * @param orientation the page orientation

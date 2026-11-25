@@ -59,7 +59,8 @@ final class ResourceGuard {
   private final Set<String> refused = new LinkedHashSet<>();
   private final Set<String> missing = new LinkedHashSet<>();
 
-  ResourceGuard(String root, TemplateName template, ClassLoader classLoader, ResourceAccessPolicy policy) {
+  ResourceGuard(
+      String root, TemplateName template, ClassLoader classLoader, ResourceAccessPolicy policy) {
     this.root = root;
     this.classLoader = classLoader;
     this.policy = policy;
@@ -129,8 +130,8 @@ final class ResourceGuard {
       InputStream in = classLoader.getResourceAsStream(path);
       if (in == null) {
         missing.add(display(uri));
-        return null;
       }
+      // The engine expects a stream object; a null input stream means "not found".
       return new FSStream() {
         @Override
         public InputStream getStream() {
@@ -139,7 +140,7 @@ final class ResourceGuard {
 
         @Override
         public Reader getReader() {
-          return new InputStreamReader(in, StandardCharsets.UTF_8);
+          return in == null ? null : new InputStreamReader(in, StandardCharsets.UTF_8);
         }
       };
     };
@@ -153,7 +154,8 @@ final class ResourceGuard {
       String id = diagnostic.getLogMessageId().getEnum().name();
       if (MISSING_DIAGNOSTICS.contains(id)) {
         Object[] args = diagnostic.getArgs();
-        String resource = args != null && args.length > 0 && args[0] != null ? args[0].toString() : id;
+        String resource =
+            args != null && args.length > 0 && args[0] != null ? args[0].toString() : id;
         if (!refused.contains(display(resource))) {
           missing.add(display(resource));
         }
@@ -161,7 +163,10 @@ final class ResourceGuard {
     };
   }
 
-  /** Returns the class path location of a private-scheme URI, or {@code null} if it escapes the root. */
+  /**
+   * Returns the class path location of a private-scheme URI, or {@code null} if it escapes the
+   * root.
+   */
   String classpathPath(String uri) {
     try {
       URI parsed = new URI(uri);
