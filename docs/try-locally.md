@@ -10,8 +10,9 @@ cd /path/to/DocMint
 ./mvnw install -DskipTests -DskipExamples
 ```
 
-This puts `docmint-core`, `docmint-spring-boot-starter` and `docmint-bom` (version
-`0.2.0-SNAPSHOT`) in `~/.m2/repository/io/github/juste120/`.
+This puts `docmint-core`, `docmint-spring-boot-starter`, `docmint-bom` and the optional modules
+`docmint-excel`, `docmint-word`, `docmint-signature` (version `0.5.0-SNAPSHOT`) in
+`~/.m2/repository/io/github/juste120/`.
 
 ## 2. Use it in a new Spring Boot 4 project
 
@@ -19,7 +20,7 @@ This puts `docmint-core`, `docmint-spring-boot-starter` and `docmint-bom` (versi
 <dependency>
   <groupId>io.github.juste120</groupId>
   <artifactId>docmint-spring-boot-starter</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -39,10 +40,10 @@ Plain Java (no Spring): depend on `docmint-core` and call
 ```bash
 cd /path/to/DocMint/docmint-angular
 npm ci && npm run build
-cd dist/docmint-angular && npm pack          # creates juste120-docmint-angular-0.2.0.tgz
+cd dist/docmint-angular && npm pack          # creates juste120-docmint-angular-0.5.0.tgz
 
 cd /path/to/your-angular-app
-npm install /path/to/DocMint/docmint-angular/dist/docmint-angular/juste120-docmint-angular-0.2.0.tgz
+npm install /path/to/DocMint/docmint-angular/dist/docmint-angular/juste120-docmint-angular-0.5.0.tgz
 ```
 
 Then `inject(DocMintClient)` (with `provideHttpClient()`), and enable CORS with
