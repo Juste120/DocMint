@@ -52,6 +52,7 @@ public final class DefaultReportService implements ReportService {
   private final TimeLimiter timeLimiter;
   private final List<PostProcessor> postProcessors;
   private final Watermark defaultWatermark;
+  private final PdfDefaults defaults;
   private final Map<OutputFormat, TableWriter> tableWriters = new EnumMap<>(OutputFormat.class);
 
   /**
@@ -66,6 +67,7 @@ public final class DefaultReportService implements ReportService {
    * @param postProcessors the post-processors, in order
    * @param defaultWatermark the watermark applied when a request has none, or {@code null}
    * @param tableWriters the writers of tabular formats (CSV, Excel...)
+   * @param defaults the default PDF/A level, accessibility and signature of PDF documents
    */
   public DefaultReportService(
       TemplateResolver resolver,
@@ -76,7 +78,8 @@ public final class DefaultReportService implements ReportService {
       ClassLoader classLoader,
       List<PostProcessor> postProcessors,
       Watermark defaultWatermark,
-      List<TableWriter> tableWriters) {
+      List<TableWriter> tableWriters,
+      PdfDefaults defaults) {
     this.resolver = Objects.requireNonNull(resolver, "resolver");
     this.engine = Objects.requireNonNull(engine, "engine");
     this.renderers = Objects.requireNonNull(renderers, "renderers");
@@ -85,6 +88,7 @@ public final class DefaultReportService implements ReportService {
     this.timeLimiter = new TimeLimiter(classLoader);
     this.postProcessors = List.copyOf(postProcessors);
     this.defaultWatermark = defaultWatermark;
+    this.defaults = defaults == null ? PdfDefaults.NONE : defaults;
     for (TableWriter writer : tableWriters) {
       this.tableWriters.put(writer.format(), writer);
     }
@@ -95,14 +99,7 @@ public final class DefaultReportService implements ReportService {
     Objects.requireNonNull(request, "request");
     TemplateName name = parse(request.templateName());
     Locale locale = request.options().locale() == null ? defaultLocale : request.options().locale();
-    DocumentOptions options = request.options().documentOptions(defaultWatermark);
-    if (options.protection() != null && request.format() != OutputFormat.PDF) {
-      throw new InvalidOptionsException(
-          InvalidOptionsException.PROTECTION_INVALID,
-          "Password protection only applies to PDF documents, not to "
-              + request.format()
-              + ". Remove the protection from this request.");
-    }
+    DocumentOptions options = options(request);
     var renderer = renderers.get(request.format().baseFormat());
     PostProcessContext postContext =
         new PostProcessContext(name, request.format(), options, limits);
@@ -136,6 +133,48 @@ public final class DefaultReportService implements ReportService {
           document.pageCount());
     }
     return responseMapper.toResponse(document, name, request.options());
+  }
+
+  /** Applies the defaults and refuses incompatible combinations. */
+  private DocumentOptions options(RenderRequest request) {
+    RenderOptions given = request.options();
+    boolean pdf = request.format() == OutputFormat.PDF;
+    DocumentOptions options =
+        given.documentOptions(
+            defaultWatermark,
+            pdf ? defaults.pdfStandard() : null,
+            pdf && defaults.accessible(),
+            pdf ? defaults.signature() : null);
+    if (options.protection() != null && !pdf) {
+      throw new InvalidOptionsException(
+          InvalidOptionsException.PROTECTION_INVALID,
+          "Password protection only applies to PDF documents, not to "
+              + request.format()
+              + ". Remove the protection from this request.");
+    }
+    if (options.protection() != null && options.pdfStandard() != null) {
+      throw new InvalidOptionsException(
+          InvalidOptionsException.PROTECTION_INVALID,
+          "PDF/A forbids encryption: remove the password protection or the PDF/A standard.");
+    }
+    if (options.protection() != null && options.signature() != null) {
+      throw new InvalidOptionsException(
+          InvalidOptionsException.PROTECTION_INVALID,
+          "A signed document cannot also be password-protected by DocMint: choose one.");
+    }
+    if (given.signature() != null && !pdf) {
+      throw new InvalidOptionsException(
+          InvalidOptionsException.SIGNATURE_INVALID,
+          "Only PDF documents can be signed, not " + request.format() + ".");
+    }
+    if (options.signature() != null
+        && postProcessors.stream().noneMatch(p -> p.provides(PostProcessor.SIGNATURE))) {
+      throw new InvalidOptionsException(
+          InvalidOptionsException.SIGNATURE_INVALID,
+          "Electronic signature requested, but the module is missing: add the dependency"
+              + " io.github.juste120:docmint-signature.");
+    }
+    return options;
   }
 
   @Override

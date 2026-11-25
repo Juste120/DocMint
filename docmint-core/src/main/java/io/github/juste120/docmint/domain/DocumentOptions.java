@@ -1,15 +1,37 @@
 package io.github.juste120.docmint.domain;
 
 /**
- * Options applied to a rendered document by post-processors.
+ * Options applied when rendering and post-processing a document.
  *
  * @param watermark the watermark, or {@code null}
  * @param protection the password protection, or {@code null}
  * @param preview the preview settings for image formats, or {@code null} for the defaults
  * @param csv the CSV settings, or {@code null} for the defaults
+ * @param pdfStandard the PDF/A level, or {@code null} for a regular PDF
+ * @param accessible whether to produce a tagged, accessible PDF (PDF/UA)
+ * @param signature the electronic signature, or {@code null}
  */
 public record DocumentOptions(
-    Watermark watermark, Protection protection, PreviewSettings preview, CsvSettings csv) {
+    Watermark watermark,
+    Protection protection,
+    PreviewSettings preview,
+    CsvSettings csv,
+    PdfStandard pdfStandard,
+    boolean accessible,
+    SignatureSettings signature) {
+
+  /**
+   * Creates options without PDF/A, accessibility or signature (V3 constructor).
+   *
+   * @param watermark the watermark, or {@code null}
+   * @param protection the protection, or {@code null}
+   * @param preview the preview settings, or {@code null}
+   * @param csv the CSV settings, or {@code null}
+   */
+  public DocumentOptions(
+      Watermark watermark, Protection protection, PreviewSettings preview, CsvSettings csv) {
+    this(watermark, protection, preview, csv, null, false, null);
+  }
 
   /**
    * Creates options without CSV settings (V2 constructor).

@@ -13,6 +13,9 @@ public final class InvalidOptionsException extends RenderException {
   /** The protection cannot be applied (e.g. on an image). */
   public static final String PROTECTION_INVALID = "DOCMINT_PROTECTION_INVALID";
 
+  /** The electronic signature cannot be applied (module missing, wrong key store...). */
+  public static final String SIGNATURE_INVALID = "DOCMINT_SIGNATURE_INVALID";
+
   /** The watermark cannot be applied (e.g. image not found). */
   public static final String WATERMARK_INVALID = "DOCMINT_WATERMARK_INVALID";
 

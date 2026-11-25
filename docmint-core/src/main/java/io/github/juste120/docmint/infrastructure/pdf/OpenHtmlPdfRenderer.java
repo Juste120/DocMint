@@ -7,6 +7,7 @@ import io.github.juste120.docmint.api.LimitExceededException;
 import io.github.juste120.docmint.api.RenderException;
 import io.github.juste120.docmint.api.ResourceMissingException;
 import io.github.juste120.docmint.api.ResourceRefusedException;
+import io.github.juste120.docmint.domain.DocumentOptions;
 import io.github.juste120.docmint.domain.MissingResourceMode;
 import io.github.juste120.docmint.domain.OutputFormat;
 import io.github.juste120.docmint.domain.PageSettings;
@@ -14,6 +15,8 @@ import io.github.juste120.docmint.domain.RenderedDocument;
 import io.github.juste120.docmint.domain.ResourceAccessPolicy;
 import io.github.juste120.docmint.port.DocumentRenderer;
 import io.github.juste120.docmint.port.RenderContext;
+import java.awt.color.ColorSpace;
+import java.awt.color.ICC_Profile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -37,6 +40,7 @@ import org.slf4j.LoggerFactory;
 public final class OpenHtmlPdfRenderer implements DocumentRenderer {
 
   private static final Logger LOG = LoggerFactory.getLogger(OpenHtmlPdfRenderer.class);
+  private static final byte[] SRGB_PROFILE = ICC_Profile.getInstance(ColorSpace.CS_sRGB).getData();
 
   static {
     Slf4jXrLogger.installIfDefault();
@@ -88,7 +92,22 @@ public final class OpenHtmlPdfRenderer implements DocumentRenderer {
 
     PdfRendererBuilder builder = new PdfRendererBuilder();
     builder.withProducer("DocMint");
-    builder.withW3cDocument(toW3c(html, defaultCss, guard.baseUri()), guard.baseUri());
+    DocumentOptions options = context.options();
+    boolean archive = options.pdfStandard() != null;
+    boolean tagged =
+        options.accessible() || (archive && options.pdfStandard().conformance().equals("A"));
+    builder.withW3cDocument(
+        toW3c(html, defaultCss, guard.baseUri(), archive || tagged ? context : null),
+        guard.baseUri());
+    if (archive) {
+      builder.usePdfAConformance(
+          PdfRendererBuilder.PdfAConformance.valueOf(
+              "PDFA_" + options.pdfStandard().part() + "_" + options.pdfStandard().conformance()));
+      builder.useColorProfile(SRGB_PROFILE);
+    }
+    if (tagged) {
+      builder.usePdfUaAccessibility(true);
+    }
     builder.useUriResolver(guard.uriResolver());
     builder.useProtocolsStreamImplementation(guard.classpathStreams(), ResourceGuard.SCHEME);
     builder.useExternalResourceAccessControl(
@@ -115,8 +134,19 @@ public final class OpenHtmlPdfRenderer implements DocumentRenderer {
     return new RenderedDocument(out.toByteArray(), OutputFormat.PDF, pages.pages());
   }
 
-  private static org.w3c.dom.Document toW3c(String html, String css, String baseUri) {
+  private static org.w3c.dom.Document toW3c(
+      String html, String css, String baseUri, RenderContext metadata) {
     Document document = Jsoup.parse(html, baseUri);
+    if (metadata != null) {
+      // PDF/A and PDF/UA need a title and a language: use the template's, or sensible defaults.
+      if (document.title().isBlank()) {
+        document.title(metadata.templateName().simpleName());
+      }
+      Element root = document.selectFirst("html");
+      if (root != null && root.attr("lang").isBlank()) {
+        root.attr("lang", metadata.locale().toLanguageTag());
+      }
+    }
     Element style = new Element("style").attr("data-docmint", "default");
     style.appendChild(new DataNode(css + PageMarginBoxes.apply(document)));
     document.head().prependChild(style);

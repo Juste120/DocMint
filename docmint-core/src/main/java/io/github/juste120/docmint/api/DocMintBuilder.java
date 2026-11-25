@@ -1,12 +1,15 @@
 package io.github.juste120.docmint.api;
 
 import io.github.juste120.docmint.application.DefaultReportService;
+import io.github.juste120.docmint.application.PdfDefaults;
 import io.github.juste120.docmint.application.RendererRegistry;
 import io.github.juste120.docmint.domain.FontDefinition;
 import io.github.juste120.docmint.domain.MissingResourceMode;
 import io.github.juste120.docmint.domain.PageSettings;
+import io.github.juste120.docmint.domain.PdfStandard;
 import io.github.juste120.docmint.domain.ResourceAccessPolicy;
 import io.github.juste120.docmint.domain.ResourceLimits;
+import io.github.juste120.docmint.domain.SignatureSettings;
 import io.github.juste120.docmint.domain.Watermark;
 import io.github.juste120.docmint.infrastructure.export.CsvTableWriter;
 import io.github.juste120.docmint.infrastructure.export.HtmlDocumentRenderer;
@@ -66,6 +69,9 @@ public final class DocMintBuilder {
   private final List<PostProcessor> customPostProcessors = new ArrayList<>();
   private Watermark defaultWatermark;
   private Executor executor;
+  private PdfStandard pdfStandard;
+  private boolean accessible;
+  private SignatureSettings signature;
 
   DocMintBuilder() {}
 
@@ -230,6 +236,40 @@ public final class DocMintBuilder {
   }
 
   /**
+   * Produces every PDF as PDF/A (archiving) unless a render says otherwise. Not compatible with
+   * password protection.
+   *
+   * @param standard the PDF/A level, e.g. {@link PdfStandard#PDF_A_3B}, or {@code null}
+   * @return this builder
+   */
+  public DocMintBuilder pdfStandard(PdfStandard standard) {
+    this.pdfStandard = standard;
+    return this;
+  }
+
+  /**
+   * Produces tagged, accessible PDFs (PDF/UA) by default.
+   *
+   * @param enabled whether PDFs are accessible
+   * @return this builder
+   */
+  public DocMintBuilder accessible(boolean enabled) {
+    this.accessible = enabled;
+    return this;
+  }
+
+  /**
+   * Signs every PDF electronically by default (module {@code docmint-signature}).
+   *
+   * @param settings the key store and signature information, or {@code null}
+   * @return this builder
+   */
+  public DocMintBuilder signature(SignatureSettings settings) {
+    this.signature = settings;
+    return this;
+  }
+
+  /**
    * Sets the executor of {@link DocMint#renderAsync}. By default, a shared pool of daemon threads
    * sized to the number of processors.
    *
@@ -298,7 +338,8 @@ public final class DocMintBuilder {
             loader,
             postProcessors,
             defaultWatermark,
-            tableWriters),
+            tableWriters,
+            new PdfDefaults(pdfStandard, accessible, signature)),
         executor != null ? executor : DefaultExecutor.INSTANCE);
   }
 

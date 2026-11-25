@@ -30,6 +30,20 @@ public interface PostProcessor {
   RenderedDocument process(RenderedDocument document, PostProcessContext context);
 
   /**
+   * Tells whether this post-processor provides a capability that must not be silently missing, such
+   * as {@value #SIGNATURE}. The application checks it before rendering.
+   *
+   * @param capability the capability name
+   * @return {@code true} if provided
+   */
+  default boolean provides(String capability) {
+    return false;
+  }
+
+  /** Capability of electronic signature post-processors. */
+  String SIGNATURE = "signature";
+
+  /**
    * Returns {@code true} when the document has the given format.
    *
    * @param document a document

@@ -7,12 +7,14 @@
     <Package name="~io\.github\.juste120\.docmint\.spring.*"/>
     <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
   </Match>
-  <!-- Protection is deliberately shared, not copied: the caller wipes the passwords with
-       Protection.clear(); a defensive copy would leave an unwiped copy in memory. -->
+  <!-- Protection and SignatureSettings are deliberately shared, not copied: the caller wipes
+       the secrets with clear(); a defensive copy would leave an unwiped copy in memory. -->
   <Match>
     <Or>
       <Class name="io.github.juste120.docmint.api.RenderOptions"/>
       <Class name="io.github.juste120.docmint.domain.DocumentOptions"/>
+      <Class name="io.github.juste120.docmint.api.DocMintBuilder"/>
+      <Class name="io.github.juste120.docmint.application.PdfDefaults"/>
     </Or>
     <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
   </Match>
