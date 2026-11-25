@@ -51,7 +51,8 @@ public class DocMintProblemDetailsHandler {
           Map.entry(CodeGenerationException.CODE, "Invalid QR code or barcode"),
           Map.entry(InvalidOptionsException.PREVIEW_PAGE_OUT_OF_RANGE, "Preview page out of range"),
           Map.entry(InvalidOptionsException.PROTECTION_INVALID, "Invalid protection"),
-          Map.entry(InvalidOptionsException.WATERMARK_INVALID, "Invalid watermark"));
+          Map.entry(InvalidOptionsException.WATERMARK_INVALID, "Invalid watermark"),
+          Map.entry(InvalidOptionsException.SIGNATURE_INVALID, "Invalid signature"));
 
   /**
    * Converts a DocMint error.

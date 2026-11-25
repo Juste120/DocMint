@@ -2,8 +2,10 @@ package io.github.juste120.docmint.spring.web;
 
 import io.github.juste120.docmint.api.RenderOptions;
 import io.github.juste120.docmint.domain.CsvSettings;
+import io.github.juste120.docmint.domain.PdfStandard;
 import io.github.juste120.docmint.domain.PreviewSettings;
 import io.github.juste120.docmint.domain.Protection;
+import io.github.juste120.docmint.domain.SignatureSettings;
 import io.github.juste120.docmint.domain.Watermark;
 import java.util.Objects;
 
@@ -83,6 +85,36 @@ public record ReportContent(Object data, RenderOptions options) {
    */
   public ReportContent withCsv(CsvSettings csv) {
     return new ReportContent(data, options.withCsv(csv));
+  }
+
+  /**
+   * Returns a copy produced as PDF/A.
+   *
+   * @param standard the PDF/A level
+   * @return the new content
+   */
+  public ReportContent withPdfStandard(PdfStandard standard) {
+    return new ReportContent(data, options.withPdfStandard(standard));
+  }
+
+  /**
+   * Returns a copy produced (or not) as an accessible, tagged PDF.
+   *
+   * @param accessible whether the PDF is tagged
+   * @return the new content
+   */
+  public ReportContent withAccessible(boolean accessible) {
+    return new ReportContent(data, options.withAccessible(accessible));
+  }
+
+  /**
+   * Returns a copy signed electronically (module {@code docmint-signature}).
+   *
+   * @param signature the signature settings
+   * @return the new content
+   */
+  public ReportContent withSignature(SignatureSettings signature) {
+    return new ReportContent(data, options.withSignature(signature));
   }
 
   /**

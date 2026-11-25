@@ -1,6 +1,7 @@
 package io.github.juste120.docmint.spring;
 
 import io.github.juste120.docmint.domain.MissingResourceMode;
+import io.github.juste120.docmint.domain.PdfStandard;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +20,8 @@ import org.springframework.util.unit.DataSize;
  * @param resources resource loading settings
  * @param web web settings for {@code @Report} endpoints
  * @param watermark default watermark applied to every document (none by default)
+ * @param pdf PDF/A and accessibility of PDF documents
+ * @param signature electronic signature of PDF documents (module {@code docmint-signature})
  */
 @ConfigurationProperties("docmint")
 public record DocMintProperties(
@@ -29,7 +32,9 @@ public record DocMintProperties(
     @DefaultValue Limits limits,
     @DefaultValue Resources resources,
     @DefaultValue Web web,
-    @DefaultValue WatermarkDefaults watermark) {
+    @DefaultValue WatermarkDefaults watermark,
+    @DefaultValue Pdf pdf,
+    @DefaultValue Signature signature) {
 
   /**
    * Creates the properties, replacing a missing font list by an empty list.
@@ -42,6 +47,8 @@ public record DocMintProperties(
    * @param resources resource loading settings
    * @param web web settings
    * @param watermark default watermark
+   * @param pdf PDF settings
+   * @param signature signature settings
    */
   public DocMintProperties {
     fonts = fonts == null ? List.of() : List.copyOf(fonts);
@@ -129,4 +136,37 @@ public record DocMintProperties(
    * @param enabled whether DocMint errors are turned into {@code application/problem+json}
    */
   public record ProblemDetails(@DefaultValue("true") boolean enabled) {}
+
+  /**
+   * PDF/A and accessibility of PDF documents.
+   *
+   * @param standard the PDF/A level ({@code pdf-a-3b}...), none by default
+   * @param accessible whether PDFs are tagged for screen readers (PDF/UA)
+   */
+  public record Pdf(PdfStandard standard, @DefaultValue("false") boolean accessible) {}
+
+  /**
+   * Electronic signature of PDF documents (needs {@code docmint-signature}).
+   *
+   * @param keyStore location of the PKCS#12 key store, e.g. {@code file:/etc/docmint/sign.p12} or
+   *     {@code classpath:keys/sign.p12}; no signature when empty
+   * @param password the key store password (use an environment variable, never commit it)
+   * @param alias the key alias, or empty for the first key
+   * @param reason the reason shown by PDF readers
+   * @param location the signing location
+   * @param contact the signer's contact information
+   */
+  public record Signature(
+      String keyStore,
+      String password,
+      String alias,
+      String reason,
+      String location,
+      String contact) {
+
+    @Override
+    public String toString() {
+      return "Signature[keyStore=" + keyStore + ", password=***, alias=" + alias + "]";
+    }
+  }
 }

@@ -51,10 +51,11 @@
     <module>docmint-spring-boot-starter</module>
     <module>docmint-excel</module>
     <module>docmint-word</module>
+    <module>docmint-signature</module>
   </modules>
 
   <properties>
-    <revision>0.4.0-SNAPSHOT</revision>
+    <revision>0.5.0-SNAPSHOT</revision>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -67,6 +68,7 @@
     <jsoup.version>1.24.1</jsoup.version>
     <zxing.version>3.5.4</zxing.version>
     <poi.version>6.0.0</poi.version>
+    <bouncycastle.version>1.87</bouncycastle.version>
     <slf4j.version>2.0.20</slf4j.version>
     <spring-boot.version>4.2.0</spring-boot.version>
 
@@ -123,6 +125,16 @@
         <groupId>io.github.juste120</groupId>
         <artifactId>docmint-word</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.juste120</groupId>
+        <artifactId>docmint-signature</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk18on</artifactId>
+        <version>${bouncycastle.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.poi</groupId>

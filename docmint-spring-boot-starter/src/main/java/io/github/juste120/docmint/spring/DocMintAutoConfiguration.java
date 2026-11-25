@@ -4,11 +4,15 @@ import io.github.juste120.docmint.api.DocMint;
 import io.github.juste120.docmint.api.DocMintBuilder;
 import io.github.juste120.docmint.domain.FontDefinition;
 import io.github.juste120.docmint.domain.ResourceLimits;
+import io.github.juste120.docmint.domain.SignatureSettings;
 import io.github.juste120.docmint.domain.Watermark;
+import java.io.IOException;
+import java.io.InputStream;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 /**
@@ -50,6 +54,11 @@ public class DocMintAutoConfiguration {
               .withOpacity(watermark.opacity())
               .withColor(watermark.color()));
     }
+    builder.pdfStandard(properties.pdf().standard()).accessible(properties.pdf().accessible());
+    SignatureSettings signature = signature(properties.signature(), resourceLoader);
+    if (signature != null) {
+      builder.signature(signature);
+    }
     ClassLoader classLoader = resourceLoader.getClassLoader();
     if (classLoader != null) {
       builder.classLoader(classLoader);
@@ -62,5 +71,29 @@ public class DocMintAutoConfiguration {
           new FontDefinition(font.family(), font.location(), font.weight(), font.italic()));
     }
     return builder.build();
+  }
+
+  private static SignatureSettings signature(
+      DocMintProperties.Signature properties, ResourceLoader resourceLoader) {
+    if (properties.keyStore() == null || properties.keyStore().isBlank()) {
+      return null;
+    }
+    Resource resource = resourceLoader.getResource(properties.keyStore());
+    byte[] keyStore;
+    try (InputStream in = resource.getInputStream()) {
+      keyStore = in.readAllBytes();
+    } catch (IOException e) {
+      throw new IllegalStateException(
+          "docmint.signature.key-store: cannot read '" + properties.keyStore() + "'", e);
+    }
+    String password = properties.password() == null ? "" : properties.password();
+    SignatureSettings settings = SignatureSettings.pkcs12(keyStore, password.toCharArray());
+    if (properties.alias() != null && !properties.alias().isBlank()) {
+      settings = settings.withAlias(properties.alias());
+    }
+    return settings
+        .withReason(properties.reason())
+        .withLocation(properties.location())
+        .withContact(properties.contact());
   }
 }
