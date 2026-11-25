@@ -20,3 +20,5 @@ alternatives). A decision is never edited after acceptance: a new ADR supersedes
 | [0013](0013-angular-library.md) | Angular helper library | Accepted |
 | [0014](0014-charts-java2d.md) | Charts drawn with Java2D | Accepted |
 | [0015](0015-docmint-excel-module.md) | Optional docmint-excel module and TableWriter SPI | Accepted |
+| [0016](0016-word-export-poi.md) | Word export with Apache POI XWPF | Accepted |
+| [0017](0017-streaming-and-async.md) | Streaming and asynchronous rendering | Accepted |

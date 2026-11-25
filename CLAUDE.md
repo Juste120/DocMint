@@ -48,6 +48,7 @@ explicit request.**
 | `docmint-core` | Pure Java engine (no Spring). Packages `api` (public), `domain` + `port` (public SPI), `application` + `infrastructure` (internal) |
 | `docmint-spring-boot-starter` | `DocMintAutoConfiguration`, `DocMintProperties`, `web/` (`@Report`, return value handler, RFC 9457 errors) |
 | `docmint-excel` | Optional Excel export (Apache POI), discovered with `ServiceLoader` |
+| `docmint-word` | Optional Word export (Apache POI XWPF), discovered with `ServiceLoader` |
 | `docmint-bom` | Version alignment |
 | `docmint-examples/demo-api` | Layered demo API (controller, dto/request, dto/response, mapper, service/impl, entity, repository) — never published |
 | `docmint-angular` | Angular workspace of the npm library `@juste120/docmint-angular` (Vitest tests) |

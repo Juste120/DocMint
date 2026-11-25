@@ -1,6 +1,6 @@
 # DocMint user guide
 
-This guide covers DocMint 0.1.0 to 0.3.0. For a quick start, read the [README](../README.md)
+This guide covers DocMint 0.1.0 to 0.4.0. For a quick start, read the [README](../README.md)
 first.
 
 - [1. Concepts](#1-concepts)
@@ -16,6 +16,7 @@ first.
 - [11. Logging](#11-logging)
 - [12. Professional documents (0.2.0)](#12-professional-documents-020)
 - [13. Charts, Excel and CSV (0.3.0)](#13-charts-excel-and-csv-030)
+- [14. Word, pivot tables, streaming and async (0.4.0)](#14-word-pivot-tables-streaming-and-async-040)
 
 ## 1. Concepts
 
@@ -433,3 +434,52 @@ dependency. Exports are limited to `maxExportRows` (100 000 by default).
 @Report(value = "sales", format = OutputFormat.XLSX)           // template tables → workbook
 @Report(format = OutputFormat.CSV, filename = "clients.csv")   // method returns a List: no template
 ```
+
+## 14. Word, pivot tables, streaming and async (0.4.0)
+
+### Word
+
+Add `io.github.juste120:docmint-word`, then render any template as `OutputFormat.DOCX` (or
+`@Report(format = OutputFormat.DOCX)`). Converted: headings, paragraphs, bold/italic/underline,
+line breaks, lists, tables (bold header rows, `colspan`), images (logos and template images,
+QR codes, charts), `.page-break`, and `docmint-header` / `docmint-footer` with page numbers.
+CSS layout (positions, colours, widths) is not reproduced: Word documents are meant to be edited.
+Data is always inserted as text: no macros, no fields built from data.
+
+### Pivot tables
+
+```html
+{% set p = pivot(sales, rows="city", columns="month", value="amount", aggregate="sum", sort=true) %}
+<table>
+  <tr><th></th>{% for c in p.columnKeys %}<th>{{ c }}</th>{% endfor %}<th>Total</th></tr>
+  {% for r in p.rowKeys %}{% set i = loop.index %}
+  <tr><td>{{ r }}</td>{% for c in p.columnKeys %}<td>{{ p.cells[i][loop.index] | default("-") }}</td>{% endfor %}<td>{{ p.rowTotals[i] }}</td></tr>
+  {% endfor %}
+  <tr><td>Total</td>{% for t in p.columnTotals %}<td>{{ t }}</td>{% endfor %}<td>{{ p.total }}</td></tr>
+</table>
+```
+
+Aggregates: `sum`, `count`, `avg` (2 decimals), `min`, `max`. Keys keep their order of
+appearance unless `sort=true`. Limits: 10 000 input rows, 500 row keys and 500 column keys. In
+Java: `PivotTable.compute(items, rowKey, columnKey, value, aggregate, sorted)`.
+
+### Streaming
+
+```java
+docMint.render(request, outputStream);                               // write a document to a stream
+long rows = docMint.exportCsv(repository.streamAll(), out, null);     // CSV row by row
+```
+
+`exportCsv` reads the rows while writing, so memory does not depend on the number of rows (the
+row limit does not apply). In Spring, a `@Report(format = CSV)` method returning a
+`java.util.stream.Stream` is streamed to the response.
+
+### Asynchronous rendering
+
+```java
+docMint.renderAsync(RenderRequest.of("statement", data))
+    .thenAccept(document -> mailer.send(document.content()));
+```
+
+The executor defaults to a pool of daemon threads (one per processor); set your own with
+`DocMintBuilder.executor(...)`. In Spring, a `@Report` method may return a `CompletableFuture`.

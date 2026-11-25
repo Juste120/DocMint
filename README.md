@@ -27,6 +27,8 @@ byte[] pdf = docMint.pdf("invoice", invoice);
   protection, PNG previews, and an Angular helper library.
 - **Charts and spreadsheets**: `{{ chart(type="bar", ...) }}` in any document; export the same
   template — or a list of `@ExcelColumn` objects — to Excel (`docmint-excel`) or CSV.
+- **Word and large volumes**: render any template as `.docx` (`docmint-word`), cross tables with
+  `pivot(...)`, stream CSV exports of millions of rows, asynchronous rendering.
 - **Secure by default**: no path traversal, no remote resources (SSRF), no XXE, auto-escaping,
   sandboxed templates, size/page/time limits, clean JSON errors.
 
@@ -46,7 +48,8 @@ Java 17 or later. Spring Boot 4.x for the starter.
 </dependency>
 ```
 
-**Plain Java** — use `docmint-core` instead. **Excel** — add `docmint-excel`. Several DocMint modules? Import `docmint-bom`.
+**Plain Java** — use `docmint-core` instead. **Excel** — add `docmint-excel`. **Word** — add
+`docmint-word`. Several DocMint modules? Import `docmint-bom`.
 
 Gradle: `implementation("io.github.juste120:docmint-spring-boot-starter:0.1.0")`.
 
@@ -178,6 +181,18 @@ byte[] csv = docMint.csv(rows);
 List<InvoiceRow> export() { … }      // Excel needs io.github.juste120:docmint-excel
 ```
 
+## Word, pivot tables, streaming, async
+
+```java
+docMint.render(new RenderRequest("contract", data, OutputFormat.DOCX, null));   // docmint-word
+docMint.exportCsv(repository.streamAll(), response.getOutputStream(), null);    // row by row
+CompletableFuture<RenderResponse> later = docMint.renderAsync(RenderRequest.of("statement", data));
+```
+
+```html
+{% set p = pivot(sales, rows="city", columns="month", value="amount", aggregate="sum") %}
+```
+
 **Angular**: `npm install @juste120/docmint-angular`, then
 `inject(DocMintClient).download('/api/invoices/1/pdf').subscribe()` — see
 [its README](docmint-angular/projects/docmint-angular/README.md).
@@ -252,8 +267,8 @@ applications. See [ADR-0003](docs/adr/0003-openhtmltopdf-and-jsoup.md).
 |---|---|
 | 0.1.0 | The PDF in one line |
 | 0.2.0 | Professional documents: headers/footers, watermark, QR and barcodes, amount in words, password protection, PNG preview, Angular helper |
-| **0.3.0** | Charts and Excel: `chart(...)`, Excel and CSV export (in progress) |
-| 0.4.0 | Word and large volumes: `.docx`, pivot tables, streaming, async generation |
+| 0.3.0 | Charts and Excel: `chart(...)`, Excel and CSV export |
+| **0.4.0** | Word and large volumes: `.docx`, pivot tables, streaming, async generation (in progress) |
 | 0.5.0 | Official documents: e-signature, PDF/A, accessibility |
 | 1.0.0 | Stable API, complete documentation, migration guide from JasperReports |
 

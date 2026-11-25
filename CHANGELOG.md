@@ -8,6 +8,19 @@ minor versions may change the public API; every such change is listed here.
 
 ## [Unreleased]
 
+## [0.4.0] - Not yet released
+
+### Added
+
+- Optional module `docmint-word`: any template as a Word document (`OutputFormat.DOCX`):
+  headings, formatting, lists, tables, images, page breaks, header/footer with page numbers.
+- `pivot(...)` template function and `PivotTable` (sum, count, avg, min, max, totals).
+- `DocMint.render(request, OutputStream)`, `DocMint.exportCsv(Stream, OutputStream, CsvSettings)`
+  (row by row), `DocMint.renderAsync(request)` and `DocMintBuilder.executor(...)`.
+- `PostProcessor`s are discovered with `ServiceLoader`; HTML output inlines template images.
+- Starter: `@Report(format = DOCX)`, streamed CSV for methods returning a `Stream`,
+  `CompletableFuture` results.
+
 ## [0.3.0] - Not yet released
 
 ### Added
@@ -73,7 +86,8 @@ minor versions may change the public API; every such change is listed here.
 - `docmint-bom`.
 - Demo Spring Boot API and Angular application (not published).
 
-[Unreleased]: https://github.com/Juste120/DocMint/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Juste120/DocMint/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Juste120/DocMint/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Juste120/DocMint/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Juste120/DocMint/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Juste120/DocMint/releases/tag/v0.1.0

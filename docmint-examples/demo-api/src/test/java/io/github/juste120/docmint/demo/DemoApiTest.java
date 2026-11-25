@@ -221,4 +221,36 @@ class DemoApiTest {
     assertThat(csv)
         .startsWith("\uFEFFN° facture;Client;Date\r\nF-2026-001;Kossi Mensah;2026-11-24");
   }
+
+  @Test
+  void wordAttestationAndStreamedCsv() throws Exception {
+    byte[] docx =
+        mvc.perform(get("/api/employees/1/attestation.docx"))
+            .andExpect(status().isOk())
+            .andExpect(
+                header()
+                    .string(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        startsWith("inline; filename=\"attestation-MAT-0042.docx\"")))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    try (var word =
+        new org.apache.poi.xwpf.usermodel.XWPFDocument(new java.io.ByteArrayInputStream(docx))) {
+      String text =
+          word.getParagraphs().stream()
+              .map(org.apache.poi.xwpf.usermodel.XWPFParagraph::getText)
+              .reduce("", (a, b) -> a + "\n" + b);
+      assertThat(text).contains("ATTESTATION DE TRAVAIL").contains("Yawo Agbeko");
+      assertThat(word.getHeaderList()).isNotEmpty();
+    }
+    String csv =
+        new String(
+            mvc.perform(get("/api/invoices/stream.csv"))
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray(),
+            java.nio.charset.StandardCharsets.UTF_8);
+    assertThat(csv).contains("F-2026-002;Akossiwa Ɖogbe");
+  }
 }

@@ -9,6 +9,7 @@ import io.github.juste120.docmint.spring.web.Disposition;
 import io.github.juste120.docmint.spring.web.Report;
 import io.github.juste120.docmint.spring.web.ReportContent;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,13 @@ public class InvoiceController {
       disposition = Disposition.ATTACHMENT)
   public List<InvoiceSummaryResponse> exportExcel() {
     return service.findAll();
+  }
+
+  /** Streamed CSV: rows are written one by one (use a repository Stream for large tables). */
+  @GetMapping("/stream.csv")
+  @Report(format = OutputFormat.CSV, filename = "factures-flux.csv")
+  public Stream<InvoiceSummaryResponse> exportStream() {
+    return service.findAll().stream();
   }
 
   /** The same list as CSV (';' and BOM: opens directly in Excel in French). */

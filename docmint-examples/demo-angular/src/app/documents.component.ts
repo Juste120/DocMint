@@ -63,6 +63,8 @@ export class DocumentsComponent {
     { label: 'Relevé des ventes 2026 en Excel', path: 'reports/sales/xlsx' },
     { label: 'Liste des factures en Excel', path: 'invoices/export.xlsx' },
     { label: 'Liste des factures en CSV', path: 'invoices/export.csv' },
+    { label: 'Attestation de travail en Word', path: 'employees/1/attestation.docx' },
+    { label: 'Liste des factures en CSV (streaming)', path: 'invoices/stream.csv' },
   ];
 
   view(doc: DocumentLink): void {

@@ -4,6 +4,7 @@ import io.github.juste120.docmint.demo.dto.request.AttestationRequest;
 import io.github.juste120.docmint.demo.dto.response.AttestationResponse;
 import io.github.juste120.docmint.demo.dto.response.EmployeeSummaryResponse;
 import io.github.juste120.docmint.demo.service.EmployeeService;
+import io.github.juste120.docmint.domain.OutputFormat;
 import io.github.juste120.docmint.domain.Permission;
 import io.github.juste120.docmint.domain.Protection;
 import io.github.juste120.docmint.spring.web.Report;
@@ -41,5 +42,16 @@ public class EmployeeController {
         .withProtection(
             Protection.openPassword(attestation.registrationNumber().toCharArray())
                 .withPermissions(Permission.PRINT, Permission.PRINT_HIGH_QUALITY));
+  }
+
+  /** The same attestation as an editable Word document (module docmint-word). */
+  @GetMapping("/{id}/attestation.docx")
+  @Report(
+      value = "attestation",
+      filename = "attestation-{registrationNumber}.docx",
+      format = OutputFormat.DOCX)
+  public AttestationResponse attestationWord(
+      @PathVariable Long id, @Valid AttestationRequest request) {
+    return service.attestation(id, request);
   }
 }
