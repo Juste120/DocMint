@@ -31,7 +31,16 @@ jobs:
       # Tests, JaCoCo (>= 80 % on docmint-core), SpotBugs, Javadoc, architecture rules.
       # On JDK 21 the 'format' profile also runs the Spotless formatting check.
       - name: Verify
-        run: ./mvnw -B -ntp verify
+        shell: bash
+        run: |
+          set -o pipefail
+          ./mvnw -B -ntp verify 2>&1 | tee build.log
+      - name: Report build errors as annotations
+        if: failure()
+        shell: bash
+        run: |
+          grep -E '^\[ERROR\]|<<< (FAILURE|ERROR)!|expected|but was' build.log | grep -v '^\[ERROR\] *$' \
+            | head -40 | while IFS= read -r line; do echo "::error::${line:0:900}"; done
       - name: Upload coverage report
         if: matrix.java == '21'
         uses: actions/upload-artifact@v7
@@ -49,6 +58,8 @@ jobs:
   dependency-check:
     name: OWASP Dependency-Check
     runs-on: ubuntu-latest
+    env:
+      NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
@@ -56,11 +67,14 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      # Fails the build on any vulnerability with CVSS >= 9 (critical).
+      # Fails the build on any vulnerability with CVSS >= 9 (critical). Needs the NVD_API_KEY
+      # secret (free key from nvd.nist.gov): without it, the NVD download is throttled.
       - name: Scan dependencies
-        env:
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        if: env.NVD_API_KEY != ''
         run: ./mvnw -B -ntp -DskipTests -DskipExamples -P security-scan verify -Dspotbugs.skip -Dmaven.javadoc.skip -Djacoco.skip
+      - name: Warn when the NVD key is missing
+        if: env.NVD_API_KEY == ''
+        run: echo "::warning::Dependency scan skipped - add the NVD_API_KEY repository secret to enable it."
 
   secrets:
     name: Secret scan
