@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "demo-api",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12+1.1-tem && ./mvnw -q -B -pl docmint-examples/demo-api -am spring-boot:run -DskipTests -Dspotbugs.skip -Djacoco.skip -Dmaven.javadoc.skip -Dspotless.check.skip"
+      ],
+      "port": 8080
+    },
+    {
+      "name": "demo-angular",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "export PATH=$HOME/.nvm/versions/node/v24.22.2/bin:$PATH && cd docmint-examples/demo-angular && npx ng serve --port 4200"
+      ],
+      "port": 4200
+    }
+  ]
+}
