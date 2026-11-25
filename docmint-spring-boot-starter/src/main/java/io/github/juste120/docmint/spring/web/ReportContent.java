@@ -1,6 +1,7 @@
 package io.github.juste120.docmint.spring.web;
 
 import io.github.juste120.docmint.api.RenderOptions;
+import io.github.juste120.docmint.domain.CsvSettings;
 import io.github.juste120.docmint.domain.PreviewSettings;
 import io.github.juste120.docmint.domain.Protection;
 import io.github.juste120.docmint.domain.Watermark;
@@ -72,6 +73,16 @@ public record ReportContent(Object data, RenderOptions options) {
    */
   public ReportContent withPreview(PreviewSettings preview) {
     return new ReportContent(data, options.withPreview(preview));
+  }
+
+  /**
+   * Returns a copy with another CSV dialect (for {@code format = CSV}).
+   *
+   * @param csv the separator and BOM settings
+   * @return the new content
+   */
+  public ReportContent withCsv(CsvSettings csv) {
+    return new ReportContent(data, options.withCsv(csv));
   }
 
   /**

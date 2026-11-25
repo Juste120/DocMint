@@ -39,7 +39,8 @@ public class DocMintAutoConfiguration {
                     properties.limits().maxTemplateSize().toBytes(),
                     properties.limits().maxPages(),
                     properties.limits().maxRenderTime(),
-                    properties.limits().maxImagePixels()))
+                    properties.limits().maxImagePixels(),
+                    properties.limits().maxExportRows()))
             .missingResources(properties.resources().missing());
     DocMintProperties.WatermarkDefaults watermark = properties.watermark();
     if (watermark.text() != null && !watermark.text().isBlank()) {

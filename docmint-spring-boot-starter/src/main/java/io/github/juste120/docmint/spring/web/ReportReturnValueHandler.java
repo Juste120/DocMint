@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.core.MethodParameter;
@@ -67,10 +68,7 @@ public final class ReportReturnValueHandler implements HandlerMethodReturnValueH
     }
     checkAccept(request, report.format());
     String template = report.value();
-    if (template.isBlank()) {
-      throw new InvalidReportMethodException(
-          "@Report on method '" + method + "' has no template name: use @Report(\"invoice\").");
-    }
+    boolean tabular = report.format() == OutputFormat.CSV || report.format() == OutputFormat.XLSX;
     Object value =
         returnValue instanceof Optional<?> optional ? optional.orElse(null) : returnValue;
     RenderOptions options = RenderOptions.defaults();
@@ -87,14 +85,28 @@ public final class ReportReturnValueHandler implements HandlerMethodReturnValueH
           null);
     }
 
+    // A list exported as CSV or Excel needs no template: columns come from @ExcelColumn.
+    boolean listExport = template.isBlank() && tabular && data instanceof Collection<?>;
+    if (template.isBlank() && !listExport) {
+      throw new InvalidReportMethodException(
+          "@Report on method '"
+              + method
+              + "' has no template name: use @Report(\"invoice\"), or return a collection with"
+              + " format = CSV or XLSX.");
+    }
     String extension = "." + report.format().fileExtension();
+    String baseName = listExport ? "export" : template;
     String fileName =
         options.fileName() != null
             ? ReportFileNameResolver.sanitise(options.fileName(), extension)
-            : ReportFileNameResolver.resolve(report.filename(), template, data, extension);
+            : listExport && report.filename().isBlank()
+                ? baseName + extension
+                : ReportFileNameResolver.resolve(report.filename(), baseName, data, extension);
+    RenderOptions effective = options.withFileName(fileName);
     RenderResponse document =
-        docMint.render(
-            new RenderRequest(template, data, report.format(), options.withFileName(fileName)));
+        listExport
+            ? docMint.export((Collection<?>) data, report.format(), effective)
+            : docMint.render(new RenderRequest(template, data, report.format(), effective));
 
     ContentDisposition disposition =
         (report.disposition() == Disposition.ATTACHMENT

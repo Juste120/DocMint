@@ -1,5 +1,6 @@
 package io.github.juste120.docmint.spring.testapp;
 
+import io.github.juste120.docmint.domain.CsvSettings;
 import io.github.juste120.docmint.domain.OutputFormat;
 import io.github.juste120.docmint.domain.PreviewSettings;
 import io.github.juste120.docmint.domain.Protection;
@@ -8,6 +9,7 @@ import io.github.juste120.docmint.spring.web.Disposition;
 import io.github.juste120.docmint.spring.web.Report;
 import io.github.juste120.docmint.spring.web.ReportContent;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -140,6 +142,36 @@ public class TestApplication {
     @Report(value = "invoice", format = OutputFormat.PNG)
     public ReportContent previewMissingPage() {
       return ReportContent.of(invoice("I-2")).withPreview(new PreviewSettings(2, 96));
+    }
+
+    @GetMapping("/v3/table.csv")
+    @Report(value = "table", format = OutputFormat.CSV)
+    public Map<String, Object> tableCsv() {
+      return Map.of();
+    }
+
+    @GetMapping("/v3/list.csv")
+    @Report(format = OutputFormat.CSV, filename = "clients.csv")
+    public List<Customer> listCsv() {
+      return List.of(new Customer("Kossi Mensah", "C-01"), new Customer("=1+1", "C-02"));
+    }
+
+    @GetMapping("/v3/list-default.csv")
+    @Report(format = OutputFormat.CSV)
+    public ReportContent listDefault() {
+      return ReportContent.of(List.of(new Customer("Ama", "C-03"))).withCsv(CsvSettings.rfc4180());
+    }
+
+    @GetMapping("/v3/table.html")
+    @Report(value = "table", format = OutputFormat.HTML)
+    public Map<String, Object> tableHtml() {
+      return Map.of();
+    }
+
+    @GetMapping("/v3/no-template")
+    @Report(format = OutputFormat.CSV)
+    public Customer notAList() {
+      return new Customer("x", "y");
     }
 
     @GetMapping("/json")

@@ -72,12 +72,14 @@ public record DocMintProperties(
    * @param maxPages maximum number of pages of a document
    * @param maxRenderTime maximum duration of a render
    * @param maxImagePixels maximum number of pixels of a PNG preview
+   * @param maxExportRows maximum number of rows of a CSV or Excel export
    */
   public record Limits(
       @DefaultValue("1MB") DataSize maxTemplateSize,
       @DefaultValue("500") int maxPages,
       @DefaultValue("30s") Duration maxRenderTime,
-      @DefaultValue("25000000") long maxImagePixels) {}
+      @DefaultValue("25000000") long maxImagePixels,
+      @DefaultValue("100000") int maxExportRows) {}
 
   /**
    * Default watermark, e.g. {@code TEST} on a staging server.

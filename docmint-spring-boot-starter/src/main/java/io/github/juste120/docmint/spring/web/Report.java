@@ -61,8 +61,10 @@ public @interface Report {
   Disposition disposition() default Disposition.INLINE;
 
   /**
-   * The output format: {@link OutputFormat#PDF} (default) or {@link OutputFormat#PNG} for an image
-   * preview of a page.
+   * The output format: {@link OutputFormat#PDF} (default), {@link OutputFormat#PNG} (preview of a
+   * page), {@link OutputFormat#HTML}, {@link OutputFormat#CSV} or {@link OutputFormat#XLSX} (with
+   * {@code docmint-excel}). With CSV or XLSX, a method returning a collection needs no template:
+   * columns come from {@code @ExcelColumn}.
    *
    * @return the format
    */
