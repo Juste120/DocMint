@@ -64,6 +64,7 @@ export class DocumentsComponent {
     { label: 'Liste des factures en Excel', path: 'invoices/export.xlsx' },
     { label: 'Liste des factures en CSV', path: 'invoices/export.csv' },
     { label: 'Attestation de travail en Word', path: 'employees/1/attestation.docx' },
+    { label: 'Attestation signée électroniquement (PDF/A)', path: 'employees/1/attestation-signee.pdf' },
     { label: 'Liste des factures en CSV (streaming)', path: 'invoices/stream.csv' },
   ];
 

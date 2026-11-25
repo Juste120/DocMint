@@ -253,4 +253,21 @@ class DemoApiTest {
             java.nio.charset.StandardCharsets.UTF_8);
     assertThat(csv).contains("F-2026-002;Akossiwa Ɖogbe");
   }
+
+  @Test
+  void signedPdfAAttestation() throws Exception {
+    byte[] pdf =
+        keep(
+            "attestation-signee.pdf",
+            mvc.perform(get("/api/employees/1/attestation-signee.pdf"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray());
+    try (PDDocument document = Loader.loadPDF(pdf)) {
+      assertThat(document.getLastSignatureDictionary().getLocation()).isEqualTo("Lomé, Togo");
+      assertThat(document.getDocumentCatalog().getOutputIntents()).isNotEmpty();
+      assertThat(document.getDocumentCatalog().getStructureTreeRoot()).isNotNull();
+    }
+  }
 }

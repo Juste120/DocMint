@@ -8,6 +8,24 @@ minor versions may change the public API; every such change is listed here.
 
 ## [Unreleased]
 
+## [0.5.0] - Not yet released
+
+### Added
+
+- PDF/A (`PdfStandard`: 2b, 2u, 2a, 3b, 3u, 3a) with sRGB output intent and XMP metadata.
+- Accessible, tagged PDFs (PDF/UA); title and language added when the template has none.
+- Optional module `docmint-signature`: electronic signature with a PKCS#12 key store (detached
+  CMS, SHA-256, certificate chain), compatible with PDF/A.
+- `RenderOptions.withPdfStandard/withAccessible/withSignature`, builder defaults, starter
+  properties `docmint.pdf.*` and `docmint.signature.*`, `ReportContent` methods.
+- `PostProcessor.provides(...)`: a requested signature never silently disappears when the
+  module is missing. New code `DOCMINT_SIGNATURE_INVALID`.
+
+### Security
+
+- PDF/A or signature combined with password protection is refused; key store passwords are
+  `char[]`, redacted and wipeable.
+
 ## [0.4.0] - Not yet released
 
 ### Added
@@ -86,7 +104,8 @@ minor versions may change the public API; every such change is listed here.
 - `docmint-bom`.
 - Demo Spring Boot API and Angular application (not published).
 
-[Unreleased]: https://github.com/Juste120/DocMint/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/Juste120/DocMint/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/Juste120/DocMint/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Juste120/DocMint/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Juste120/DocMint/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Juste120/DocMint/compare/v0.1.0...v0.2.0

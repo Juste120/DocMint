@@ -1,6 +1,6 @@
 # DocMint user guide
 
-This guide covers DocMint 0.1.0 to 0.4.0. For a quick start, read the [README](../README.md)
+This guide covers DocMint 0.1.0 to 0.5.0. For a quick start, read the [README](../README.md)
 first.
 
 - [1. Concepts](#1-concepts)
@@ -17,6 +17,7 @@ first.
 - [12. Professional documents (0.2.0)](#12-professional-documents-020)
 - [13. Charts, Excel and CSV (0.3.0)](#13-charts-excel-and-csv-030)
 - [14. Word, pivot tables, streaming and async (0.4.0)](#14-word-pivot-tables-streaming-and-async-040)
+- [15. Official documents: PDF/A, accessibility, signature (0.5.0)](#15-official-documents-pdfa-accessibility-signature-050)
 
 ## 1. Concepts
 
@@ -483,3 +484,43 @@ docMint.renderAsync(RenderRequest.of("statement", data))
 
 The executor defaults to a pool of daemon threads (one per processor); set your own with
 `DocMintBuilder.executor(...)`. In Spring, a `@Report` method may return a `CompletableFuture`.
+
+## 15. Official documents: PDF/A, accessibility, signature (0.5.0)
+
+### PDF/A
+
+```java
+docMint.render(RenderRequest.of("invoice", data)
+    .withOptions(RenderOptions.defaults().withPdfStandard(PdfStandard.PDF_A_3B)));
+DocMint.builder().pdfStandard(PdfStandard.PDF_A_3B).build();      // every PDF
+```
+
+Levels: `PDF_A_2B`, `PDF_A_2U`, `PDF_A_2A`, `PDF_A_3B` (recommended for invoices and archives),
+`PDF_A_3U`, `PDF_A_3A`. DocMint embeds the fonts, adds an sRGB output intent and the XMP
+metadata (`pdfaid`), and uses the template's `<title>` (or its name) as document title.
+PDF/A forbids encryption: combining it with password protection is refused.
+
+### Accessibility (PDF/UA)
+
+`withAccessible(true)` or `DocMintBuilder.accessible(true)` produces a tagged PDF with its
+language (the template's `lang`, or the render locale) and title, so screen readers can read
+it. Give images an `alt` text (QR codes and charts have one).
+
+### Electronic signature
+
+Add `io.github.juste120:docmint-signature`, then:
+
+```java
+SignatureSettings signature =
+    SignatureSettings.pkcs12(Files.readAllBytes(Path.of("company.p12")), password)
+        .withReason("Attestation officielle").withLocation("Lomé, Togo");
+docMint.render(RenderRequest.of("attestation", data)
+    .withOptions(RenderOptions.defaults().withSignature(signature)));
+```
+
+or with Spring properties (`docmint.signature.key-store`, `.password`, `.alias`, `.reason`,
+`.location`, `.contact`). The signature is a detached CMS (SHA-256) covering the whole file, with
+the certificate chain; any later modification invalidates it. It works with PDF/A. Use a
+certificate from a certification authority recognised by your readers; keep the key store and
+its password out of the repository (environment variables, secret store). A signed document
+cannot also be password-protected by DocMint. Timestamping (TSA) is not included yet.

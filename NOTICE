@@ -14,4 +14,5 @@ Runtime dependencies (not bundled, resolved by your build tool):
 - Apache PDFBox (Apache License 2.0)
 - jsoup (MIT License)
 - ZXing core (Apache License 2.0)
+- Optional modules: Apache POI (Apache License 2.0), Bouncy Castle (Bouncy Castle Licence, MIT-style)
 - SLF4J API (MIT License)

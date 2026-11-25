@@ -5,8 +5,10 @@ import io.github.juste120.docmint.demo.dto.response.AttestationResponse;
 import io.github.juste120.docmint.demo.dto.response.EmployeeSummaryResponse;
 import io.github.juste120.docmint.demo.service.EmployeeService;
 import io.github.juste120.docmint.domain.OutputFormat;
+import io.github.juste120.docmint.domain.PdfStandard;
 import io.github.juste120.docmint.domain.Permission;
 import io.github.juste120.docmint.domain.Protection;
+import io.github.juste120.docmint.domain.SignatureSettings;
 import io.github.juste120.docmint.spring.web.Report;
 import io.github.juste120.docmint.spring.web.ReportContent;
 import jakarta.validation.Valid;
@@ -22,9 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class EmployeeController {
 
   private final EmployeeService service;
+  private final SignatureSettings signature;
 
-  public EmployeeController(EmployeeService service) {
+  public EmployeeController(EmployeeService service, SignatureSettings signature) {
     this.service = service;
+    this.signature = signature;
   }
 
   @GetMapping
@@ -53,5 +57,15 @@ public class EmployeeController {
   public AttestationResponse attestationWord(
       @PathVariable Long id, @Valid AttestationRequest request) {
     return service.attestation(id, request);
+  }
+
+  /** Official version: PDF/A-3b (archiving), accessible, and electronically signed. */
+  @GetMapping("/{id}/attestation-signee.pdf")
+  @Report(value = "attestation", filename = "attestation-{registrationNumber}-signee.pdf")
+  public ReportContent signedAttestation(@PathVariable Long id, @Valid AttestationRequest request) {
+    return ReportContent.of(service.attestation(id, request))
+        .withPdfStandard(PdfStandard.PDF_A_3B)
+        .withAccessible(true)
+        .withSignature(signature);
   }
 }

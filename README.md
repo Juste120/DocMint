@@ -29,6 +29,8 @@ byte[] pdf = docMint.pdf("invoice", invoice);
   template — or a list of `@ExcelColumn` objects — to Excel (`docmint-excel`) or CSV.
 - **Word and large volumes**: render any template as `.docx` (`docmint-word`), cross tables with
   `pivot(...)`, stream CSV exports of millions of rows, asynchronous rendering.
+- **Official documents**: PDF/A archiving, accessible tagged PDFs (PDF/UA) and electronic
+  signatures with your certificate (`docmint-signature`).
 - **Secure by default**: no path traversal, no remote resources (SSRF), no XXE, auto-escaping,
   sandboxed templates, size/page/time limits, clean JSON errors.
 
@@ -48,8 +50,8 @@ Java 17 or later. Spring Boot 4.x for the starter.
 </dependency>
 ```
 
-**Plain Java** — use `docmint-core` instead. **Excel** — add `docmint-excel`. **Word** — add
-`docmint-word`. Several DocMint modules? Import `docmint-bom`.
+**Plain Java** — use `docmint-core` instead. Optional modules: `docmint-excel` (Excel),
+`docmint-word` (Word), `docmint-signature` (electronic signature). Several DocMint modules? Import `docmint-bom`.
 
 Gradle: `implementation("io.github.juste120:docmint-spring-boot-starter:0.1.0")`.
 
@@ -193,6 +195,20 @@ CompletableFuture<RenderResponse> later = docMint.renderAsync(RenderRequest.of("
 {% set p = pivot(sales, rows="city", columns="month", value="amount", aggregate="sum") %}
 ```
 
+## PDF/A, accessibility, electronic signature
+
+```yaml
+docmint:
+  pdf:
+    standard: pdf-a-3b        # archiving
+    accessible: true          # tagged PDF for screen readers
+  signature:                  # needs io.github.juste120:docmint-signature
+    key-store: file:/etc/docmint/company.p12
+    password: ${DOCMINT_SIGNATURE_PASSWORD}
+    reason: Document officiel
+    location: Lomé, Togo
+```
+
 **Angular**: `npm install @juste120/docmint-angular`, then
 `inject(DocMintClient).download('/api/invoices/1/pdf').subscribe()` — see
 [its README](docmint-angular/projects/docmint-angular/README.md).
@@ -217,6 +233,9 @@ All [Pebble](https://pebbletemplates.io/wiki/) tags and filters are available (`
 | `docmint.watermark.text` / `.angle` / `.opacity` / `.color` | none | Watermark on every document (e.g. `TEST` on staging) |
 | `docmint.limits.max-image-pixels` | `25000000` | Maximum size of a PNG preview |
 | `docmint.limits.max-export-rows` | `100000` | Maximum rows of a CSV or Excel export |
+| `docmint.pdf.standard` | none | PDF/A level of every PDF (`pdf-a-3b`, `pdf-a-2u`…) |
+| `docmint.pdf.accessible` | `false` | Tagged, accessible PDFs (PDF/UA) |
+| `docmint.signature.key-store` / `.password` / `.alias` / `.reason` / `.location` | none | Sign every PDF (PKCS#12, `docmint-signature`) |
 
 Without Spring: `DocMint.builder().templatesPath("documents").locale(Locale.ENGLISH).build()`.
 
@@ -259,6 +278,8 @@ applications. See [ADR-0003](docs/adr/0003-openhtmltopdf-and-jsoup.md).
 
 - [User guide](docs/user-guide.md) — templates, filters, layouts, errors, security, limits
 - [Architecture](docs/architecture.md) and [decision records](docs/adr/)
+- [Migrating from JasperReports](docs/migrating-from-jasperreports.md)
+- [Trying a snapshot in another project](docs/try-locally.md)
 - [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md) · [Changelog](CHANGELOG.md)
 
 ## Roadmap
@@ -268,8 +289,8 @@ applications. See [ADR-0003](docs/adr/0003-openhtmltopdf-and-jsoup.md).
 | 0.1.0 | The PDF in one line |
 | 0.2.0 | Professional documents: headers/footers, watermark, QR and barcodes, amount in words, password protection, PNG preview, Angular helper |
 | 0.3.0 | Charts and Excel: `chart(...)`, Excel and CSV export |
-| **0.4.0** | Word and large volumes: `.docx`, pivot tables, streaming, async generation (in progress) |
-| 0.5.0 | Official documents: e-signature, PDF/A, accessibility |
+| 0.4.0 | Word and large volumes: `.docx`, pivot tables, streaming, async generation |
+| **0.5.0** | Official documents: e-signature, PDF/A, accessibility (in progress) |
 | 1.0.0 | Stable API, complete documentation, migration guide from JasperReports |
 
 Details in [ROADMAP.md](ROADMAP.md).

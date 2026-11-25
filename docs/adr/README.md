@@ -22,3 +22,5 @@ alternatives). A decision is never edited after acceptance: a new ADR supersedes
 | [0015](0015-docmint-excel-module.md) | Optional docmint-excel module and TableWriter SPI | Accepted |
 | [0016](0016-word-export-poi.md) | Word export with Apache POI XWPF | Accepted |
 | [0017](0017-streaming-and-async.md) | Streaming and asynchronous rendering | Accepted |
+| [0018](0018-pdfa-and-pdfua.md) | PDF/A and PDF/UA through OpenHTMLtoPDF | Accepted |
+| [0019](0019-electronic-signature.md) | Electronic signature module | Accepted |
