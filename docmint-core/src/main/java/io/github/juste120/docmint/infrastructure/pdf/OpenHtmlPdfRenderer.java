@@ -118,7 +118,7 @@ public final class OpenHtmlPdfRenderer implements DocumentRenderer {
   private static org.w3c.dom.Document toW3c(String html, String css, String baseUri) {
     Document document = Jsoup.parse(html, baseUri);
     Element style = new Element("style").attr("data-docmint", "default");
-    style.appendChild(new DataNode(css));
+    style.appendChild(new DataNode(css + PageMarginBoxes.apply(document)));
     document.head().prependChild(style);
     return new W3CDom().fromJsoup(document);
   }

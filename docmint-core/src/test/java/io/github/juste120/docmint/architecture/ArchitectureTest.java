@@ -18,7 +18,11 @@ class ArchitectureTest {
           .importPackages(ROOT);
 
   private static final String[] THIRD_PARTY_ENGINES = {
-    "io.pebbletemplates..", "com.openhtmltopdf..", "org.apache.pdfbox..", "org.jsoup.."
+    "io.pebbletemplates..",
+    "com.openhtmltopdf..",
+    "org.apache.pdfbox..",
+    "org.jsoup..",
+    "com.google.zxing.."
   };
 
   @Test

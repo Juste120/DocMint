@@ -34,6 +34,19 @@ public final class PdfText {
     }
   }
 
+  /** Returns the text of one page (1-based), sorted by position on the page. */
+  public static String sortedPageText(byte[] pdf, int page) {
+    try (PDDocument document = Loader.loadPDF(pdf)) {
+      PDFTextStripper stripper = new PDFTextStripper();
+      stripper.setSortByPosition(true);
+      stripper.setStartPage(page);
+      stripper.setEndPage(page);
+      return normalise(stripper.getText(document));
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
   /** Returns the number of pages. */
   public static int pages(byte[] pdf) {
     try (PDDocument document = Loader.loadPDF(pdf)) {

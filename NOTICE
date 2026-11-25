@@ -13,4 +13,5 @@ Runtime dependencies (not bundled, resolved by your build tool):
 - OpenHTMLtoPDF (GNU LGPL 2.1 or later), used unmodified as a separate library
 - Apache PDFBox (Apache License 2.0)
 - jsoup (MIT License)
+- ZXing core (Apache License 2.0)
 - SLF4J API (MIT License)

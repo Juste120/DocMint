@@ -22,7 +22,9 @@ public final class LimitExceededException extends RenderException {
     /** Number of pages of the document. */
     PAGES("max pages", "maxPages", "docmint.limits.max-pages"),
     /** Duration of the render. */
-    RENDER_TIME("max render time", "maxRenderTime", "docmint.limits.max-render-time");
+    RENDER_TIME("max render time", "maxRenderTime", "docmint.limits.max-render-time"),
+    /** Number of pixels of a generated image. */
+    IMAGE_SIZE("max image size", "maxImagePixels", "docmint.limits.max-image-pixels");
 
     private final String label;
     private final String builderSetting;

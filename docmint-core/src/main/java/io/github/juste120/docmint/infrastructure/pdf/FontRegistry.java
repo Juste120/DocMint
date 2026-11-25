@@ -75,6 +75,11 @@ public final class FontRegistry {
     }
   }
 
+  /** Returns the bytes of the embedded regular font (used by the watermark). */
+  static byte[] defaultRegularFont() {
+    return BUILT_IN.get(0).bytes().clone();
+  }
+
   private static List<LoadedFont> builtIn() {
     ClassLoader loader = FontRegistry.class.getClassLoader();
     return List.of(

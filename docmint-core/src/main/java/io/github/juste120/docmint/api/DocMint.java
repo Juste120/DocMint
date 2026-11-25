@@ -1,6 +1,7 @@
 package io.github.juste120.docmint.api;
 
 import io.github.juste120.docmint.application.ReportService;
+import io.github.juste120.docmint.domain.OutputFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -74,6 +75,19 @@ public final class DocMint {
         RenderRequest.of(templateName, data)
             .withOptions(RenderOptions.defaults().withLocale(locale));
     return render(request).content();
+  }
+
+  /**
+   * Renders the first page of a template as a PNG image at 96 DPI (preview, thumbnail).
+   *
+   * @param templateName the template name
+   * @param data the data exposed to the template, not null
+   * @return the PNG bytes
+   * @throws DocMintException if the template cannot be found or rendered
+   */
+  public byte[] png(String templateName, Object data) {
+    return render(new RenderRequest(templateName, data, OutputFormat.PNG, RenderOptions.defaults()))
+        .content();
   }
 
   /**

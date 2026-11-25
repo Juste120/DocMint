@@ -2,14 +2,8 @@
  * DocMint default print stylesheet. It is inserted BEFORE the template's own styles, so any rule
  * written in a template overrides it. The @page size and margins are generated from PageSettings.
  */
-@page {
-  @bottom-center {
-    content: "Page " counter(page) " / " counter(pages);
-    font-family: 'Noto Sans', sans-serif;
-    font-size: 8pt;
-    color: #555555;
-  }
-}
+/* The page footer ("Page X / Y" by default) and custom headers/footers (.docmint-header,
+   .docmint-footer) are generated per document: see PageMarginBoxes. */
 
 body {
   font-family: 'Noto Sans', sans-serif;
@@ -41,4 +35,12 @@ tr {
 
 img {
   max-width: 100%;
+}
+
+/* Page numbers inside custom headers and footers. */
+.docmint-page::after {
+  content: counter(page);
+}
+.docmint-pages::after {
+  content: counter(pages);
 }

@@ -7,12 +7,17 @@ import io.github.juste120.docmint.domain.MissingResourceMode;
 import io.github.juste120.docmint.domain.PageSettings;
 import io.github.juste120.docmint.domain.ResourceAccessPolicy;
 import io.github.juste120.docmint.domain.ResourceLimits;
+import io.github.juste120.docmint.domain.Watermark;
 import io.github.juste120.docmint.infrastructure.pdf.FontRegistry;
 import io.github.juste120.docmint.infrastructure.pdf.OpenHtmlPdfRenderer;
+import io.github.juste120.docmint.infrastructure.pdf.PdfProtectionPostProcessor;
+import io.github.juste120.docmint.infrastructure.pdf.PdfWatermarkPostProcessor;
+import io.github.juste120.docmint.infrastructure.pdf.PngPreviewPostProcessor;
 import io.github.juste120.docmint.infrastructure.pebble.PebbleTemplateEngine;
 import io.github.juste120.docmint.infrastructure.template.ClasspathTemplateResolver;
 import io.github.juste120.docmint.infrastructure.template.ConcurrentTemplateCache;
 import io.github.juste120.docmint.port.DocumentRenderer;
+import io.github.juste120.docmint.port.PostProcessor;
 import io.github.juste120.docmint.port.TemplateResolver;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +57,8 @@ public final class DocMintBuilder {
   private ClassLoader classLoader;
   private TemplateResolver templateResolver;
   private final List<DocumentRenderer> customRenderers = new ArrayList<>();
+  private final List<PostProcessor> customPostProcessors = new ArrayList<>();
+  private Watermark defaultWatermark;
 
   DocMintBuilder() {}
 
@@ -193,6 +200,29 @@ public final class DocMintBuilder {
   }
 
   /**
+   * Sets a watermark applied to every document that does not specify one (e.g. {@code TEST} on a
+   * staging server). None by default.
+   *
+   * @param watermark the watermark, or {@code null} for none
+   * @return this builder
+   */
+  public DocMintBuilder defaultWatermark(Watermark watermark) {
+    this.defaultWatermark = watermark;
+    return this;
+  }
+
+  /**
+   * Adds a post-processor, run after the built-in ones (expert use).
+   *
+   * @param postProcessor the post-processor
+   * @return this builder
+   */
+  public DocMintBuilder postProcessor(PostProcessor postProcessor) {
+    customPostProcessors.add(Objects.requireNonNull(postProcessor, "postProcessor"));
+    return this;
+  }
+
+  /**
    * Builds the instance.
    *
    * @return an immutable, thread-safe instance
@@ -223,9 +253,22 @@ public final class DocMintBuilder {
               + " trusted",
           policy.allowedHosts());
     }
+    // Order matters: watermark before encryption; conversion to an image last.
+    List<PostProcessor> postProcessors = new ArrayList<>();
+    postProcessors.add(new PdfWatermarkPostProcessor(templatesPath, loader));
+    postProcessors.add(new PdfProtectionPostProcessor());
+    postProcessors.addAll(customPostProcessors);
+    postProcessors.add(new PngPreviewPostProcessor());
     return new DocMint(
         new DefaultReportService(
-            resolver, engine, new RendererRegistry(renderers), locale, limits, loader));
+            resolver,
+            engine,
+            new RendererRegistry(renderers),
+            locale,
+            limits,
+            loader,
+            postProcessors,
+            defaultWatermark));
   }
 
   private static ClassLoader defaultClassLoader() {

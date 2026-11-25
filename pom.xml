@@ -63,6 +63,7 @@
     <openhtmltopdf.version>1.1.117</openhtmltopdf.version>
     <pdfbox.version>3.0.8</pdfbox.version>
     <jsoup.version>1.24.1</jsoup.version>
+    <zxing.version>3.5.4</zxing.version>
     <slf4j.version>2.0.20</slf4j.version>
     <spring-boot.version>4.2.0</spring-boot.version>
 
@@ -129,6 +130,11 @@
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>${jsoup.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.zxing</groupId>
+        <artifactId>core</artifactId>
+        <version>${zxing.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>

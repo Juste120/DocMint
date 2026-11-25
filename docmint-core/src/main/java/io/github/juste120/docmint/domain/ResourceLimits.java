@@ -9,8 +9,10 @@ import java.util.Objects;
  * @param maxTemplateBytes maximum size in bytes of each template file (layouts and includes too)
  * @param maxPages maximum number of pages of a generated document
  * @param maxRenderTime maximum duration of one render
+ * @param maxImagePixels maximum number of pixels of a generated image (PNG preview)
  */
-public record ResourceLimits(long maxTemplateBytes, int maxPages, Duration maxRenderTime) {
+public record ResourceLimits(
+    long maxTemplateBytes, int maxPages, Duration maxRenderTime, long maxImagePixels) {
 
   /** Default maximum template size: 1 MiB. */
   public static final long DEFAULT_MAX_TEMPLATE_BYTES = 1024L * 1024L;
@@ -20,6 +22,9 @@ public record ResourceLimits(long maxTemplateBytes, int maxPages, Duration maxRe
 
   /** Default maximum render time: 30 seconds. */
   public static final Duration DEFAULT_MAX_RENDER_TIME = Duration.ofSeconds(30);
+
+  /** Default maximum image size: 25 megapixels. */
+  public static final long DEFAULT_MAX_IMAGE_PIXELS = 25_000_000L;
 
   /** Ratio between the maximum rendered HTML size and the maximum template size. */
   private static final int RENDERED_SIZE_RATIO = 8;
@@ -43,6 +48,20 @@ public record ResourceLimits(long maxTemplateBytes, int maxPages, Duration maxRe
     if (maxRenderTime.isNegative() || maxRenderTime.isZero()) {
       throw new IllegalArgumentException("maxRenderTime must be > 0");
     }
+    if (maxImagePixels <= 0) {
+      throw new IllegalArgumentException("maxImagePixels must be > 0");
+    }
+  }
+
+  /**
+   * Creates limits with the default image size limit (V1 constructor).
+   *
+   * @param maxTemplateBytes maximum size in bytes of each template file
+   * @param maxPages maximum number of pages
+   * @param maxRenderTime maximum duration of one render
+   */
+  public ResourceLimits(long maxTemplateBytes, int maxPages, Duration maxRenderTime) {
+    this(maxTemplateBytes, maxPages, maxRenderTime, DEFAULT_MAX_IMAGE_PIXELS);
   }
 
   /**
@@ -72,7 +91,7 @@ public record ResourceLimits(long maxTemplateBytes, int maxPages, Duration maxRe
    * @return the new limits
    */
   public ResourceLimits withMaxTemplateBytes(long bytes) {
-    return new ResourceLimits(bytes, maxPages, maxRenderTime);
+    return new ResourceLimits(bytes, maxPages, maxRenderTime, maxImagePixels);
   }
 
   /**
@@ -82,7 +101,7 @@ public record ResourceLimits(long maxTemplateBytes, int maxPages, Duration maxRe
    * @return the new limits
    */
   public ResourceLimits withMaxPages(int pages) {
-    return new ResourceLimits(maxTemplateBytes, pages, maxRenderTime);
+    return new ResourceLimits(maxTemplateBytes, pages, maxRenderTime, maxImagePixels);
   }
 
   /**
@@ -92,6 +111,16 @@ public record ResourceLimits(long maxTemplateBytes, int maxPages, Duration maxRe
    * @return the new limits
    */
   public ResourceLimits withMaxRenderTime(Duration duration) {
-    return new ResourceLimits(maxTemplateBytes, maxPages, duration);
+    return new ResourceLimits(maxTemplateBytes, maxPages, duration, maxImagePixels);
+  }
+
+  /**
+   * Returns a copy with another image size limit.
+   *
+   * @param pixels the new limit, in pixels
+   * @return the new limits
+   */
+  public ResourceLimits withMaxImagePixels(long pixels) {
+    return new ResourceLimits(maxTemplateBytes, maxPages, maxRenderTime, pixels);
   }
 }
