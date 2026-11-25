@@ -36,6 +36,8 @@ Format the code before committing: `./mvnw spotless:apply`.
 Run the demo: `./mvnw -pl docmint-examples/demo-api -am spring-boot:run`, then
 `http://localhost:8080/api/invoices/1/pdf`.
 
+To try your build in another project, see [docs/try-locally.md](docs/try-locally.md).
+
 ## Project layout
 
 | Module | Content |
