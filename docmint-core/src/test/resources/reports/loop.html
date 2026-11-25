@@ -1,0 +1,1 @@
+<html><body><ul>{% for item in items %}<li>{{ loop.index }}/{{ loop.length }}{% if loop.first %} premier{% endif %}{% if loop.last %} dernier{% endif %} {{ item }} rev{{ loop.revindex }}</li>{% endfor %}</ul></body></html>

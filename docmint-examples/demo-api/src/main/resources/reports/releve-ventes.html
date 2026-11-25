@@ -1,0 +1,38 @@
+{% extends "layouts/base" %}
+
+{% block title %}Relevé des ventes {{ year }}{% endblock %}
+
+{% block content %}
+  <h1>Relevé des ventes — 1er semestre {{ year }}</h1>
+
+  {{ chart(type="bar", labels=months, title="Chiffre d'affaires mensuel (FCFA)",
+           series=[{"name": "Lomé", "values": lome}, {"name": "Kara", "values": kara}],
+           width="180mm", height="80mm") }}
+
+  <table class="lines docmint-export" data-docmint-sheet="Ventes {{ year }}">
+    <thead><tr><th>Mois</th><th class="right">Lomé</th><th class="right">Kara</th></tr></thead>
+    <tbody>
+      {% for month in months %}
+      <tr>
+        <td>{{ month }}</td>
+        <td class="right" data-value="{{ lome[loop.index] }}">{{ lome[loop.index] | fcfa }}</td>
+        <td class="right" data-value="{{ kara[loop.index] }}">{{ kara[loop.index] | fcfa }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p>Total du semestre : <strong>{{ total | fcfa }}</strong> ({{ total | words("XOF") }}).</p>
+
+  <div class="page-break"></div>
+  <h1>Moyens de paiement</h1>
+  {{ chart(type="doughnut", labels=paymentMethods, values=paymentShares, title="Répartition des encaissements",
+           width="150mm", height="75mm") }}
+  <table class="lines docmint-export" data-docmint-sheet="Paiements">
+    <thead><tr><th>Moyen</th><th class="right">Part (%)</th></tr></thead>
+    <tbody>
+      {% for method in paymentMethods %}
+      <tr><td>{{ method }}</td><td class="right">{{ paymentShares[loop.index] }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

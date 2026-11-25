@@ -107,7 +107,7 @@ A developer exports a table or a list of annotated objects as CSV, readable by E
   automatically when on the class path; one sheet per table; typed cells; bold frozen header;
   auto-sized columns; values only (no formulas).
 - **FR-207**: `@ExcelColumn(name, order, format)` on fields, getters or record components MUST
-  drive exports of lists (`DocMint.csv(rows)`, `DocMintExcel.xlsx(rows)`), and `@Report(format
+  drive exports of lists (`DocMint.csv(rows)`, `DocMint.export(rows, XLSX, options)`), and `@Report(format
   = CSV|XLSX)` methods returning a collection without template.
 - **FR-208**: A configurable maximum number of exported rows (default 100 000).
 - **FR-209**: The starter MUST support `format = CSV | XLSX | HTML` and the BOM MUST include

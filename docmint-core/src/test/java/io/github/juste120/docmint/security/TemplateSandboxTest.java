@@ -1,5 +1,6 @@
 package io.github.juste120.docmint.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.github.juste120.docmint.api.DocMint;
@@ -34,6 +35,21 @@ class TemplateSandboxTest {
   void javaObjectsAreNeverExposedToTemplates() {
     // getRuntime() is not a record component: it is not part of the template model.
     assertThatThrownBy(() -> docMint.pdf("security/classloader", new Dangerous("Ama")))
+        .isInstanceOf(DocMintException.class);
+  }
+
+  @Test
+  void loopVariablesWorkButCannotBeAbused() {
+    String text =
+        io.github.juste120.docmint.support.PdfText.text(
+            docMint.pdf("loop", Map.of("items", java.util.List.of("a", "b", "c"))));
+
+    assertThat(text.replaceAll("\\s+", " "))
+        .contains("0/3 premier a")
+        .contains("1/3 b")
+        .contains("2/3 dernier c");
+    assertThatThrownBy(
+            () -> docMint.pdf("security/loop-escape", Map.of("items", java.util.List.of(1))))
         .isInstanceOf(DocMintException.class);
   }
 

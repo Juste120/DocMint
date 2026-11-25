@@ -173,4 +173,52 @@ class DemoApiTest {
         .andExpect(
             header().string(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "Content-Disposition"));
   }
+
+  @Test
+  void salesStatementWithChartsAndExports() throws Exception {
+    byte[] pdf =
+        keep(
+            "releve-ventes.pdf",
+            mvc.perform(get("/api/reports/sales/pdf"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray());
+    assertThat(pages(pdf)).isEqualTo(2);
+    assertThat(text(pdf)).contains("Relevé des ventes").contains("1 250 000 FCFA");
+
+    byte[] xlsx =
+        mvc.perform(get("/api/reports/sales/xlsx"))
+            .andExpect(
+                header()
+                    .string(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        startsWith("inline; filename=\"releve-ventes-2026.xlsx\"")))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    try (var workbook =
+        new org.apache.poi.xssf.usermodel.XSSFWorkbook(new java.io.ByteArrayInputStream(xlsx))) {
+      assertThat(workbook.getSheetAt(0).getSheetName()).isEqualTo("Ventes 2026");
+      assertThat(workbook.getSheetAt(0).getRow(1).getCell(1).getNumericCellValue())
+          .isEqualTo(1_250_000d);
+      assertThat(workbook.getSheetAt(1).getSheetName()).isEqualTo("Paiements");
+    }
+
+    mvc.perform(get("/api/invoices/export.xlsx"))
+        .andExpect(
+            header()
+                .string(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    startsWith("attachment; filename=\"factures.xlsx\"")));
+    String csv =
+        new String(
+            mvc.perform(get("/api/invoices/export.csv"))
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray(),
+            java.nio.charset.StandardCharsets.UTF_8);
+    assertThat(csv)
+        .startsWith("\uFEFFN° facture;Client;Date\r\nF-2026-001;Kossi Mensah;2026-11-24");
+  }
 }

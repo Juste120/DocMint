@@ -5,6 +5,7 @@ import io.github.juste120.docmint.demo.dto.response.InvoiceSummaryResponse;
 import io.github.juste120.docmint.demo.service.InvoiceService;
 import io.github.juste120.docmint.domain.OutputFormat;
 import io.github.juste120.docmint.domain.Watermark;
+import io.github.juste120.docmint.spring.web.Disposition;
 import io.github.juste120.docmint.spring.web.Report;
 import io.github.juste120.docmint.spring.web.ReportContent;
 import java.util.List;
@@ -26,6 +27,26 @@ public class InvoiceController {
 
   @GetMapping
   public List<InvoiceSummaryResponse> list() {
+    return service.findAll();
+  }
+
+  /** The same list as an Excel workbook: columns from @ExcelColumn, no template needed. */
+  @GetMapping("/export.xlsx")
+  @Report(
+      format = OutputFormat.XLSX,
+      filename = "factures.xlsx",
+      disposition = Disposition.ATTACHMENT)
+  public List<InvoiceSummaryResponse> exportExcel() {
+    return service.findAll();
+  }
+
+  /** The same list as CSV (';' and BOM: opens directly in Excel in French). */
+  @GetMapping("/export.csv")
+  @Report(
+      format = OutputFormat.CSV,
+      filename = "factures.csv",
+      disposition = Disposition.ATTACHMENT)
+  public List<InvoiceSummaryResponse> exportCsv() {
     return service.findAll();
   }
 

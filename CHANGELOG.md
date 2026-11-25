@@ -8,6 +8,27 @@ minor versions may change the public API; every such change is listed here.
 
 ## [Unreleased]
 
+## [0.3.0] - Not yet released
+
+### Added
+
+- `chart(...)` template function: bar, line, pie and doughnut charts (Java2D, embedded font,
+  locale-formatted values, legends, custom colours).
+- Output formats `HTML`, `CSV` and `XLSX`, produced from the tables of a template
+  (`data-value`, `data-type`, `data-docmint-sheet`, class `docmint-export`).
+- CSV export (`;` and UTF-8 BOM by default, `CsvSettings.rfc4180()`), with spreadsheet formula
+  injection neutralised.
+- Optional module `docmint-excel` (Apache POI): typed cells, bold frozen headers, merged cells,
+  auto-sized columns; discovered automatically.
+- `@ExcelColumn` and `DocMint.csv(...)` / `DocMint.export(...)` for lists of objects.
+- `TableWriter` SPI; `ResourceLimits.maxExportRows`; starter `@Report(format = CSV | XLSX |
+  HTML)` and list exports without template; property `docmint.limits.max-export-rows`.
+
+### Fixed
+
+- `loop.index`, `loop.first`, `loop.last`, `loop.length` and `loop.revindex` were refused by the
+  template sandbox; their getters are now allowed (and only them).
+
 ## [0.2.0] - Not yet released
 
 ### Added
@@ -52,6 +73,7 @@ minor versions may change the public API; every such change is listed here.
 - `docmint-bom`.
 - Demo Spring Boot API and Angular application (not published).
 
-[Unreleased]: https://github.com/Juste120/DocMint/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Juste120/DocMint/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Juste120/DocMint/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Juste120/DocMint/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Juste120/DocMint/releases/tag/v0.1.0

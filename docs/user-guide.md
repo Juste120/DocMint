@@ -1,6 +1,6 @@
 # DocMint user guide
 
-This guide covers DocMint 0.1.0 and 0.2.0. For a quick start, read the [README](../README.md)
+This guide covers DocMint 0.1.0 to 0.3.0. For a quick start, read the [README](../README.md)
 first.
 
 - [1. Concepts](#1-concepts)
@@ -15,6 +15,7 @@ first.
 - [10. Security and limits](#10-security-and-limits)
 - [11. Logging](#11-logging)
 - [12. Professional documents (0.2.0)](#12-professional-documents-020)
+- [13. Charts, Excel and CSV (0.3.0)](#13-charts-excel-and-csv-030)
 
 ## 1. Concepts
 
@@ -355,3 +356,80 @@ In Spring, return `ReportContent` from a `@Report` method to set them per reques
 
 See [`@juste120/docmint-angular`](../docmint-angular/projects/docmint-angular/README.md):
 `view`, `download`, `preview` and `DocMintError`.
+
+## 13. Charts, Excel and CSV (0.3.0)
+
+### Charts
+
+```
+{{ chart(type="bar", labels=months, values=sales, title="Ventes 2026") }}
+{{ chart(type="line", labels=months, series=[{"name": "Lomé", "values": lome}, {"name": "Kara", "values": kara}]) }}
+{{ chart(type="pie", labels=["Mobile Money", "Espèces"], values=[58, 42], width="120mm", height="60mm") }}
+```
+
+Types `bar`, `line`, `pie`, `doughnut`; `width`/`height` in mm, cm, in, pt or px (default
+160mm × 80mm); `colors=["#006A4E", …]`. Values are formatted with the render locale. Charts are
+drawn at about 288 DPI and embedded as images (no network, no JavaScript). Limits: 10 series,
+1000 points; a pie cannot have negative values.
+
+### Exporting a template to Excel or CSV
+
+The same template can be rendered as PDF, `XLSX` or `CSV`: its tables become sheets/rows.
+
+```html
+<table class="docmint-export" data-docmint-sheet="Ventes">
+  <thead><tr><th>Mois</th><th>Montant</th><th>Date</th></tr></thead>
+  <tbody><tr>
+    <td>Janvier</td>
+    <td data-value="1250000">{{ 1250000 | fcfa }}</td>          <!-- number in Excel -->
+    <td data-type="date" data-value="2026-01-31">31/01/2026</td> <!-- date in Excel -->
+  </tr></tbody>
+</table>
+```
+
+- Only tables with class `docmint-export` are exported when there is one; otherwise all tables.
+- Sheet name: `data-docmint-sheet`, else the `<caption>`, else `Sheet1`…
+- `data-value` gives the raw value; `data-type` is `number`, `date` or `text`; plain numbers are
+  detected. `colspan` becomes merged cells in Excel.
+- CSV uses the first exported table.
+
+### Exporting a list
+
+```java
+record InvoiceRow(
+    @ExcelColumn(name = "N°", order = 1) String number,
+    @ExcelColumn(name = "Montant", order = 2, format = "#,##0") BigDecimal amount) {}
+
+byte[] csv = docMint.csv(rows);
+RenderResponse xlsx = docMint.export(rows, OutputFormat.XLSX, RenderOptions.defaults());
+```
+
+Without annotations, every property is exported (records: declaration order; other classes:
+alphabetical order). Maps export their keys.
+
+### CSV dialect and security
+
+Default: `;` separator and UTF-8 BOM, so Excel in French opens columns and accents correctly.
+`RenderOptions.withCsv(CsvSettings.rfc4180())` gives `,` without BOM. Values starting with
+`=`, `+`, `-`, `@`, tab or CR are prefixed with `'` so that spreadsheets never run them as
+formulas; Excel cells are always written as values.
+
+### Excel module
+
+```xml
+<dependency>
+  <groupId>io.github.juste120</groupId>
+  <artifactId>docmint-excel</artifactId>
+  <version>0.3.0</version>
+</dependency>
+```
+
+It is discovered automatically. Without it, asking for `XLSX` fails with a message naming the
+dependency. Exports are limited to `maxExportRows` (100 000 by default).
+
+### Spring
+
+```java
+@Report(value = "sales", format = OutputFormat.XLSX)           // template tables → workbook
+@Report(format = OutputFormat.CSV, filename = "clients.csv")   // method returns a List: no template
+```

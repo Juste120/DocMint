@@ -18,7 +18,7 @@ Slogan: *Business documents from HTML, in one line of Java.*
 
 1. `.specify/memory/constitution.md` — non-negotiable principles.
 2. `specs/<feature>/spec.md` — what to build (V1: `specs/001-v1-pdf-generation/`, V2:
-   `specs/002-v2-professional-documents/`).
+   `specs/002-v2-professional-documents/`, V3: `specs/003-v3-charts-excel-csv/`).
 3. `specs/<feature>/plan.md` (+ `research.md`, `data-model.md`, `contracts/`) — how.
 4. `specs/<feature>/tasks.md` — task breakdown.
 
@@ -47,6 +47,7 @@ explicit request.**
 |---|---|
 | `docmint-core` | Pure Java engine (no Spring). Packages `api` (public), `domain` + `port` (public SPI), `application` + `infrastructure` (internal) |
 | `docmint-spring-boot-starter` | `DocMintAutoConfiguration`, `DocMintProperties`, `web/` (`@Report`, return value handler, RFC 9457 errors) |
+| `docmint-excel` | Optional Excel export (Apache POI), discovered with `ServiceLoader` |
 | `docmint-bom` | Version alignment |
 | `docmint-examples/demo-api` | Layered demo API (controller, dto/request, dto/response, mapper, service/impl, entity, repository) — never published |
 | `docmint-angular` | Angular workspace of the npm library `@juste120/docmint-angular` (Vitest tests) |

@@ -25,6 +25,8 @@ byte[] pdf = docMint.pdf("invoice", invoice);
 - **Professional documents**: headers and footers on every page, QR codes and barcodes, amounts
   in words (`un million deux cent cinquante mille francs CFA`), watermarks, AES-256 password
   protection, PNG previews, and an Angular helper library.
+- **Charts and spreadsheets**: `{{ chart(type="bar", ...) }}` in any document; export the same
+  template — or a list of `@ExcelColumn` objects — to Excel (`docmint-excel`) or CSV.
 - **Secure by default**: no path traversal, no remote resources (SSRF), no XXE, auto-escaping,
   sandboxed templates, size/page/time limits, clean JSON errors.
 
@@ -44,7 +46,7 @@ Java 17 or later. Spring Boot 4.x for the starter.
 </dependency>
 ```
 
-**Plain Java** — use `docmint-core` instead. Several DocMint modules? Import `docmint-bom`.
+**Plain Java** — use `docmint-core` instead. **Excel** — add `docmint-excel`. Several DocMint modules? Import `docmint-bom`.
 
 Gradle: `implementation("io.github.juste120:docmint-spring-boot-starter:0.1.0")`.
 
@@ -156,6 +158,26 @@ byte[] png = docMint.png("invoice", data);
 return ReportContent.of(invoice).withWatermark(invoice.paid() ? null : Watermark.text("NON PAYÉE"));
 ```
 
+## Charts, Excel and CSV
+
+```html
+{{ chart(type="bar", labels=months, series=[{"name": "Lomé", "values": lome}], title="Ventes") }}
+<table class="docmint-export" data-docmint-sheet="Ventes">…</table>
+```
+
+```java
+// Same template as PDF, Excel (one sheet per table) or CSV
+docMint.render(new RenderRequest("sales", data, OutputFormat.XLSX, null));
+// Lists of @ExcelColumn records, no template
+byte[] csv = docMint.csv(rows);
+```
+
+```java
+@GetMapping("/invoices/export.xlsx")
+@Report(format = OutputFormat.XLSX, filename = "factures.xlsx")
+List<InvoiceRow> export() { … }      // Excel needs io.github.juste120:docmint-excel
+```
+
 **Angular**: `npm install @juste120/docmint-angular`, then
 `inject(DocMintClient).download('/api/invoices/1/pdf').subscribe()` — see
 [its README](docmint-angular/projects/docmint-angular/README.md).
@@ -179,6 +201,7 @@ All [Pebble](https://pebbletemplates.io/wiki/) tags and filters are available (`
 | `docmint.web.problem-details.enabled` | `true` | RFC 9457 JSON errors for DocMint failures |
 | `docmint.watermark.text` / `.angle` / `.opacity` / `.color` | none | Watermark on every document (e.g. `TEST` on staging) |
 | `docmint.limits.max-image-pixels` | `25000000` | Maximum size of a PNG preview |
+| `docmint.limits.max-export-rows` | `100000` | Maximum rows of a CSV or Excel export |
 
 Without Spring: `DocMint.builder().templatesPath("documents").locale(Locale.ENGLISH).build()`.
 
@@ -228,8 +251,8 @@ applications. See [ADR-0003](docs/adr/0003-openhtmltopdf-and-jsoup.md).
 | Version | Theme |
 |---|---|
 | 0.1.0 | The PDF in one line |
-| **0.2.0** | Professional documents: headers/footers, watermark, QR and barcodes, amount in words, password protection, PNG preview, Angular helper (in progress) |
-| 0.3.0 | Charts and Excel: `<chart>` (SVG), Excel and CSV export |
+| 0.2.0 | Professional documents: headers/footers, watermark, QR and barcodes, amount in words, password protection, PNG preview, Angular helper |
+| **0.3.0** | Charts and Excel: `chart(...)`, Excel and CSV export (in progress) |
 | 0.4.0 | Word and large volumes: `.docx`, pivot tables, streaming, async generation |
 | 0.5.0 | Official documents: e-signature, PDF/A, accessibility |
 | 1.0.0 | Stable API, complete documentation, migration guide from JasperReports |

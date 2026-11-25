@@ -59,6 +59,10 @@ export class DocumentsComponent {
     { label: 'Facture F-2026-002 (plusieurs pages, non payée)', path: 'invoices/2/pdf' },
     { label: 'Reçu R-2026-001', path: 'payments/1/receipt' },
     { label: 'Attestation de travail MAT-0042 (protégée : MAT-0042)', path: 'employees/1/attestation' },
+    { label: 'Relevé des ventes 2026 (graphiques)', path: 'reports/sales/pdf' },
+    { label: 'Relevé des ventes 2026 en Excel', path: 'reports/sales/xlsx' },
+    { label: 'Liste des factures en Excel', path: 'invoices/export.xlsx' },
+    { label: 'Liste des factures en CSV', path: 'invoices/export.csv' },
   ];
 
   view(doc: DocumentLink): void {

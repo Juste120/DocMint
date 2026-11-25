@@ -18,3 +18,5 @@ alternatives). A decision is never edited after acceptance: a new ADR supersedes
 | [0011](0011-post-processor-chain.md) | Post-processor chain (watermark, protection, preview) | Accepted |
 | [0012](0012-zxing-codes.md) | ZXing for QR codes and barcodes | Accepted |
 | [0013](0013-angular-library.md) | Angular helper library | Accepted |
+| [0014](0014-charts-java2d.md) | Charts drawn with Java2D | Accepted |
+| [0015](0015-docmint-excel-module.md) | Optional docmint-excel module and TableWriter SPI | Accepted |
