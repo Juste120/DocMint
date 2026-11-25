@@ -13,7 +13,7 @@ loops, conditions and layout inheritance, and run in a safe mode (Principle VII)
 Use Pebble 4.x (`io.pebbletemplates:pebble`, BSD-3-Clause): Twig/Jinja-like syntax, `extends` /
 `block` / `include`, filters, auto-escaping on by default, `strictVariables`,
 `maxRenderedSize`, pluggable `Loader`, `PebbleCache` and `MethodAccessValidator`. Our own
-`AgbaleExtension` adds the business filters and replaces Pebble's `date` filter.
+`DocMintExtension` adds the business filters and replaces Pebble's `date` filter.
 
 ## Consequences
 

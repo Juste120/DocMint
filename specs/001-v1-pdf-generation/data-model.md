@@ -1,9 +1,9 @@
-# Data Model — Agbale V1 (Phase 1)
+# Data Model — DocMint V1 (Phase 1)
 
-Agbale has no persistent storage. This document describes the in-memory model of `agbale-core`
-(package `io.github.juste120.agbale`) and the demo entities.
+DocMint has no persistent storage. This document describes the in-memory model of `docmint-core`
+(package `io.github.juste120.docmint`) and the demo entities.
 
-## Domain (`…agbale.domain`) — pure Java, no dependency
+## Domain (`…docmint.domain`) — pure Java, no dependency
 
 | Type | Kind | Fields / values | Rules |
 |---|---|---|---|
@@ -16,21 +16,21 @@ Agbale has no persistent storage. This document describes the in-memory model of
 | `FontDefinition` | record | `family`, `classpathLocation`, `weight` (100–900, default 400), `italic` | location validated like a template path (classpath only). |
 | `RenderedDocument` | record | `content` (`byte[]`, defensive copy), `format`, `pageCount` | produced by a `DocumentRenderer`. |
 
-## Public API contract types (`…agbale.api`)
+## Public API contract types (`…docmint.api`)
 
 | Type | Kind | Fields | Notes |
 |---|---|---|---|
 | `RenderOptions` | record | `locale` (`Locale`, nullable → engine default), `fileName` (nullable) | `RenderOptions.defaults()`; builder-style `withLocale`, `withFileName`. |
 | `RenderRequest` | record | `templateName` (String), `data` (Object, non-null), `format` (`OutputFormat`, default PDF), `options` | `RenderRequest.of(name, data)`. |
 | `RenderResponse` | record | `content` (byte[]), `mediaType`, `fileName`, `pageCount` | `fileName` = options file name or `<last-segment>.pdf`. Defensive copies. |
-| `AgbaleException` | abstract, unchecked | `code()` (stable string) | root of the hierarchy. |
-| `TemplateNotFoundException` | final | `templateName`, `availableTemplates` (≤ 50), `suggestion` (Optional) | code `AGBALE_TEMPLATE_NOT_FOUND`. |
-| `TemplateSyntaxException` | final | `templateName`, `line`, `column` (nullable) | code `AGBALE_TEMPLATE_SYNTAX`. |
-| `RenderException` | non-final | — | code `AGBALE_RENDER_FAILED`; also used for runtime template errors (undefined variable, wrong filter input) with code `AGBALE_TEMPLATE_EVALUATION`. |
-| `InvalidTemplateNameException` | extends `RenderException` | `reason` | code `AGBALE_INVALID_TEMPLATE_NAME`. Never echoes more than 100 chars of the rejected name (control chars stripped). |
-| `ResourceRefusedException` | extends `RenderException` | `resources` (sanitised URIs) | code `AGBALE_RESOURCE_REFUSED`. |
-| `ResourceMissingException` | extends `RenderException` | `resources` | code `AGBALE_RESOURCE_MISSING`. |
-| `LimitExceededException` | extends `RenderException` | `limit` (`TEMPLATE_SIZE`, `PAGES`, `RENDER_TIME`), `configuredValue` | code `AGBALE_LIMIT_EXCEEDED`; message names the builder method / property to change. |
+| `DocMintException` | abstract, unchecked | `code()` (stable string) | root of the hierarchy. |
+| `TemplateNotFoundException` | final | `templateName`, `availableTemplates` (≤ 50), `suggestion` (Optional) | code `DOCMINT_TEMPLATE_NOT_FOUND`. |
+| `TemplateSyntaxException` | final | `templateName`, `line`, `column` (nullable) | code `DOCMINT_TEMPLATE_SYNTAX`. |
+| `RenderException` | non-final | — | code `DOCMINT_RENDER_FAILED`; also used for runtime template errors (undefined variable, wrong filter input) with code `DOCMINT_TEMPLATE_EVALUATION`. |
+| `InvalidTemplateNameException` | extends `RenderException` | `reason` | code `DOCMINT_INVALID_TEMPLATE_NAME`. Never echoes more than 100 chars of the rejected name (control chars stripped). |
+| `ResourceRefusedException` | extends `RenderException` | `resources` (sanitised URIs) | code `DOCMINT_RESOURCE_REFUSED`. |
+| `ResourceMissingException` | extends `RenderException` | `resources` | code `DOCMINT_RESOURCE_MISSING`. |
+| `LimitExceededException` | extends `RenderException` | `limit` (`TEMPLATE_SIZE`, `PAGES`, `RENDER_TIME`), `configuredValue` | code `DOCMINT_LIMIT_EXCEEDED`; message names the builder method / property to change. |
 
 ## Template model (output of `TemplateModelMapper`)
 
@@ -54,7 +54,7 @@ detection (identity), max depth 32, max 100 000 nodes → `RenderException`.
 Rendering is stateless per call. The only shared state is the template cache:
 `absent → compiled (on first render) → cleared (clearCache() / cache disabled)`.
 
-## Demo API entities (`agbale-examples/demo-api`, H2)
+## Demo API entities (`docmint-examples/demo-api`, H2)
 
 | Entity | Fields | Relations |
 |---|---|---|

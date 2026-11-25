@@ -8,7 +8,7 @@ updates:
       maven-plugins:
         patterns: ['*-plugin', '*maven*']
   - package-ecosystem: npm
-    directory: /agbale-examples/demo-angular
+    directory: /docmint-examples/demo-angular
     schedule:
       interval: weekly
     groups:

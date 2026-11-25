@@ -38,7 +38,7 @@ jobs:
           server-password: CENTRAL_TOKEN
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
-      # Only agbale-bom, agbale-core and agbale-spring-boot-starter are deployed:
+      # Only docmint-bom, docmint-core and docmint-spring-boot-starter are deployed:
       # the examples profile is disabled with -DskipExamples.
       - name: Deploy to Maven Central (validated, not auto-published)
         env:

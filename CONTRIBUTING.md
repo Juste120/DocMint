@@ -1,4 +1,4 @@
-# Contributing to Agbale
+# Contributing to DocMint
 
 Thank you for your interest! Contributions of any size are welcome: bug reports, documentation,
 templates, tests, code. Issues and discussions can be written in English or French.
@@ -18,32 +18,32 @@ Requirements: JDK 21 (the code is compiled with `--release 17`; JDK 17 also work
 Maven is provided by the wrapper. Node.js 22.22+ or 24.15+ only for the Angular demo.
 
 ```bash
-git clone https://github.com/Juste120/agbale.git
-cd agbale
+git clone https://github.com/Juste120/DocMint.git
+cd docMint
 ./mvnw verify
 ```
 
 `verify` runs, for every module:
 
 - unit, integration, security and architecture tests (JUnit 6, AssertJ, ArchUnit, PDFBox);
-- JaCoCo — line coverage of `agbale-core` must stay ≥ 80 %;
+- JaCoCo — line coverage of `docmint-core` must stay ≥ 80 %;
 - SpotBugs;
 - Javadoc of the public API;
 - Spotless formatting check (google-java-format) — on JDK 21+.
 
 Format the code before committing: `./mvnw spotless:apply`.
 
-Run the demo: `./mvnw -pl agbale-examples/demo-api -am spring-boot:run`, then
+Run the demo: `./mvnw -pl docmint-examples/demo-api -am spring-boot:run`, then
 `http://localhost:8080/api/invoices/1/pdf`.
 
 ## Project layout
 
 | Module | Content |
 |---|---|
-| `agbale-core` | The engine, pure Java (no Spring). Packages `api`, `domain`, `port`, `application`, `infrastructure` |
-| `agbale-spring-boot-starter` | Auto-configuration, `@Report`, error handling |
-| `agbale-bom` | Version alignment |
-| `agbale-examples/*` | Demos, never published |
+| `docmint-core` | The engine, pure Java (no Spring). Packages `api`, `domain`, `port`, `application`, `infrastructure` |
+| `docmint-spring-boot-starter` | Auto-configuration, `@Report`, error handling |
+| `docmint-bom` | Version alignment |
+| `docmint-examples/*` | Demos, never published |
 
 Read [docs/architecture.md](docs/architecture.md) before changing the core. Architecture rules are
 enforced by `ArchitectureTest`.
@@ -55,8 +55,8 @@ enforced by `ArchitectureTest`.
   `feat:`, `fix:`, `docs:`, `test:`, `refactor:`, `build:`, `ci:`, `chore:`; scope optional
   (`feat(starter): …`).
 - **Tests first-class**: every change comes with tests; security-related code gets a test in
-  `agbale-core/src/test/java/…/security`.
-- **Errors**: throw an `AgbaleException` subtype with a message that says what to do next; never
+  `docmint-core/src/test/java/…/security`.
+- **Errors**: throw an `DocMintException` subtype with a message that says what to do next; never
   include absolute paths, stack traces or data values.
 - **Decisions**: a significant technical choice gets an ADR in `docs/adr/` (copy the format of an
   existing one).

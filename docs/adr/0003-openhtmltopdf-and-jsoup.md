@@ -25,10 +25,10 @@ loading, with a licence compatible with Apache 2.0.
 
 ## Licence analysis
 
-OpenHTMLtoPDF is **LGPL-2.1-or-later**. Agbale depends on it as a separate, unmodified JAR
+OpenHTMLtoPDF is **LGPL-2.1-or-later**. DocMint depends on it as a separate, unmodified JAR
 resolved by the user's build tool (no shading, no copied code). The LGPL allows such use by
 software under any licence, including Apache 2.0 libraries and proprietary applications; users
-can replace the LGPL JAR with another version. If Agbale ever needs to modify OpenHTMLtoPDF, the
+can replace the LGPL JAR with another version. If DocMint ever needs to modify OpenHTMLtoPDF, the
 changes must be contributed upstream or published under the LGPL.
 
 ## Consequences

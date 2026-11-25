@@ -1,19 +1,19 @@
-# Agbale
+# DocMint
 
 **Business documents from HTML, in one line of Java.**
 
-[![CI](https://github.com/Juste120/agbale/actions/workflows/ci.yml/badge.svg)](https://github.com/Juste120/agbale/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/Juste120/agbale/graph/badge.svg)](https://codecov.io/gh/Juste120/agbale)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.juste120/agbale-core)](https://central.sonatype.com/artifact/io.github.juste120/agbale-core)
+[![CI](https://github.com/Juste120/DocMint/actions/workflows/ci.yml/badge.svg)](https://github.com/Juste120/DocMint/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/Juste120/DocMint/graph/badge.svg)](https://codecov.io/gh/Juste120/DocMint)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.juste120/docmint-core)](https://central.sonatype.com/artifact/io.github.juste120/docmint-core)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-Agbale (*Agbalẽ*: "paper, document" in Ewe, a language of Togo) generates invoices, receipts,
+DocMint *mints* business documents: it generates invoices, receipts,
 statements, attestations and certificates as PDF from plain HTML/CSS templates. No proprietary
 designer, no XML report format, no mandatory configuration: a simple alternative to
 JasperReports.
 
 ```java
-byte[] pdf = agbale.pdf("invoice", invoice);
+byte[] pdf = docMint.pdf("invoice", invoice);
 ```
 
 - **Plain HTML/CSS templates** with [Pebble](https://pebbletemplates.io) syntax: variables,
@@ -36,14 +36,14 @@ Java 17 or later. Spring Boot 4.x for the starter.
 ```xml
 <dependency>
   <groupId>io.github.juste120</groupId>
-  <artifactId>agbale-spring-boot-starter</artifactId>
+  <artifactId>docmint-spring-boot-starter</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
 
-**Plain Java** — use `agbale-core` instead. Several Agbale modules? Import `agbale-bom`.
+**Plain Java** — use `docmint-core` instead. Several DocMint modules? Import `docmint-bom`.
 
-Gradle: `implementation("io.github.juste120:agbale-spring-boot-starter:0.1.0")`.
+Gradle: `implementation("io.github.juste120:docmint-spring-boot-starter:0.1.0")`.
 
 ## Your first PDF in 5 minutes
 
@@ -79,7 +79,7 @@ record Invoice(String number, Customer customer, List<Line> lines, LocalDate iss
 var invoice = new Invoice("F-001", new Customer("Kossi Mensah"),
     List.of(new Line("Ciment", new BigDecimal("125000"))), LocalDate.of(2026, 11, 24));
 
-byte[] pdf = Agbale.createDefault().pdf("invoice", invoice);
+byte[] pdf = DocMint.createDefault().pdf("invoice", invoice);
 Files.write(Path.of("invoice.pdf"), pdf);
 ```
 
@@ -87,7 +87,7 @@ You get an A4 PDF with `Kossi Mensah`, `125 000 FCFA`, `24 novembre 2026` and "P
 
 ## Spring Boot + Angular
 
-**API** — the starter configures an `Agbale` bean. One annotation turns a method returning a
+**API** — the starter configures an `DocMint` bean. One annotation turns a method returning a
 DTO into a PDF endpoint:
 
 ```java
@@ -103,7 +103,7 @@ class InvoiceController {
 }
 ```
 
-Anywhere else, inject it: `byte[] pdf = agbale.pdf("invoice", data);`
+Anywhere else, inject it: `byte[] pdf = docMint.pdf("invoice", data);`
 
 **Front end** — a PDF is binary, so ask for a `blob`, and read the file name from the header:
 
@@ -115,8 +115,8 @@ this.http.get(`/api/invoices/${id}/pdf`, { responseType: 'blob', observe: 'respo
   });
 ```
 
-See [`agbale-examples/demo-api`](agbale-examples/demo-api) and
-[`agbale-examples/demo-angular`](agbale-examples/demo-angular) for a complete example
+See [`docmint-examples/demo-api`](docmint-examples/demo-api) and
+[`docmint-examples/demo-angular`](docmint-examples/demo-angular) for a complete example
 (invoices, receipts, attestations).
 
 ## Filters
@@ -136,30 +136,30 @@ All [Pebble](https://pebbletemplates.io/wiki/) tags and filters are available (`
 
 | Property | Default | Description |
 |---|---|---|
-| `agbale.templates-path` | `reports` | Class path folder of the templates |
-| `agbale.cache.enabled` | `true` | Cache compiled templates (disable while editing templates) |
-| `agbale.locale` | `fr` | Locale of `date` and `money` |
-| `agbale.fonts[0].family` / `.location` | — | Extra TrueType fonts from the class path |
-| `agbale.limits.max-template-size` | `1MB` | Maximum size of each template |
-| `agbale.limits.max-pages` | `500` | Maximum pages per document |
-| `agbale.limits.max-render-time` | `30s` | Maximum render duration |
-| `agbale.resources.allowed-hosts` | empty | HTTPS hosts allowed for remote images/CSS |
-| `agbale.resources.missing` | `fail` | `fail` or `warn` when an image/CSS file is missing |
-| `agbale.web.problem-details.enabled` | `true` | RFC 9457 JSON errors for Agbale failures |
+| `docmint.templates-path` | `reports` | Class path folder of the templates |
+| `docmint.cache.enabled` | `true` | Cache compiled templates (disable while editing templates) |
+| `docmint.locale` | `fr` | Locale of `date` and `money` |
+| `docmint.fonts[0].family` / `.location` | — | Extra TrueType fonts from the class path |
+| `docmint.limits.max-template-size` | `1MB` | Maximum size of each template |
+| `docmint.limits.max-pages` | `500` | Maximum pages per document |
+| `docmint.limits.max-render-time` | `30s` | Maximum render duration |
+| `docmint.resources.allowed-hosts` | empty | HTTPS hosts allowed for remote images/CSS |
+| `docmint.resources.missing` | `fail` | `fail` or `warn` when an image/CSS file is missing |
+| `docmint.web.problem-details.enabled` | `true` | RFC 9457 JSON errors for DocMint failures |
 
-Without Spring: `Agbale.builder().templatesPath("documents").locale(Locale.ENGLISH).build()`.
+Without Spring: `DocMint.builder().templatesPath("documents").locale(Locale.ENGLISH).build()`.
 
 ## FAQ
 
-**Accents or letters like ɖ, ŋ, ɔ appear as squares?** They will not with Agbale: Noto Sans is
+**Accents or letters like ɖ, ŋ, ɔ appear as squares?** They will not with DocMint: Noto Sans is
 embedded and used for every font family, so output is identical on your laptop and in a
 `eclipse-temurin:21-jre` Docker image without fonts. For emoji, CJK or symbols such as arrows,
-register an extra font (`agbale.fonts`).
+register an extra font (`docmint.fonts`).
 
 **My logo does not appear.** Put it in the templates folder (`reports/images/logo.png`) and use
 `<img src="images/logo.png">` (relative to the template) or `/images/logo.png` (from the
-templates root). `data:` URIs also work. Remote URLs are refused unless allow-listed; Agbale
-fails with `AGBALE_RESOURCE_MISSING` or `AGBALE_RESOURCE_REFUSED` rather than silently dropping
+templates root). `data:` URIs also work. Remote URLs are refused unless allow-listed; DocMint
+fails with `DOCMINT_RESOURCE_MISSING` or `DOCMINT_RESOURCE_REFUSED` rather than silently dropping
 the image.
 
 **Angular cannot read the file name.** With CORS, the browser hides `Content-Disposition` unless
@@ -174,14 +174,14 @@ values). Compute values in your response DTO.
 **`NoClassDefFoundError: org/apache/pdfbox/...` at runtime, but tests pass?** You declared
 `pdfbox` with `<scope>test</scope>` (for example to read PDFs in tests). Maven's "nearest
 declaration wins" rule then removes it from the runtime class path. PDFBox already comes with
-`agbale-core`: remove your declaration, or declare it without a scope.
+`docmint-core`: remove your declaration, or declare it without a scope.
 
-**SLF4J prints "No SLF4J providers were found" in a plain Java program.** Agbale logs through
+**SLF4J prints "No SLF4J providers were found" in a plain Java program.** DocMint logs through
 SLF4J; add a backend such as `slf4j-simple` or Logback to see its logs. Spring Boot already has
 one.
 
 **Is the LGPL dependency a problem?** OpenHTMLtoPDF is LGPL-2.1 and used as an unmodified,
-separate library, which is compatible with Agbale's Apache 2.0 licence and with closed-source
+separate library, which is compatible with DocMint's Apache 2.0 licence and with closed-source
 applications. See [ADR-0003](docs/adr/0003-openhtmltopdf-and-jsoup.md).
 
 ## Documentation
@@ -207,14 +207,14 @@ Details in [ROADMAP.md](ROADMAP.md).
 
 ## En français
 
-Agbale génère des documents métier (factures, reçus, relevés, attestations, certificats) en PDF à
+DocMint génère des documents métier (factures, reçus, relevés, attestations, certificats) en PDF à
 partir de templates HTML/CSS, **en une ligne de Java**. Il n'y a ni éditeur propriétaire, ni
 format XML, ni configuration obligatoire.
 
-- **Spring Boot** : ajoutez `agbale-spring-boot-starter`, mettez vos templates dans
+- **Spring Boot** : ajoutez `docmint-spring-boot-starter`, mettez vos templates dans
   `src/main/resources/reports/`, puis annotez une méthode de contrôleur avec
   `@Report("facture")`. Elle renvoie un DTO et le client reçoit un PDF.
-- **Java pur** : `byte[] pdf = Agbale.createDefault().pdf("facture", donnees);`
+- **Java pur** : `byte[] pdf = DocMint.createDefault().pdf("facture", donnees);`
 - **Pensé pour l'Afrique francophone** : le filtre `fcfa` affiche `1 250 000 FCFA`, les dates
   sont en français (`24 novembre 2026`), et la police intégrée gère les accents et les lettres
   éwé (ɖ, ɛ, ƒ, ɣ, ŋ, ɔ, ʋ), y compris dans Docker.

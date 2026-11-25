@@ -1,6 +1,6 @@
-# Agbale user guide
+# DocMint user guide
 
-This guide covers everything in Agbale 0.1.0. For a quick start, read the [README](../README.md)
+This guide covers everything in DocMint 0.1.0. For a quick start, read the [README](../README.md)
 first.
 
 - [1. Concepts](#1-concepts)
@@ -18,7 +18,7 @@ first.
 ## 1. Concepts
 
 A **template** is an HTML file in the templates folder (class path `reports/` by default).
-Agbale fills it with your **data** using the [Pebble](https://pebbletemplates.io) template
+DocMint fills it with your **data** using the [Pebble](https://pebbletemplates.io) template
 language, then converts the HTML to **PDF** with print rules (pages, margins, page numbers).
 
 ```
@@ -46,12 +46,12 @@ Templates are standard HTML5 — you can open them in a browser. Pebble syntax:
 with `{% block %}` placeholders; child templates `{% extends "layouts/base" %}` and override the
 blocks. Names in `extends`/`include` are always relative to the templates root.
 
-Strict mode: using a variable that does not exist is an error (`AGBALE_TEMPLATE_EVALUATION`), so
+Strict mode: using a variable that does not exist is an error (`DOCMINT_TEMPLATE_EVALUATION`), so
 typos are caught immediately. A property that exists but is `null` prints nothing.
 
 ## 3. Data
 
-`agbale.pdf("invoice", data)` accepts:
+`docMint.pdf("invoice", data)` accepts:
 
 - a **record** (`record Invoice(String number, …)`) — components become variables;
 - an **object with getters** (`getNumber()`, `isPaid()`) — properties become variables;
@@ -60,7 +60,7 @@ typos are caught immediately. A property that exists but is `null` prints nothin
 Nested objects, lists, arrays and maps are converted the same way. Values reach the template as
 `String`, numbers (`BigDecimal`, `Integer`, …), `Boolean`, `java.time` dates or `null`; enums
 become their name. A root that is a list or a simple value is available as `data`:
-`agbale.pdf("list", List.of(…))` → `{% for item in data %}`.
+`docMint.pdf("list", List.of(…))` → `{% for item in data %}`.
 
 Templates **cannot call methods** on your objects. Prepare the values in a response DTO
 (totals, labels, formatted fields). Never pass JPA entities: lazy associations and
@@ -101,11 +101,11 @@ control, never for user input.
 
 ## 5. Layout and printing
 
-Agbale inserts a default print stylesheet **before** your styles, so you can override anything:
+DocMint inserts a default print stylesheet **before** your styles, so you can override anything:
 
 | Default | How to change it |
 |---|---|
-| A4 portrait, margins 20 mm / 15 mm | `@page { size: A4 landscape; margin: 10mm; }` or `AgbaleBuilder.pageSettings(…)` |
+| A4 portrait, margins 20 mm / 15 mm | `@page { size: A4 landscape; margin: 10mm; }` or `DocMintBuilder.pageSettings(…)` |
 | "Page X / Y" at the bottom centre | `@page { @bottom-center { content: none; } }` or your own `content` |
 | `Noto Sans` 10 pt | `body { font-family: …; font-size: …; }` |
 | Table headers repeated on each page | `<thead>` rows repeat automatically |
@@ -133,14 +133,14 @@ server). It covers French and the Latin letters of Ewe and many West African lan
 other TrueType fonts from the class path:
 
 ```java
-Agbale.builder()
+DocMint.builder()
     .font("Inter", "fonts/Inter-Regular.ttf")
     .font(new FontDefinition("Inter", "fonts/Inter-Bold.ttf", FontDefinition.BOLD, false))
     .build();
 ```
 
 ```yaml
-agbale:
+docmint:
   fonts:
     - family: Inter
       location: fonts/Inter-Regular.ttf
@@ -152,7 +152,7 @@ agbale:
 ## 7. Java API
 
 ```java
-Agbale agbale = Agbale.builder()
+DocMint docMint = DocMint.builder()
     .templatesPath("reports")                       // class path folder
     .locale(Locale.FRENCH)                          // dates and amounts
     .cache(true)                                    // compiled template cache
@@ -162,15 +162,15 @@ Agbale agbale = Agbale.builder()
     .pageSettings(PageSettings.defaults())
     .build();                                       // immutable, thread-safe: share it
 
-byte[] pdf = agbale.pdf("invoice", data);
-byte[] english = agbale.pdf("invoice", data, Locale.ENGLISH);
+byte[] pdf = docMint.pdf("invoice", data);
+byte[] english = docMint.pdf("invoice", data, Locale.ENGLISH);
 
-RenderResponse response = agbale.render(
+RenderResponse response = docMint.render(
     RenderRequest.of("invoice", data).withOptions(RenderOptions.defaults().withFileName("F-1.pdf")));
 response.content(); response.fileName(); response.pageCount(); response.mediaType();
 
-agbale.availableTemplates();   // ["invoice", "layouts/base", …]
-agbale.clearCache();
+docMint.availableTemplates();   // ["invoice", "layouts/base", …]
+docMint.clearCache();
 ```
 
 **Extension points** (experts): implement `TemplateResolver` to read templates from elsewhere,
@@ -179,8 +179,8 @@ or `DocumentRenderer` to replace the PDF renderer, and register them with
 
 ## 8. Spring Boot
 
-The starter auto-configures an `Agbale` bean from `agbale.*` properties (see the
-[README](../README.md#configuration-all-optional)). Define your own `Agbale` bean to take full
+The starter auto-configures an `DocMint` bean from `docmint.*` properties (see the
+[README](../README.md#configuration-all-optional)). Define your own `DocMint` bean to take full
 control; the starter then backs off.
 
 ### `@Report`
@@ -215,58 +215,58 @@ registry.addMapping("/api/**").allowedOrigins("http://localhost:4200")
 
 ## 9. Errors
 
-Every error is an unchecked `AgbaleException` with a stable `code()`:
+Every error is an unchecked `DocMintException` with a stable `code()`:
 
-<a id="error-agbale-template-not-found"></a>
-<a id="error-agbale-template-syntax"></a>
-<a id="error-agbale-template-evaluation"></a>
-<a id="error-agbale-invalid-template-name"></a>
-<a id="error-agbale-resource-refused"></a>
-<a id="error-agbale-resource-missing"></a>
-<a id="error-agbale-limit-exceeded"></a>
-<a id="error-agbale-render-failed"></a>
-<a id="error-agbale-invalid-report-method"></a>
-<a id="error-agbale-not-acceptable"></a>
+<a id="error-docmint-template-not-found"></a>
+<a id="error-docmint-template-syntax"></a>
+<a id="error-docmint-template-evaluation"></a>
+<a id="error-docmint-invalid-template-name"></a>
+<a id="error-docmint-resource-refused"></a>
+<a id="error-docmint-resource-missing"></a>
+<a id="error-docmint-limit-exceeded"></a>
+<a id="error-docmint-render-failed"></a>
+<a id="error-docmint-invalid-report-method"></a>
+<a id="error-docmint-not-acceptable"></a>
 
 | Code | Exception | Typical cause and fix |
 |---|---|---|
-| `AGBALE_TEMPLATE_NOT_FOUND` | `TemplateNotFoundException` | Wrong name or folder. The message lists available templates and suggests the closest one. |
-| `AGBALE_TEMPLATE_SYNTAX` | `TemplateSyntaxException` | Unclosed tag or bad expression; message gives template and line. |
-| `AGBALE_TEMPLATE_EVALUATION` | `RenderException` | Undefined variable, wrong filter input. |
-| `AGBALE_INVALID_TEMPLATE_NAME` | `InvalidTemplateNameException` | `../`, absolute path, forbidden characters. |
-| `AGBALE_RESOURCE_REFUSED` | `ResourceRefusedException` | Remote/file resource not allowed. |
-| `AGBALE_RESOURCE_MISSING` | `ResourceMissingException` | Image/CSS not found or unreadable (switch to `warn` to ignore). |
-| `AGBALE_LIMIT_EXCEEDED` | `LimitExceededException` | Template size, rendered size, pages or time limit; message names the setting. |
-| `AGBALE_RENDER_FAILED` | `RenderException` | Other failure (e.g. `@Report` method returned null). |
-| `AGBALE_INVALID_REPORT_METHOD` | `InvalidReportMethodException` | `@Report` misuse (no template, wrong return type, unknown placeholder). |
-| `AGBALE_NOT_ACCEPTABLE` | `ReportNotAcceptableException` | Client does not accept `application/pdf` (HTTP 406). |
+| `DOCMINT_TEMPLATE_NOT_FOUND` | `TemplateNotFoundException` | Wrong name or folder. The message lists available templates and suggests the closest one. |
+| `DOCMINT_TEMPLATE_SYNTAX` | `TemplateSyntaxException` | Unclosed tag or bad expression; message gives template and line. |
+| `DOCMINT_TEMPLATE_EVALUATION` | `RenderException` | Undefined variable, wrong filter input. |
+| `DOCMINT_INVALID_TEMPLATE_NAME` | `InvalidTemplateNameException` | `../`, absolute path, forbidden characters. |
+| `DOCMINT_RESOURCE_REFUSED` | `ResourceRefusedException` | Remote/file resource not allowed. |
+| `DOCMINT_RESOURCE_MISSING` | `ResourceMissingException` | Image/CSS not found or unreadable (switch to `warn` to ignore). |
+| `DOCMINT_LIMIT_EXCEEDED` | `LimitExceededException` | Template size, rendered size, pages or time limit; message names the setting. |
+| `DOCMINT_RENDER_FAILED` | `RenderException` | Other failure (e.g. `@Report` method returned null). |
+| `DOCMINT_INVALID_REPORT_METHOD` | `InvalidReportMethodException` | `@Report` misuse (no template, wrong return type, unknown placeholder). |
+| `DOCMINT_NOT_ACCEPTABLE` | `ReportNotAcceptableException` | Client does not accept `application/pdf` (HTTP 406). |
 
 In Spring MVC, these errors become RFC 9457 responses:
 
 ```json
 {
-  "type": "https://github.com/Juste120/agbale/blob/main/docs/user-guide.md#error-agbale-template-not-found",
+  "type": "https://github.com/Juste120/DocMint/blob/main/docs/user-guide.md#error-docmint-template-not-found",
   "title": "Template not found",
   "status": 500,
   "detail": "Template 'invoce' not found in class path folder 'reports'. Available templates: invoice. Did you mean 'invoice'?",
   "instance": "/api/invoices/1/pdf",
-  "code": "AGBALE_TEMPLATE_NOT_FOUND"
+  "code": "DOCMINT_TEMPLATE_NOT_FOUND"
 }
 ```
 
 Messages never contain stack traces, absolute paths or your data. Disable with
-`agbale.web.problem-details.enabled=false` to handle errors yourself.
+`docmint.web.problem-details.enabled=false` to handle errors yourself.
 
 ## 10. Security and limits
 
-Agbale is safe by default; see [SECURITY.md](../SECURITY.md) for the full list. Limits:
+DocMint is safe by default; see [SECURITY.md](../SECURITY.md) for the full list. Limits:
 
 | Limit | Default | Builder | Property |
 |---|---|---|---|
-| Template file size | 1 MiB | `ResourceLimits.withMaxTemplateBytes` | `agbale.limits.max-template-size` |
+| Template file size | 1 MiB | `ResourceLimits.withMaxTemplateBytes` | `docmint.limits.max-template-size` |
 | Rendered HTML size | 8 × template size | (derived) | (derived) |
-| Pages | 500 | `withMaxPages` | `agbale.limits.max-pages` |
-| Render time | 30 s | `withMaxRenderTime` | `agbale.limits.max-render-time` |
+| Pages | 500 | `withMaxPages` | `docmint.limits.max-pages` |
+| Render time | 30 s | `withMaxRenderTime` | `docmint.limits.max-render-time` |
 
 A render that exceeds the time limit returns an error to the caller immediately; the JVM cannot
 force the rendering thread to stop, but the page and size limits bound the remaining work.
@@ -276,11 +276,11 @@ written by end users.
 
 ## 11. Logging
 
-Agbale logs through SLF4J (no backend imposed):
+DocMint logs through SLF4J (no backend imposed):
 
-- `DEBUG io.github.juste120.agbale` — one line per render (template, format, duration, pages).
-- `WARN` — missing resources in `warn` mode, wildcard remote hosts, Agbale errors in `@Report`
+- `DEBUG io.github.juste120.docmint` — one line per render (template, format, duration, pages).
+- `WARN` — missing resources in `warn` mode, wildcard remote hosts, DocMint errors in `@Report`
   endpoints.
-- `io.github.juste120.agbale.pdf.engine` — OpenHTMLtoPDF internals at DEBUG/TRACE.
+- `io.github.juste120.docmint.pdf.engine` — OpenHTMLtoPDF internals at DEBUG/TRACE.
 
 Data values and rendered content are never logged.

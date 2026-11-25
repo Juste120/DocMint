@@ -1,4 +1,4 @@
-# Quickstart — validation scenario for Agbale V1
+# Quickstart — validation scenario for DocMint V1
 
 This is the "first PDF" path that the README reproduces; it doubles as the manual acceptance
 check before a release (SC-001).
@@ -8,7 +8,7 @@ check before a release (SC-001).
 ```xml
 <dependency>
   <groupId>io.github.juste120</groupId>
-  <artifactId>agbale-core</artifactId>
+  <artifactId>docmint-core</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
@@ -40,7 +40,7 @@ record Customer(String name) {}
 record Line(String label, BigDecimal amount) {}
 record Invoice(String number, Customer customer, List<Line> lines, LocalDate issuedOn) {}
 
-byte[] pdf = Agbale.createDefault().pdf("invoice", new Invoice("F-001",
+byte[] pdf = DocMint.createDefault().pdf("invoice", new Invoice("F-001",
     new Customer("Kossi Mensah"), List.of(new Line("Ciment", new BigDecimal("125000"))),
     LocalDate.of(2026, 11, 24)));
 Files.write(Path.of("invoice.pdf"), pdf);
@@ -54,7 +54,7 @@ Expected: `invoice.pdf` (A4, "Page 1 / 1" footer) containing `Kossi Mensah`, `12
 ```xml
 <dependency>
   <groupId>io.github.juste120</groupId>
-  <artifactId>agbale-spring-boot-starter</artifactId>
+  <artifactId>docmint-spring-boot-starter</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
@@ -82,5 +82,5 @@ With CORS, expose the header: `allowedHeaders`/`exposedHeaders("Content-Disposit
 
 ```bash
 ./mvnw verify            # tests, coverage, SpotBugs, Javadoc, architecture rules
-./mvnw -pl agbale-examples/demo-api spring-boot:run
+./mvnw -pl docmint-examples/demo-api spring-boot:run
 ```

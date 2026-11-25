@@ -1,4 +1,4 @@
-# Feature Specification: Agbale V1 — One-Line PDF Generation
+# Feature Specification: DocMint V1 — One-Line PDF Generation
 
 **Feature Branch**: `001-v1-pdf-generation`
 
@@ -6,17 +6,17 @@
 
 **Status**: Draft
 
-**Input**: User description: "Agbale V1 (0.1.0) – The PDF in one line: an open source Java library
+**Input**: User description: "DocMint V1 (0.1.0) – The PDF in one line: an open source Java library
 that generates business documents (invoices, receipts, statements, attestations, certificates)
 from HTML/CSS templates in one line of code, with a ready-to-use Spring Boot starter. Templates
-support variables, loops, conditions and layout inheritance; `agbale.pdf()`; `@Report` with
+support variables, loops, conditions and layout inheritance; `docMint.pdf()`; `@Report` with
 configurable file name and inline/attachment; `fcfa`, `money`, `sum`, `date` filters (French by
 default); embedded free font (accents OK, even under Docker); images from the classpath and Data
 URIs; default print CSS (A4, margins, 'Page X / Y', `.page-break`, repeated table headers);
 thread-safe template cache; clear errors; demo (Spring API + Angular); publication on Maven
 Central; complete open source project files; security by default."
 
-> **Note on vocabulary.** Agbale is a developer library: its "users" are Java developers, and the
+> **Note on vocabulary.** DocMint is a developer library: its "users" are Java developers, and the
 > host platforms it integrates with (plain Java, Spring Boot, an Angular front end) are part of
 > the product's scope, not implementation choices. Engine, renderer and build-tool choices are
 > left to the plan.
@@ -46,13 +46,13 @@ Central; complete open source project files; security by default."
 
 ## Actors
 
-- **Library user (developer)**: a Java developer who adds Agbale to an application to produce
+- **Library user (developer)**: a Java developer who adds DocMint to an application to produce
   business documents.
 - **Template author**: the person (often the same developer, sometimes a front-end developer)
   who writes HTML/CSS templates.
 - **End user**: the person who views or downloads the generated document, typically through a
   web front end calling an API.
-- **Contributor**: an open source developer who reads, builds, tests or extends Agbale.
+- **Contributor**: an open source developer who reads, builds, tests or extends DocMint.
 - **Maintainer**: the project owner (Juste120), who approves and publishes releases.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -66,7 +66,7 @@ single call, in plain Java, without any configuration.
 **Why this priority**: this is the product. Everything else builds on it; on its own it already
 replaces a heavyweight reporting tool for the common case.
 
-**Independent Test**: in a plain Java project with only Agbale added, place `reports/invoice.html`
+**Independent Test**: in a plain Java project with only DocMint added, place `reports/invoice.html`
 on the classpath, call the one-line API with a data object, and check that the returned bytes
 are a valid PDF whose extracted text contains the expected values.
 
@@ -183,7 +183,7 @@ text (formatted values, accents, "Page 1 / 3"), the page size and the presence o
 
 ### User Story 4 - Spring Boot API endpoint that returns a PDF (Priority: P2)
 
-A Spring Boot developer adds the Agbale starter, gets a ready-to-use Agbale component injected
+A Spring Boot developer adds the DocMint starter, gets a ready-to-use DocMint component injected
 with zero configuration, and turns a controller method that returns a Response DTO into a PDF
 endpoint with a single annotation, choosing the file name and whether the browser displays or
 downloads the document. An Angular front end calls the endpoint and displays or downloads it.
@@ -197,8 +197,8 @@ annotated controller, call the endpoint and check the HTTP status, the content t
 
 **Acceptance Scenarios**:
 
-1. **Given** a Spring Boot application with the starter and no Agbale property, **When** it
-   starts, **Then** an Agbale component is available for injection and `agbale.pdf("invoice",
+1. **Given** a Spring Boot application with the starter and no DocMint property, **When** it
+   starts, **Then** an DocMint component is available for injection and `docMint.pdf("invoice",
    data)` works anywhere in the application.
 2. **Given** a controller method annotated `@Report("invoice")` returning an invoice Response
    DTO, **When** a client calls the endpoint, **Then** the response is `200`, content type
@@ -212,9 +212,9 @@ annotated controller, call the endpoint and check the HTTP status, the content t
    **Then** the documentation explains how to expose `Content-Disposition` so the front end can
    read the file name.
 6. **Given** the application sets properties for templates location, cache, locale, fonts and
-   limits, **When** it starts, **Then** the Agbale component uses them; invalid property values
+   limits, **When** it starts, **Then** the DocMint component uses them; invalid property values
    cause a clear startup error.
-7. **Given** the application defines its own Agbale component, **When** it starts, **Then** the
+7. **Given** the application defines its own DocMint component, **When** it starts, **Then** the
    starter backs off and uses the application's component.
 8. **Given** a rendering error in an annotated endpoint (unknown template, template syntax
    error, limit exceeded), **When** the endpoint is called, **Then** the response is an
@@ -262,7 +262,7 @@ content (and absence of sensitive data).
 
 ### User Story 6 - Discover, try and adopt the project (Priority: P3)
 
-A developer who has never heard of Agbale finds the repository, reads the README, adds the
+A developer who has never heard of DocMint finds the repository, reads the README, adds the
 dependency from Maven Central, and produces a first PDF in under 10 minutes; they can also run
 the demo (Spring API + Angular) to see invoices, receipts and attestations, and a contributor
 can build and test the project from `CONTRIBUTING.md`.
@@ -337,8 +337,8 @@ build; the release pipeline produces signed artifacts accepted by the Maven Cent
 #### Core rendering (US1)
 
 - **FR-001**: The library MUST produce a PDF (as bytes) from a template name and a data object in
-  a single call, both from a pre-built instance (`agbale.pdf(name, data)`) and from a default
-  builder (`Agbale.builder().build().pdf(name, data)`), without any mandatory configuration.
+  a single call, both from a pre-built instance (`docMint.pdf(name, data)`) and from a default
+  builder (`DocMint.builder().build().pdf(name, data)`), without any mandatory configuration.
 - **FR-002**: The library MUST accept as data: records, plain objects exposing getters, and
   key/value maps (including nested objects, lists and maps). The properties of the root object
   (record components, getters or map keys) MUST be exposed as top-level template variables
@@ -358,7 +358,7 @@ build; the release pipeline produces signed artifacts accepted by the Maven Cent
   template resolver and document renderer without affecting the default one-line usage.
 - **FR-008**: Compiled templates MUST be cached in a thread-safe way, enabled by default, with
   the option to disable the cache (development) and to clear it programmatically.
-- **FR-009**: A single Agbale instance MUST be safe to share across threads and reusable for
+- **FR-009**: A single DocMint instance MUST be safe to share across threads and reusable for
   any number of renders.
 
 #### Security (US2)
@@ -409,9 +409,9 @@ build; the release pipeline produces signed artifacts accepted by the Maven Cent
 
 #### Spring Boot integration (US4)
 
-- **FR-027**: The Spring Boot starter MUST auto-configure a shared Agbale component with zero
+- **FR-027**: The Spring Boot starter MUST auto-configure a shared DocMint component with zero
   mandatory properties, and MUST back off when the application defines its own.
-- **FR-028**: The starter MUST expose configuration properties under the `agbale` prefix for at
+- **FR-028**: The starter MUST expose configuration properties under the `docMint` prefix for at
   least: templates location, cache (enabled), default locale, additional fonts, resource limits,
   missing-resource mode (fail or warn) and the remote-resource allow-list; properties MUST be
   documented and validated at startup.
@@ -429,14 +429,14 @@ build; the release pipeline produces signed artifacts accepted by the Maven Cent
   attempts.
 - **FR-032**: Rendering errors in the web layer MUST be returned as RFC 9457 Problem Details
   (`application/problem+json`) with the standard members `type`, `title`, `status` and
-  `detail` (actionable message), plus an Agbale-specific `code` member holding a stable,
-  documented error code (e.g. `AGBALE_TEMPLATE_NOT_FOUND`). The body MUST never contain a stack
+  `detail` (actionable message), plus an DocMint-specific `code` member holding a stable,
+  documented error code (e.g. `DOCMINT_TEMPLATE_NOT_FOUND`). The body MUST never contain a stack
   trace or internal path. The list of error codes is part of the public contract. Template and
   rendering errors (not found, syntax, refused/missing resource, limit exceeded) are developer
   or server errors and MUST map to HTTP 500 with distinct error codes; a client that does not
   accept PDF MUST receive HTTP 406.
 - **FR-033**: The starter MUST NOT require any web-specific dependency for the non-web usage of
-  the Agbale component (injectable in batch or messaging applications).
+  the DocMint component (injectable in batch or messaging applications).
 - **FR-034**: Resource failures MUST be handled as follows:
   - a **refused** resource (scheme or host not allowed) MUST always fail the render with a
     resource-refused error naming the resource; this cannot be relaxed by configuration;
@@ -477,7 +477,7 @@ build; the release pipeline produces signed artifacts accepted by the Maven Cent
   DTOs, with a shared base layout and a logo, and a demo Angular application with "View" and
   "Download" actions. Demos MUST never be published.
 - **FR-041**: The project MUST provide a bill of materials aligning the versions of all
-  published Agbale modules.
+  published DocMint modules.
 - **FR-042**: The repository MUST contain all open source files listed in User Story 6,
   scenario 4, including ADRs for every significant technical decision.
 - **FR-043**: CI MUST run on Java 17 and 21 and enforce: tests, formatting, static analysis,
@@ -533,7 +533,7 @@ build; the release pipeline produces signed artifacts accepted by the Maven Cent
   without system fonts yields identical extracted text, with zero missing glyphs for French and
   Ewe sample texts.
 - **SC-007**: Templates of the demo open and display legibly in a standard web browser without
-  any Agbale tooling.
+  any DocMint tooling.
 - **SC-008**: For 100 % of the error categories in US5, the message names the cause and the next
   action, and contains no absolute path or stack trace.
 - **SC-009**: Line coverage of the core module is at least 80 %, and every public API type and

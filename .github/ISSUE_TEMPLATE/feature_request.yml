@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea for Agbale.
+description: Suggest an idea for DocMint.
 labels: [enhancement]
 body:
   - type: markdown

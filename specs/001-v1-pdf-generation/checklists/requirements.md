@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Agbale V1 — One-Line PDF Generation
+# Specification Quality Checklist: DocMint V1 — One-Line PDF Generation
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-11-24
@@ -31,7 +31,7 @@
 
 ## Notes
 
-- Agbale is a developer library: Java, Spring Boot and Angular are the product's target
+- DocMint is a developer library: Java, Spring Boot and Angular are the product's target
   platforms (scope), not implementation choices. Engine, renderer, font, build tooling and
   versions are deliberately left to the plan.
 - Iteration 1 fixed: an incomplete acceptance scenario (US4 #9) and a non-testable HTTP status

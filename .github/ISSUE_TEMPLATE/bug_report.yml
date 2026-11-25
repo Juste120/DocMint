@@ -26,12 +26,12 @@ body:
     id: error
     attributes:
       label: Error message / code
-      description: The Agbale error code (e.g. AGBALE_TEMPLATE_SYNTAX) and message, if any.
+      description: The DocMint error code (e.g. DOCMINT_TEMPLATE_SYNTAX) and message, if any.
   - type: input
     id: versions
     attributes:
       label: Versions
-      description: Agbale, Java, Spring Boot (if used), OS / Docker image.
-      placeholder: Agbale 0.1.0, Java 21, Spring Boot 4.2.0, eclipse-temurin:21-jre
+      description: DocMint, Java, Spring Boot (if used), OS / Docker image.
+      placeholder: DocMint 0.1.0, Java 21, Spring Boot 4.2.0, eclipse-temurin:21-jre
     validations:
       required: true

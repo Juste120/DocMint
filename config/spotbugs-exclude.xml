@@ -4,11 +4,11 @@
   <!-- Records and immutable value types expose defensive copies or unmodifiable views;
        EI_EXPOSE_REP findings on Spring-managed beans and properties are false positives. -->
   <Match>
-    <Package name="~io\.github\.juste120\.agbale\.spring.*"/>
+    <Package name="~io\.github\.juste120\.docmint\.spring.*"/>
     <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
   </Match>
   <!-- Demo application is never published. -->
   <Match>
-    <Package name="~io\.github\.juste120\.agbale\.demo.*"/>
+    <Package name="~io\.github\.juste120\.docmint\.demo.*"/>
   </Match>
 </FindBugsFilter>

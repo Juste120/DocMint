@@ -1,24 +1,24 @@
-# Contract — Spring Boot starter (`agbale-spring-boot-starter`)
+# Contract — Spring Boot starter (`docmint-spring-boot-starter`)
 
-## Configuration properties (`agbale.*`) — all optional
+## Configuration properties (`docmint.*`) — all optional
 
 | Property | Type | Default | Description |
 |---|---|---|---|
-| `agbale.templates-path` | String | `reports` | Classpath root of templates. |
-| `agbale.cache.enabled` | boolean | `true` | Template cache. |
-| `agbale.locale` | Locale | `fr` | Default locale for `date` and `money`. |
-| `agbale.fonts[i].family` / `.location` / `.weight` / `.italic` | — | — | Additional classpath fonts. |
-| `agbale.limits.max-template-size` | DataSize | `1MB` | Max size of each template file. |
-| `agbale.limits.max-pages` | int | `500` | Max pages per document. |
-| `agbale.limits.max-render-time` | Duration | `30s` | Max time per render. |
-| `agbale.resources.allowed-hosts` | List<String> | empty | HTTPS hosts allowed for remote images/CSS/fonts. |
-| `agbale.resources.missing` | `fail` \| `warn` | `fail` | Behaviour for missing (allowed) resources. |
-| `agbale.web.problem-details.enabled` | boolean | `true` | Agbale error handler for `@Report` endpoints. |
+| `docmint.templates-path` | String | `reports` | Classpath root of templates. |
+| `docmint.cache.enabled` | boolean | `true` | Template cache. |
+| `docmint.locale` | Locale | `fr` | Default locale for `date` and `money`. |
+| `docmint.fonts[i].family` / `.location` / `.weight` / `.italic` | — | — | Additional classpath fonts. |
+| `docmint.limits.max-template-size` | DataSize | `1MB` | Max size of each template file. |
+| `docmint.limits.max-pages` | int | `500` | Max pages per document. |
+| `docmint.limits.max-render-time` | Duration | `30s` | Max time per render. |
+| `docmint.resources.allowed-hosts` | List<String> | empty | HTTPS hosts allowed for remote images/CSS/fonts. |
+| `docmint.resources.missing` | `fail` \| `warn` | `fail` | Behaviour for missing (allowed) resources. |
+| `docmint.web.problem-details.enabled` | boolean | `true` | DocMint error handler for `@Report` endpoints. |
 
 Invalid values (negative limits, unknown enum, blank path) fail at startup with a binding
 error naming the property.
 
-Beans: `Agbale` (`@ConditionalOnMissingBean`). Web beans only for servlet web applications with
+Beans: `DocMint` (`@ConditionalOnMissingBean`). Web beans only for servlet web applications with
 Spring MVC on the class path.
 
 ## `@Report`
@@ -56,18 +56,18 @@ and control characters (incl. CR/LF) → `_`; result trimmed, ≤ 150 chars, `.p
 Content-Type: application/problem+json
 
 {
-  "type": "https://github.com/Juste120/agbale/blob/main/docs/user-guide.md#errors",
+  "type": "https://github.com/Juste120/DocMint/blob/main/docs/user-guide.md#errors",
   "title": "Template not found",
   "status": 500,
   "detail": "Template 'invoce' not found in 'reports'. Available templates: facture, recu. Did you mean 'facture'?",
   "instance": "/api/factures/1/pdf",
-  "code": "AGBALE_TEMPLATE_NOT_FOUND"
+  "code": "DOCMINT_TEMPLATE_NOT_FOUND"
 }
 ```
 
 | Code | Status |
 |---|---|
-| `AGBALE_TEMPLATE_NOT_FOUND`, `AGBALE_TEMPLATE_SYNTAX`, `AGBALE_TEMPLATE_EVALUATION`, `AGBALE_INVALID_TEMPLATE_NAME`, `AGBALE_RESOURCE_REFUSED`, `AGBALE_RESOURCE_MISSING`, `AGBALE_LIMIT_EXCEEDED`, `AGBALE_RENDER_FAILED`, `AGBALE_INVALID_REPORT_METHOD` | 500 |
-| `AGBALE_NOT_ACCEPTABLE` (client `Accept` excludes `application/pdf`) | 406 |
+| `DOCMINT_TEMPLATE_NOT_FOUND`, `DOCMINT_TEMPLATE_SYNTAX`, `DOCMINT_TEMPLATE_EVALUATION`, `DOCMINT_INVALID_TEMPLATE_NAME`, `DOCMINT_RESOURCE_REFUSED`, `DOCMINT_RESOURCE_MISSING`, `DOCMINT_LIMIT_EXCEEDED`, `DOCMINT_RENDER_FAILED`, `DOCMINT_INVALID_REPORT_METHOD` | 500 |
+| `DOCMINT_NOT_ACCEPTABLE` (client `Accept` excludes `application/pdf`) | 406 |
 
 Never present: stack traces, exception class names, absolute paths, data values.

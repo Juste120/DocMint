@@ -1,4 +1,4 @@
-# Implementation Plan: Agbale V1 — One-Line PDF Generation
+# Implementation Plan: DocMint V1 — One-Line PDF Generation
 
 **Branch**: `001-v1-pdf-generation` | **Date**: 2026-11-25 | **Spec**: [spec.md](spec.md)
 
@@ -6,10 +6,10 @@
 
 ## Summary
 
-Build `agbale-core` (pure Java 17 library: Pebble templates → sanitised HTML → OpenHTMLtoPDF PDF,
+Build `docmint-core` (pure Java 17 library: Pebble templates → sanitised HTML → OpenHTMLtoPDF PDF,
 with FCFA/money/sum/date filters, embedded Noto Sans, default print CSS, thread-safe cache,
-secure-by-default resource and template handling), `agbale-spring-boot-starter` (Spring Boot 4.2
-auto-configuration, `@Report` return-value handler, RFC 9457 errors), `agbale-bom`, two
+secure-by-default resource and template handling), `docmint-spring-boot-starter` (Spring Boot 4.2
+auto-configuration, `@Report` return-value handler, RFC 9457 errors), `docmint-bom`, two
 unpublished demos (Spring API + Angular), and the full open source project scaffolding (docs,
 ADRs, CI, release pipeline). Technical choices and their verification are in
 [research.md](research.md).
@@ -46,7 +46,7 @@ Angular 22.
 | Principle | How the plan complies | Status |
 |---|---|---|
 | I. Exemplary OSS | All files of FR-042 are tasks; ADR-0001…0010 record each decision below | ✅ |
-| II. Simplicity | `Agbale.createDefault().pdf(name, data)` and `@Report`; every setting defaulted | ✅ |
+| II. Simplicity | `DocMint.createDefault().pdf(name, data)` and `@Report`; every setting defaulted | ✅ |
 | III. Standard HTML/CSS | HTML5 parsed by jsoup; print rules in standard CSS paged media | ✅ |
 | IV. Escape hatches | `TemplateResolver` / `DocumentRenderer` SPI, `render(RenderRequest)` | ✅ |
 | V. Modular clean architecture | Modules & packages below; ArchUnit rules; renderers registered per `OutputFormat` | ✅ (see note on composition root) |
@@ -74,13 +74,13 @@ specs/001-v1-pdf-generation/
 ```text
 pom.xml                                   # parent: versions, plugins, quality gates, release profile
 mvnw, .mvn/wrapper/
-agbale-bom/pom.xml
-agbale-core/
+docmint-bom/pom.xml
+docmint-core/
 ├── pom.xml
 └── src/
-    ├── main/java/io/github/juste120/agbale/
-    │   ├── api/            Agbale, AgbaleBuilder, RenderRequest, RenderResponse, RenderOptions,
-    │   │                   AgbaleException (+ TemplateNotFound, TemplateSyntax, Render,
+    ├── main/java/io/github/juste120/docmint/
+    │   ├── api/            DocMint, DocMintBuilder, RenderRequest, RenderResponse, RenderOptions,
+    │   │                   DocMintException (+ TemplateNotFound, TemplateSyntax, Render,
     │   │                   InvalidTemplateName, ResourceRefused, ResourceMissing, LimitExceeded)
     │   ├── domain/         TemplateName, OutputFormat, PageSettings, ResourceLimits,
     │   │                   MissingResourceMode, ResourceAccessPolicy, FontDefinition, RenderedDocument
@@ -90,21 +90,21 @@ agbale-core/
     │   │                   TemplateModelMapper, RenderResponseMapper, TimeLimiter, NameSuggester
     │   └── infrastructure/
     │       ├── template/   ClasspathTemplateResolver, ConcurrentTemplateCache
-    │       ├── pebble/     PebbleTemplateEngine, AgbaleExtension, FcfaFilter, MoneyFilter,
+    │       ├── pebble/     PebbleTemplateEngine, DocMintExtension, FcfaFilter, MoneyFilter,
     │       │               SumFilter, DateFilter, ResolverLoader, DenyAllMethodAccessValidator,
     │       │               PebbleCacheAdapter
     │       └── pdf/        OpenHtmlPdfRenderer, FontRegistry, ClasspathResourceResolver,
     │                       ResourceGuard, PageLimitingSupplier, DefaultStylesheet
-    ├── main/resources/io/github/juste120/agbale/
+    ├── main/resources/io/github/juste120/docmint/
     │   ├── fonts/          NotoSans-{Regular,Bold,Italic,BoldItalic}.ttf, OFL.txt
-    │   └── css/agbale-default.css
+    │   └── css/docmint-default.css
     └── test/java/…         unit, integration (PDF text), security/, architecture/, concurrency
-agbale-spring-boot-starter/
-└── src/main/java/io/github/juste120/agbale/spring/
-    ├── AgbaleAutoConfiguration, AgbaleProperties
-    └── web/  Report, Disposition, AgbaleWebAutoConfiguration, ReportReturnValueHandler,
-              ReportFileNameResolver, AgbaleProblemDetailsHandler, ReturnValueHandlerInstaller
-agbale-examples/
+docmint-spring-boot-starter/
+└── src/main/java/io/github/juste120/docmint/spring/
+    ├── DocMintAutoConfiguration, DocMintProperties
+    └── web/  Report, Disposition, DocMintWebAutoConfiguration, ReportReturnValueHandler,
+              ReportFileNameResolver, DocMintProblemDetailsHandler, ReturnValueHandlerInstaller
+docmint-examples/
 ├── demo-api/      controller, dto/request, dto/response, mapper (MapStruct), service(+impl),
 │                  entity, repository; resources/reports/{layouts/base.html, facture.html,
 │                  recu.html, attestation.html, images/logo.png}
@@ -130,9 +130,9 @@ constitution (Principle V). Infrastructure is split into three sub-packages by a
    (`PebbleCacheAdapter`), disabled when `cache(false)`.
 3. **PDF adapter**: jsoup → W3C DOM; inject `<style>` with the default stylesheet (generated
    from `PageSettings` + static CSS) as **first** child of `<head>` so template CSS overrides it;
-   base URI `agbale-classpath:/<root>/<template-dir>/`; fonts from `FontRegistry`; access control
+   base URI `docmint-classpath:/<root>/<template-dir>/`; fonts from `FontRegistry`; access control
    + stream factory from `ResourceGuard`; `PageLimitingSupplier`; `useFastMode()`;
-   producer `Agbale <version>`.
+   producer `DocMint <version>`.
 4. **Default stylesheet**: `@page { size: A4; margin: …; @bottom-center { content: "Page "
    counter(page) " / " counter(pages); font-size: 9pt; } }`, `body { font-family: 'Noto Sans',
    sans-serif; font-size: 10pt; }`, `.page-break { page-break-after: always; }`,
@@ -140,25 +140,25 @@ constitution (Principle V). Infrastructure is split into three sub-packages by a
    `thead { display: table-header-group; }`, `tr { page-break-inside: avoid; }`.
 5. **Error translation**: Pebble `ParserException` → `TemplateSyntaxException` (line, file);
    `PebbleException` with cause "not found" → `TemplateNotFoundException`; other evaluation errors
-   → `RenderException(AGBALE_TEMPLATE_EVALUATION)` with template name + line; messages built from
+   → `RenderException(DOCMINT_TEMPLATE_EVALUATION)` with template name + line; messages built from
    Pebble's own message stripped of absolute paths.
-6. **Spring**: `AgbaleAutoConfiguration` (`@AutoConfiguration`, `@EnableConfigurationProperties`,
-   `@ConditionalOnMissingBean Agbale`) — uses `ClassLoader` of the application context;
-   `AgbaleWebAutoConfiguration` (`@ConditionalOnWebApplication(SERVLET)`,
+6. **Spring**: `DocMintAutoConfiguration` (`@AutoConfiguration`, `@EnableConfigurationProperties`,
+   `@ConditionalOnMissingBean DocMint`) — uses `ClassLoader` of the application context;
+   `DocMintWebAutoConfiguration` (`@ConditionalOnWebApplication(SERVLET)`,
    `@ConditionalOnClass(RequestMappingHandlerAdapter)`) registers `ReturnValueHandlerInstaller`
    (`SmartInitializingSingleton` prepending `ReportReturnValueHandler`) and
-   `AgbaleProblemDetailsHandler` (`@RestControllerAdvice`, `@Order(HIGHEST_PRECEDENCE)`, handles
-   only Agbale exceptions).
+   `DocMintProblemDetailsHandler` (`@RestControllerAdvice`, `@Order(HIGHEST_PRECEDENCE)`, handles
+   only DocMint exceptions).
 
-## Architecture rules (ArchUnit, `agbale-core/src/test/…/architecture`)
+## Architecture rules (ArchUnit, `docmint-core/src/test/…/architecture`)
 
 1. `domain` depends only on `java..`.
 2. `port` depends only on `domain` and `java..`.
 3. `application` depends only on `domain`, `port`, `api` contract types (records + exceptions,
-   not `Agbale`/`AgbaleBuilder`) and `java..`/`org.slf4j..`.
+   not `DocMint`/`DocMintBuilder`) and `java..`/`org.slf4j..`.
 4. Only `infrastructure..` may depend on `io.pebbletemplates..`, `com.openhtmltopdf..`,
    `org.apache.pdfbox..`, `org.jsoup..`.
-5. `infrastructure` does not depend on `application` nor on `Agbale`/`AgbaleBuilder`.
+5. `infrastructure` does not depend on `application` nor on `DocMint`/`DocMintBuilder`.
 6. No class in core depends on `org.springframework..`.
 7. Every public class in `api` has Javadoc (checked by doclint) — and no `api` type exposes an
    infrastructure type in a public signature.
@@ -185,6 +185,6 @@ surface, no JPMS in V1 · 0006 Spring Boot 4.x only · 0007 template sandbox via
 
 | Deviation | Why needed | Simpler alternative rejected because |
 |---|---|---|
-| `api` → `infrastructure` dependency (composition root in `AgbaleBuilder`) | zero-config one-liner must wire default adapters | a separate DI container or ServiceLoader adds machinery and hides wiring from readers |
+| `api` → `infrastructure` dependency (composition root in `DocMintBuilder`) | zero-config one-liner must wire default adapters | a separate DI container or ServiceLoader adds machinery and hides wiring from readers |
 | `application` → `api` contract types | spec places DTOs and exceptions in `api`; application returns them | duplicating DTOs/exceptions in application doubles the public surface for no gain |
 | jsoup as extra dependency | HTML5 templates + XXE-proof parsing | XHTML-only templates violate Principle III |

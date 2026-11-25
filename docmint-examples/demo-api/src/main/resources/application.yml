@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: docmint-demo-api
+  jpa:
+    open-in-view: false
+  datasource:
+    url: jdbc:h2:mem:docmint-demo;DB_CLOSE_DELAY=-1
+
+# DocMint works with zero configuration. These are the defaults, shown for reference:
+docmint:
+  templates-path: reports
+  locale: fr
+  cache:
+    enabled: true

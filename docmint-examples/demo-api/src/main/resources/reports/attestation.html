@@ -1,0 +1,15 @@
+{% extends "layouts/base" %}
+
+{% block title %}Attestation de travail {{ registrationNumber }}{% endblock %}
+
+{% block content %}
+  <h1 style="text-align: center; margin-top: 10mm">ATTESTATION DE TRAVAIL</h1>
+  <p style="margin-top: 10mm; line-height: 1.8">
+    Je soussigné, Directeur Général de la Quincaillerie du Golfe SARL, atteste que
+    <strong>{{ fullName }}</strong> (matricule {{ registrationNumber }}) est employé(e) au sein de notre
+    entreprise en qualité de <strong>{{ position }}</strong> depuis le {{ hireDate | date }}.
+  </p>
+  <p style="line-height: 1.8">La présente attestation est délivrée pour {{ purpose }}.</p>
+  <p style="margin-top: 15mm" class="right">Fait à {{ city }}, le {{ issuedOn | date }}</p>
+  <p style="margin-top: 20mm" class="right"><strong>Le Directeur Général</strong></p>
+{% endblock %}

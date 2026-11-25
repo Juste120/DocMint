@@ -2,7 +2,7 @@
 
 ## Our pledge
 
-Agbale adopts the [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/)
+DocMint adopts the [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/)
 as its code of conduct. We want participation in this project to be a harassment-free
 experience for everyone, regardless of age, body size, visible or invisible disability,
 ethnicity, sex characteristics, gender identity and expression, level of experience, education,
@@ -23,5 +23,5 @@ The full text of the Contributor Covenant 2.1 applies, including its enforcement
 
 Report unacceptable behaviour privately to the maintainer, PAKOU Komi Juste (GitHub
 [@Juste120](https://github.com/Juste120)), through a private
-[security advisory](https://github.com/Juste120/agbale/security/advisories/new) or by contacting
+[security advisory](https://github.com/Juste120/DocMint/security/advisories/new) or by contacting
 the maintainer through the GitHub profile. All reports are reviewed promptly and kept confidential.

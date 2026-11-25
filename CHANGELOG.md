@@ -12,8 +12,8 @@ minor versions may change the public API; every such change is listed here.
 
 ### Added
 
-- `agbale-core`: PDF generation from HTML/CSS templates in one line —
-  `Agbale.createDefault().pdf(name, data)` and the advanced `render(RenderRequest)` API.
+- `docmint-core`: PDF generation from HTML/CSS templates in one line —
+  `DocMint.createDefault().pdf(name, data)` and the advanced `render(RenderRequest)` API.
 - Pebble templates with variables, loops, conditions, includes and layout inheritance; data from
   records, JavaBeans or maps.
 - Filters `fcfa`, `money`, `sum` and `date` (French by default, configurable locale).
@@ -23,11 +23,11 @@ minor versions may change the public API; every such change is listed here.
 - Security by default: template name validation, no remote or file resources unless an HTTPS
   host is allow-listed, XXE-proof HTML parsing, auto-escaping, sandboxed templates, limits on
   template size, rendered size, pages and render time.
-- Actionable errors with stable codes (`AGBALE_TEMPLATE_NOT_FOUND`, …) and name suggestions.
-- `agbale-spring-boot-starter` for Spring Boot 4: auto-configured `Agbale` bean, `agbale.*`
+- Actionable errors with stable codes (`DOCMINT_TEMPLATE_NOT_FOUND`, …) and name suggestions.
+- `docmint-spring-boot-starter` for Spring Boot 4: auto-configured `DocMint` bean, `docmint.*`
   properties, `@Report` annotation with file name placeholders, RFC 9457 error responses.
-- `agbale-bom`.
+- `docmint-bom`.
 - Demo Spring Boot API and Angular application (not published).
 
-[Unreleased]: https://github.com/Juste120/agbale/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/Juste120/agbale/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Juste120/DocMint/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Juste120/DocMint/releases/tag/v0.1.0

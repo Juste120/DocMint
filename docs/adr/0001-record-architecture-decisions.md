@@ -5,7 +5,7 @@
 
 ## Context
 
-Agbale is a public open source project meant to be understandable by any developer who
+DocMint is a public open source project meant to be understandable by any developer who
 discovers it (constitution, Principle I). Choices made today (engines, licences, security model)
 will be questioned by future contributors.
 

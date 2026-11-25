@@ -1,4 +1,4 @@
-# Research — Agbale V1 (Phase 0)
+# Research — DocMint V1 (Phase 0)
 
 All versions below were verified against Maven Central / npm on 2026-11-25 (latest **stable**
 release; milestones, betas and release candidates excluded).
@@ -43,8 +43,8 @@ release; milestones, betas and release candidates excluded).
 ## R3. Embedded font — Noto Sans 2.004
 
 - **Decision**: Noto Sans Regular / Bold / Italic / BoldItalic, version 2.004 (SIL OFL 1.1),
-  ~2.1 MB in total, shipped in `agbale-core` under
-  `io/github/juste120/agbale/fonts/` with `OFL.txt`.
+  ~2.1 MB in total, shipped in `docmint-core` under
+  `io/github/juste120/docmint/fonts/` with `OFL.txt`.
 - **Verification**: glyph coverage checked with fontTools on all four files: French diacritics,
   `Œ œ`, `€`, narrow no-break space (U+202F, used by French number formatting), em dash, and the
   Ewe letters `Ɖ ɖ Ɛ ɛ Ƒ ƒ Ɣ ɣ Ŋ ŋ Ɔ ɔ Ʋ ʋ` + combining tilde (U+0303): **all present**.
@@ -80,11 +80,11 @@ release; milestones, betas and release candidates excluded).
 ## R5. Resource loading & SSRF
 
 - **Decision**: relative URIs in templates (`images/logo.png`, `css/print.css`) are resolved
-  against a private base URI `agbale-classpath:/<templates-root>/<template-dir>/` and served by an
+  against a private base URI `docmint-classpath:/<templates-root>/<template-dir>/` and served by an
   `FSStreamFactory` that reads **only** from the class loader, below the templates root, with the
   same path validation as template names. `data:` URIs are handled natively.
 - Every external access goes through `useExternalResourceAccessControl` (priority
-  `RUN_AFTER_RESOLVING_URI`) with an `ResourceAccessPolicy`: allow `agbale-classpath:` and
+  `RUN_AFTER_RESOLVING_URI`) with an `ResourceAccessPolicy`: allow `docmint-classpath:` and
   `data:`; allow `https://<host>` only if the host is allow-listed (exact match, no wildcard
   except an explicit `*.` sub-domain prefix, logged as WARN); deny everything else (`http`,
   `file`, `jar`, `ftp`, unknown).
@@ -117,14 +117,14 @@ release; milestones, betas and release candidates excluded).
 - `@Report` handling: a `HandlerMethodReturnValueHandler` **prepended** to the
   `RequestMappingHandlerAdapter` handlers (custom handlers added through `WebMvcConfigurer` run
   *after* `@ResponseBody` processing and would never see `@RestController` methods).
-- Errors: `@RestControllerAdvice` (ordered first, scoped to Agbale exceptions) returning
+- Errors: `@RestControllerAdvice` (ordered first, scoped to DocMint exceptions) returning
   `ProblemDetail` with a `code` property (RFC 9457, `application/problem+json`).
 - `Content-Disposition`: Spring `ContentDisposition` builder (RFC 6266 / RFC 5987 encoding of
   non-ASCII names with `filename*=UTF-8''…`).
 
 ## R8. Logging
 
-- **Decision**: SLF4J API 2.0.20 in `agbale-core` (already required by Pebble, used by Spring
+- **Decision**: SLF4J API 2.0.20 in `docmint-core` (already required by Pebble, used by Spring
   Boot). No backend is imposed (FR-047). DEBUG per render; WARN for missing resources (warn mode)
   and wildcard allow-lists; no data values logged.
 
@@ -136,7 +136,7 @@ release; milestones, betas and release candidates excluded).
 | Compiler | maven-compiler-plugin 3.16.0, `--release 17`, `-Xlint:all -Werror` on main code | |
 | Tests | JUnit 6.1.3 (BOM), AssertJ 3.27.7, ArchUnit 1.5.1, PDFBox 3.0.8 (text extraction) | JUnit 6 requires Java 17 ✔ |
 | Spring tests | `ApplicationContextRunner`, MockMvc (Boot 4.2 test modules) | |
-| Coverage | JaCoCo 0.8.16, check ≥ 0.80 line coverage on `agbale-core` | build fails below |
+| Coverage | JaCoCo 0.8.16, check ≥ 0.80 line coverage on `docmint-core` | build fails below |
 | Format | Spotless 3.12.0 + google-java-format 1.35.0 | runs on JDK 21+; 1.36+ needs commonmark, missing from the Spotless class path (ADR-0009) |
 | Static analysis | SpotBugs 4.10.5 (plugin 4.10.5.0), effort Max, threshold Medium | Checkstyle not used: formatting is fully delegated to Spotless, avoiding overlapping rule sets (ADR-0009) |
 | Javadoc | maven-javadoc-plugin 3.12.0, doclint on, internal packages excluded | |
@@ -158,7 +158,7 @@ release; milestones, betas and release candidates excluded).
 
 ## R11. Composition and package dependencies
 
-- `api` (façade/builder) is the **composition root**: `AgbaleBuilder.build()` wires
+- `api` (façade/builder) is the **composition root**: `DocMintBuilder.build()` wires
   infrastructure adapters into the application service. `application` uses `api` contract types
-  only (records and exceptions), never `Agbale`/`AgbaleBuilder`. `infrastructure` may throw `api`
+  only (records and exceptions), never `DocMint`/`DocMintBuilder`. `infrastructure` may throw `api`
   exceptions. Enforced by ArchUnit (see plan, "Architecture rules").

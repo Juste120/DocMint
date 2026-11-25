@@ -1,16 +1,16 @@
-# CLAUDE.md — Agbale
+# CLAUDE.md — DocMint
 
 Context for AI assistants (and humans) working on this repository.
 
 ## Project
 
-Agbale (*Agbalẽ*: "paper, document" in Ewe) is an open source Java library that generates
+DocMint is an open source Java library that *mints* (generates)
 business documents (invoices, receipts, statements, attestations, certificates) as PDF from
 HTML/CSS templates, in one line of Java, with a Spring Boot starter.
 Slogan: *Business documents from HTML, in one line of Java.*
 
 - Maintainer: PAKOU Komi Juste (GitHub `Juste120`), Java/Spring Boot + Angular developer in Lomé.
-- groupId `io.github.juste120`, root package `io.github.juste120.agbale`, licence Apache 2.0.
+- groupId `io.github.juste120`, root package `io.github.juste120.docmint`, licence Apache 2.0.
 - Current version: **0.1.0** (V1, "The PDF in one line"). See `ROADMAP.md` for later versions.
 
 ## Sources of truth (in this order)
@@ -43,11 +43,11 @@ explicit request.**
 
 | Path | Content |
 |---|---|
-| `agbale-core` | Pure Java engine (no Spring). Packages `api` (public), `domain` + `port` (public SPI), `application` + `infrastructure` (internal) |
-| `agbale-spring-boot-starter` | `AgbaleAutoConfiguration`, `AgbaleProperties`, `web/` (`@Report`, return value handler, RFC 9457 errors) |
-| `agbale-bom` | Version alignment |
-| `agbale-examples/demo-api` | Layered demo API (controller, dto/request, dto/response, mapper, service/impl, entity, repository) — never published |
-| `agbale-examples/demo-angular` | Angular demo (`ReportService`, View/Download) — never published |
+| `docmint-core` | Pure Java engine (no Spring). Packages `api` (public), `domain` + `port` (public SPI), `application` + `infrastructure` (internal) |
+| `docmint-spring-boot-starter` | `DocMintAutoConfiguration`, `DocMintProperties`, `web/` (`@Report`, return value handler, RFC 9457 errors) |
+| `docmint-bom` | Version alignment |
+| `docmint-examples/demo-api` | Layered demo API (controller, dto/request, dto/response, mapper, service/impl, entity, repository) — never published |
+| `docmint-examples/demo-angular` | Angular demo (`ReportService`, View/Download) — never published |
 | `docs/` | User guide, architecture, ADRs |
 | `specs/`, `.specify/` | Spec Kit artifacts |
 
@@ -66,18 +66,18 @@ Template names validated (no traversal); no remote/file resources unless an HTTP
 allow-listed; jsoup parsing (no XXE); auto-escaping (`raw` explicit); templates only see safe
 data and cannot call methods; limits on template size, rendered size, pages, time; errors
 without stack traces, paths or data; no secrets in the repository. **Every security rule has a
-test** in `agbale-core/src/test/java/io/github/juste120/agbale/security/`.
+test** in `docmint-core/src/test/java/io/github/juste120/docmint/security/`.
 
 ## Conventions
 
 - Java 17 (`--release 17`), developed on JDK 21. Records for value types, `final` classes,
   immutable objects, constructor injection.
-- Errors: throw an `AgbaleException` subtype with a stable code and a message that says what to
+- Errors: throw an `DocMintException` subtype with a stable code and a message that says what to
   do; never log data values.
 - Formatting: google-java-format via Spotless (`./mvnw spotless:apply`). No Checkstyle.
 - Javadoc on every public API type/method.
 - Tests: JUnit 6, AssertJ, PDFBox text extraction (`support/PdfText`), ArchUnit,
-  `ApplicationContextRunner` and MockMvc for the starter. Coverage of `agbale-core` ≥ 80 %.
+  `ApplicationContextRunner` and MockMvc for the starter. Coverage of `docmint-core` ≥ 80 %.
 - Commits: Conventional Commits (`feat(core): …`, `fix(starter): …`, `docs: …`, `test: …`,
   `build: …`, `ci: …`, `chore: …`).
 - Significant decision → new ADR in `docs/adr/`. User-visible change → `CHANGELOG.md`.
@@ -87,9 +87,9 @@ test** in `agbale-core/src/test/java/io/github/juste120/agbale/security/`.
 ```bash
 ./mvnw verify                                   # full quality gate (use JDK 21 locally)
 ./mvnw spotless:apply                           # format
-./mvnw -pl agbale-core test -Dtest=FiltersTest  # one test class
-./mvnw -pl agbale-examples/demo-api -am spring-boot:run   # demo API on :8080
-cd agbale-examples/demo-angular && npm ci && npm start    # Angular demo on :4200 (Node 22.22+/24.15+)
+./mvnw -pl docmint-core test -Dtest=FiltersTest  # one test class
+./mvnw -pl docmint-examples/demo-api -am spring-boot:run   # demo API on :8080
+cd docmint-examples/demo-angular && npm ci && npm start    # Angular demo on :4200 (Node 22.22+/24.15+)
 ```
 
 Release: GitHub Actions workflow `Release` (manual), never from a laptop.

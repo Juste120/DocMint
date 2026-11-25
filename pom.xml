@@ -5,13 +5,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.github.juste120</groupId>
-  <artifactId>agbale-parent</artifactId>
+  <artifactId>docmint-parent</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
 
-  <name>Agbale Parent</name>
+  <name>DocMint Parent</name>
   <description>Business documents from HTML, in one line of Java.</description>
-  <url>https://github.com/Juste120/agbale</url>
+  <url>https://github.com/Juste120/DocMint</url>
   <inceptionYear>2026</inceptionYear>
 
   <licenses>
@@ -34,21 +34,21 @@
   </developers>
 
   <scm>
-    <connection>scm:git:https://github.com/Juste120/agbale.git</connection>
-    <developerConnection>scm:git:git@github.com:Juste120/agbale.git</developerConnection>
-    <url>https://github.com/Juste120/agbale</url>
+    <connection>scm:git:https://github.com/Juste120/DocMint.git</connection>
+    <developerConnection>scm:git:git@github.com:Juste120/DocMint.git</developerConnection>
+    <url>https://github.com/Juste120/DocMint</url>
     <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/Juste120/agbale/issues</url>
+    <url>https://github.com/Juste120/DocMint/issues</url>
   </issueManagement>
 
   <modules>
-    <module>agbale-bom</module>
-    <module>agbale-core</module>
-    <module>agbale-spring-boot-starter</module>
+    <module>docmint-bom</module>
+    <module>docmint-core</module>
+    <module>docmint-spring-boot-starter</module>
   </modules>
 
   <properties>
@@ -94,7 +94,7 @@
     <!-- Spotless needs JDK 21+ (google-java-format); enabled by the 'format' profile below. -->
     <spotless.check.skip>true</spotless.check.skip>
 
-    <!-- spring-boot:run only runs the demo API, also with "-am" (see agbale-examples/demo-api). -->
+    <!-- spring-boot:run only runs the demo API, also with "-am" (see docmint-examples/demo-api). -->
     <spring-boot.run.skip>true</spring-boot.run.skip>
   </properties>
 
@@ -102,12 +102,12 @@
     <dependencies>
       <dependency>
         <groupId>io.github.juste120</groupId>
-        <artifactId>agbale-core</artifactId>
+        <artifactId>docmint-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.github.juste120</groupId>
-        <artifactId>agbale-spring-boot-starter</artifactId>
+        <artifactId>docmint-spring-boot-starter</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -318,8 +318,8 @@
           <autoPublish>false</autoPublish>
           <waitUntil>validated</waitUntil>
           <excludeArtifacts>
-            <artifact>agbale-parent</artifact>
-            <artifact>agbale-demo-api</artifact>
+            <artifact>docmint-parent</artifact>
+            <artifact>docmint-demo-api</artifact>
           </excludeArtifacts>
         </configuration>
       </plugin>
@@ -369,7 +369,7 @@
         </property>
       </activation>
       <modules>
-        <module>agbale-examples/demo-api</module>
+        <module>docmint-examples/demo-api</module>
       </modules>
     </profile>
     <profile>

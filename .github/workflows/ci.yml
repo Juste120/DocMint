@@ -28,7 +28,7 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
           cache: maven
-      # Tests, JaCoCo (>= 80 % on agbale-core), SpotBugs, Javadoc, architecture rules.
+      # Tests, JaCoCo (>= 80 % on docmint-core), SpotBugs, Javadoc, architecture rules.
       # On JDK 21 the 'format' profile also runs the Spotless formatting check.
       - name: Verify
         run: ./mvnw -B -ntp verify
@@ -37,13 +37,13 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: jacoco-report
-          path: agbale-core/target/site/jacoco/
+          path: docmint-core/target/site/jacoco/
       - name: Upload coverage to Codecov
         if: matrix.java == '21'
         uses: codecov/codecov-action@v7
         continue-on-error: true
         with:
-          files: agbale-core/target/site/jacoco/jacoco.xml
+          files: docmint-core/target/site/jacoco/jacoco.xml
           token: ${{ secrets.CODECOV_TOKEN }}
 
   dependency-check:
@@ -78,13 +78,13 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: agbale-examples/demo-angular
+        working-directory: docmint-examples/demo-angular
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: agbale-examples/demo-angular/package-lock.json
+          cache-dependency-path: docmint-examples/demo-angular/package-lock.json
       - run: npm ci
       - run: npm run build

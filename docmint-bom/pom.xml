@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.juste120</groupId>
+    <artifactId>docmint-parent</artifactId>
+    <version>${revision}</version>
+  </parent>
+
+  <artifactId>docmint-bom</artifactId>
+  <packaging>pom</packaging>
+  <name>DocMint BOM</name>
+  <description>Bill of materials aligning the versions of all DocMint modules.</description>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.github.juste120</groupId>
+        <artifactId>docmint-core</artifactId>
+        <version>${revision}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.juste120</groupId>
+        <artifactId>docmint-spring-boot-starter</artifactId>
+        <version>${revision}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- A BOM must only keep its own dependencyManagement, not the parent's. -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <configuration>
+          <!-- Keep only the BOM's own dependencyManagement, with real versions: never the
+               parent's third-party versions, which must not leak into user projects. -->
+          <flattenMode>ossrh</flattenMode>
+          <pomElements>
+            <dependencyManagement>interpolate</dependencyManagement>
+            <build>remove</build>
+          </pomElements>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

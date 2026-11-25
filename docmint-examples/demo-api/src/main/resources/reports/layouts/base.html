@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Document{% endblock %}</title>
+  <style>
+    body { color: #222; }
+    .company { display: table; width: 100%; border-bottom: 2px solid #006a4e; padding-bottom: 4mm; margin-bottom: 8mm; }
+    .company .logo, .company .identity { display: table-cell; vertical-align: middle; }
+    .company .identity { text-align: right; font-size: 9pt; color: #444; }
+    h1 { color: #006a4e; font-size: 18pt; margin: 0 0 4mm 0; }
+    table.lines { width: 100%; margin-top: 6mm; }
+    table.lines th { background: #006a4e; color: #fff; text-align: left; padding: 2mm; }
+    table.lines td { border-bottom: 1px solid #ddd; padding: 2mm; }
+    .right, table.lines th.right { text-align: right; }
+    .muted { color: #666; font-size: 9pt; }
+    footer { margin-top: 10mm; font-size: 8pt; color: #666; text-align: center; }
+  </style>
+  {% block styles %}{% endblock %}
+</head>
+<body>
+  <div class="company">
+    <div class="logo"><img src="/images/logo.png" alt="Logo" width="120"></div>
+    <div class="identity">
+      <strong>Quincaillerie du Golfe SARL</strong><br>
+      Boulevard du 13 Janvier, Lomé — Togo<br>
+      NIF 1000000000 · RCCM TG-LOM 2026 B 0001
+    </div>
+  </div>
+  {% block content %}{% endblock %}
+  <footer>Document généré avec DocMint — Business documents from HTML, in one line of Java.</footer>
+</body>
+</html>

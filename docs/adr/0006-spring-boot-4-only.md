@@ -17,6 +17,6 @@ stable Spring MVC APIs).
 
 ## Consequences
 
-- Projects still on Boot 3.x can use `agbale-core` directly (`Agbale.builder().build()` as a
+- Projects still on Boot 3.x can use `docmint-core` directly (`DocMint.builder().build()` as a
   `@Bean`).
 - Tests use the Boot 4 modules (`spring-boot-webmvc-test`, `ApplicationContextRunner`).

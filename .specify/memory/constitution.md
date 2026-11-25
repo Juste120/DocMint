@@ -1,14 +1,14 @@
-# Agbale Constitution
+# DocMint Constitution
 
-Agbale ("Agbalẽ": "paper, document" in Ewe) is an open source Java library that generates
-business documents from HTML/CSS templates, in one line of Java.
+DocMint is an open source Java library that *mints* business documents (invoices, receipts,
+attestations...) from HTML/CSS templates, in one line of Java.
 Slogan: *Business documents from HTML, in one line of Java.*
 
 ## Core Principles
 
 ### I. Exemplary Open Source
 
-Agbale is a public open source project and MUST be exemplary for any developer who
+DocMint is a public open source project and MUST be exemplary for any developer who
 discovers it.
 
 - Code MUST be clean, well structured, readable and documented; a newcomer MUST be able to
@@ -27,15 +27,15 @@ to read, trust and extend.
 
 ### II. Simplicity First
 
-- The common case MUST fit in one line of code: `agbale.pdf("invoice", data)`,
-  `@Report("invoice")`, or `Agbale.builder().build().pdf("invoice", data)` without Spring.
+- The common case MUST fit in one line of code: `docMint.pdf("invoice", data)`,
+  `@Report("invoice")`, or `DocMint.builder().build().pdf("invoice", data)` without Spring.
 - Configuration MUST be optional: every setting has a safe, documented default.
 - A developer MUST be able to produce a first PDF in under 10 minutes using only the README.
 - A feature that makes the common case longer or requires mandatory configuration MUST be
   rejected or redesigned.
 - YAGNI: only the features of the version currently specified are built.
 
-**Rationale**: simplicity is Agbale's core differentiator against JasperReports.
+**Rationale**: simplicity is DocMint's core differentiator against JasperReports.
 
 ### III. Standard HTML/CSS Templates
 
@@ -43,7 +43,7 @@ to read, trust and extend.
   previewable with any standard IDE or browser.
 - No proprietary editor, no project-specific XML format, no binary template format.
 - Print layout (page size, margins, page numbers, page breaks) MUST be expressed with
-  standard CSS (paged media), with sensible defaults provided by Agbale.
+  standard CSS (paged media), with sensible defaults provided by DocMint.
 
 **Rationale**: every web developer already knows HTML/CSS; nothing new must be learned to
 write a document.
@@ -61,13 +61,13 @@ write a document.
 ### V. Modular Clean Architecture
 
 - The project is a Maven multi-module modular monolith:
-  `agbale-core`, `agbale-spring-boot-starter`, `agbale-bom`,
-  `agbale-examples/demo-api`, `agbale-examples/demo-angular`.
-- Allowed module dependencies: starter → core; demo-api → starter. `agbale-core` MUST NEVER
+  `docmint-core`, `docmint-spring-boot-starter`, `docmint-bom`,
+  `docmint-examples/demo-api`, `docmint-examples/demo-angular`.
+- Allowed module dependencies: starter → core; demo-api → starter. `docmint-core` MUST NEVER
   depend on Spring. Example modules MUST NEVER be published.
-- `agbale-core` follows a hexagonal (Clean Architecture) layout with packages
+- `docmint-core` follows a hexagonal (Clean Architecture) layout with packages
   `api`, `domain`, `application`, `port`, `infrastructure`:
-  - `domain` depends on nothing (no third-party library, no other Agbale package);
+  - `domain` depends on nothing (no third-party library, no other DocMint package);
   - `application` depends only on `domain` and `port`;
   - only `infrastructure` may import third-party engines (Pebble, OpenHTMLtoPDF, PDFBox…);
   - only the `api` package is public API; everything else is package-private or explicitly
@@ -85,7 +85,7 @@ without rewrites.
 - Every change MUST come with automated tests (JUnit 5, AssertJ; PDF content verified by text
   extraction; starter verified with `ApplicationContextRunner` and MockMvc; architecture
   verified with ArchUnit).
-- Line coverage of `agbale-core` MUST be ≥ 80 %, enforced by the build.
+- Line coverage of `docmint-core` MUST be ≥ 80 %, enforced by the build.
 - Every public type and method of the public API MUST have Javadoc; the Javadoc build MUST
   succeed without errors.
 - Formatting and static analysis MUST run automatically in the build (e.g. Spotless plus
@@ -98,7 +98,7 @@ cannot be added afterwards.
 
 ### VII. Secure by Default (NON-NEGOTIABLE)
 
-No feature may open a vulnerability in the applications that use Agbale. Defaults MUST be
+No feature may open a vulnerability in the applications that use DocMint. Defaults MUST be
 the secure option; any relaxation MUST be explicit, opt-in and documented. The detailed,
 mandatory requirements are listed in the **Security Requirements** section below, and each
 of them MUST be covered by dedicated tests.
@@ -111,7 +111,7 @@ default would be inherited by every user.
 - Every error MUST tell the developer what went wrong and what to do next (e.g. a wrong
   template name lists the available templates; a syntax error gives the template name, line
   and column).
-- Errors MUST use the public exception hierarchy (`AgbaleException` and its subtypes).
+- Errors MUST use the public exception hierarchy (`DocMintException` and its subtypes).
 - Error messages and HTTP responses MUST NEVER expose sensitive information: no stack trace,
   no absolute filesystem path, no secret, no internal class details in HTTP responses.
 
@@ -125,7 +125,7 @@ production deployments.
 - The locale MUST be configurable; no behaviour may be hard-wired to a single locale or
   currency beyond documented defaults.
 
-**Rationale**: Agbale is born in Lomé for local business needs, and must remain useful
+**Rationale**: DocMint is born in Lomé for local business needs, and must remain useful
 everywhere.
 
 ### X. Semantic Versioning and Immutable Releases
@@ -171,7 +171,7 @@ These requirements are mandatory from V1 onwards and are part of Principle VII:
 ### Technology constraints
 
 - Java, compiled with `--release 17` (development on JDK 21 allowed); Maven multi-module.
-- `groupId`: `io.github.juste120`; root package: `io.github.juste120.agbale`.
+- `groupId`: `io.github.juste120`; root package: `io.github.juste120.docmint`.
 - Template engine: Pebble. HTML→PDF rendering: OpenHTMLtoPDF community edition
   (`io.github.openhtmltopdf`, PDFBox based).
 - Spring Boot: current stable line, with the exact compatibility range documented in an ADR.
@@ -210,4 +210,4 @@ These requirements are mandatory from V1 onwards and are part of Principle VII:
   every `/speckit-analyze` run verifies compliance. Any justified deviation MUST be written
   down in the plan's "Complexity Tracking" section and approved by the maintainer.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-24
+**Version**: 1.0.1 | **Ratified**: 2026-11-24 | **Last Amended**: 2026-11-25

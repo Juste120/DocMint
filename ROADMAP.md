@@ -1,12 +1,12 @@
 # Roadmap
 
-Agbale grows one version at a time. Each version gets its own specification
+DocMint grows one version at a time. Each version gets its own specification
 (`specs/`, spec-driven development with Spec Kit) before any code is written. There are no
 dates: a version ships when it is complete, tested and documented.
 
 ## 0.1.0 — The PDF in one line
 
-Pebble templates (variables, loops, conditions, layouts), `agbale.pdf()`, `@Report` (file name,
+Pebble templates (variables, loops, conditions, layouts), `docMint.pdf()`, `@Report` (file name,
 inline/attachment), filters `fcfa`, `money`, `sum`, `date`, embedded font, class path and Data
 URI images, default print CSS, thread-safe cache, clear errors, security by default, demos,
 Maven Central.
@@ -35,8 +35,8 @@ Frozen API, complete documentation, migration guide from JasperReports.
 
 ## After 1.0
 
-`agbale-server` (REST catalogue of reports, scheduling, sending by email) and a visual Angular
+`docmint-server` (REST catalogue of reports, scheduling, sending by email) and a visual Angular
 editor with live preview.
 
 Ideas outside this list are welcome as
-[feature requests](https://github.com/Juste120/agbale/issues/new/choose).
+[feature requests](https://github.com/Juste120/DocMint/issues/new/choose).

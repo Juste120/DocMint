@@ -6,7 +6,7 @@
 ## Context
 
 The constitution requires automatic formatting and static analysis, ≥ 80 % coverage on
-`agbale-core`, Javadoc on the public API, and architecture rules checked by the build.
+`docmint-core`, Javadoc on the public API, and architecture rules checked by the build.
 
 ## Decision
 
@@ -18,7 +18,7 @@ The constitution requires automatic formatting and static analysis, ≥ 80 % cov
   `format`), i.e. locally and in the JDK 21 CI job.
 - **SpotBugs** (effort Max, threshold Medium) on `verify`; exclusions are justified in
   `config/spotbugs-exclude.xml`.
-- **JaCoCo** check: line coverage ≥ 80 % on `agbale-core` (≈ 90 % at 0.1.0).
+- **JaCoCo** check: line coverage ≥ 80 % on `docmint-core` (≈ 90 % at 0.1.0).
 - **Javadoc** built on `verify` (doclint) for the public packages.
 - **ArchUnit** rules as plain JUnit tests (`ArchitectureTest`).
 - Security: **CodeQL**, **OWASP Dependency-Check** (`failBuildOnCVSS=9`), **gitleaks**,

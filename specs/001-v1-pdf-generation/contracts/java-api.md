@@ -1,12 +1,12 @@
-# Contract — Public Java API (`agbale-core`)
+# Contract — Public Java API (`docmint-core`)
 
-Package `io.github.juste120.agbale.api`. Everything below is public API, covered by Javadoc and
+Package `io.github.juste120.docmint.api`. Everything below is public API, covered by Javadoc and
 by semantic versioning.
 
 ```java
-public final class Agbale {
-    public static AgbaleBuilder builder();
-    public static Agbale createDefault();                         // == builder().build()
+public final class DocMint {
+    public static DocMintBuilder builder();
+    public static DocMint createDefault();                         // == builder().build()
 
     public byte[] pdf(String templateName, Object data);           // the one-liner
     public byte[] pdf(String templateName, Object data, Locale locale);
@@ -15,21 +15,21 @@ public final class Agbale {
     public void clearCache();
 }
 
-public final class AgbaleBuilder {
-    public AgbaleBuilder templatesPath(String classpathRoot);      // default "reports"
-    public AgbaleBuilder cache(boolean enabled);                   // default true
-    public AgbaleBuilder locale(Locale locale);                    // default Locale.FRENCH
-    public AgbaleBuilder font(String family, String classpathLocation);
-    public AgbaleBuilder font(FontDefinition font);
-    public AgbaleBuilder limits(ResourceLimits limits);            // default ResourceLimits.defaults()
-    public AgbaleBuilder allowRemoteHost(String host);             // https only, exact or "*.domain"
-    public AgbaleBuilder missingResources(MissingResourceMode mode); // default FAIL
-    public AgbaleBuilder pageSettings(PageSettings settings);      // default A4 portrait
-    public AgbaleBuilder classLoader(ClassLoader classLoader);     // default: thread context CL
+public final class DocMintBuilder {
+    public DocMintBuilder templatesPath(String classpathRoot);      // default "reports"
+    public DocMintBuilder cache(boolean enabled);                   // default true
+    public DocMintBuilder locale(Locale locale);                    // default Locale.FRENCH
+    public DocMintBuilder font(String family, String classpathLocation);
+    public DocMintBuilder font(FontDefinition font);
+    public DocMintBuilder limits(ResourceLimits limits);            // default ResourceLimits.defaults()
+    public DocMintBuilder allowRemoteHost(String host);             // https only, exact or "*.domain"
+    public DocMintBuilder missingResources(MissingResourceMode mode); // default FAIL
+    public DocMintBuilder pageSettings(PageSettings settings);      // default A4 portrait
+    public DocMintBuilder classLoader(ClassLoader classLoader);     // default: thread context CL
     // expert escape hatches (Principle IV)
-    public AgbaleBuilder templateResolver(TemplateResolver resolver);
-    public AgbaleBuilder renderer(DocumentRenderer renderer);
-    public Agbale build();                                         // validates, immutable, thread-safe
+    public DocMintBuilder templateResolver(TemplateResolver resolver);
+    public DocMintBuilder renderer(DocumentRenderer renderer);
+    public DocMint build();                                         // validates, immutable, thread-safe
 }
 
 public record RenderRequest(String templateName, Object data, OutputFormat format, RenderOptions options) {
@@ -41,7 +41,7 @@ public record RenderResponse(byte[] content, String mediaType, String fileName, 
 
 ## SPI (expert extension points)
 
-Package `io.github.juste120.agbale.port`:
+Package `io.github.juste120.docmint.port`:
 
 ```java
 public interface TemplateResolver {

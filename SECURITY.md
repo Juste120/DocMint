@@ -1,6 +1,6 @@
 # Security Policy
 
-Agbale renders documents inside other people's applications, so security is a core principle
+DocMint renders documents inside other people's applications, so security is a core principle
 of the project (see the [constitution](.specify/memory/constitution.md), Principle VII).
 
 ## Supported versions
@@ -14,14 +14,14 @@ Before 1.0.0, only the latest minor version receives security fixes.
 ## Reporting a vulnerability
 
 **Do not open a public issue.** Report privately through
-[GitHub Security Advisories](https://github.com/Juste120/agbale/security/advisories/new)
+[GitHub Security Advisories](https://github.com/Juste120/DocMint/security/advisories/new)
 ("Report a vulnerability"). Only the maintainers can see the report.
 
 Please include the affected version, a description, a minimal template/code to reproduce, and
 the impact you observed. You will receive an acknowledgement within 5 days. Once a fix is
 released, the advisory is published with credit to you (unless you prefer to stay anonymous).
 
-## What Agbale protects against by default
+## What DocMint protects against by default
 
 - Path traversal in template names, `extends`/`include`, and resource paths.
 - Server-side request forgery: no `http`, `https`, `file` or other remote resource unless an

@@ -1,0 +1,2 @@
+io.github.juste120.docmint.spring.DocMintAutoConfiguration
+io.github.juste120.docmint.spring.web.DocMintWebAutoConfiguration

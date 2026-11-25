@@ -15,12 +15,12 @@ wants only the API to be public. Java has no "visible to sibling packages only" 
 - **Internal**: `application` and `infrastructure`. Their classes that must be wired across
   packages are `public`, documented as internal in `package-info.java`, excluded from Javadoc,
   without compatibility guarantee. Helpers are package-private (filters, loader, guard...).
-- `AgbaleBuilder` is the **composition root**: it instantiates the default adapters.
+- `DocMintBuilder` is the **composition root**: it instantiates the default adapters.
 - `application` returns the `api` contract types (records, exceptions) instead of duplicating
-  them; it never references `Agbale`/`AgbaleBuilder`.
+  them; it never references `DocMint`/`DocMintBuilder`.
 - **No `module-info.java` in V1**: Pebble and OpenHTMLtoPDF are automatic modules, which makes
   strict modules brittle for users; almost all users run on the class path. The JAR declares
-  `Automatic-Module-Name: io.github.juste120.agbale`. Revisit before 1.0.0.
+  `Automatic-Module-Name: io.github.juste120.docmint`. Revisit before 1.0.0.
 
 ## Consequences
 
