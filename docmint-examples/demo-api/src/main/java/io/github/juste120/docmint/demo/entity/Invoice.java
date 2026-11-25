@@ -24,6 +24,7 @@ public class Invoice {
 
   private LocalDate issueDate;
   private LocalDate dueDate;
+  private boolean paid;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Customer customer;
@@ -46,6 +47,16 @@ public class Invoice {
     line.attachTo(this);
     lines.add(line);
     return this;
+  }
+
+  /** Marks this invoice as paid. */
+  public Invoice markPaid() {
+    this.paid = true;
+    return this;
+  }
+
+  public boolean isPaid() {
+    return paid;
   }
 
   public Long getId() {

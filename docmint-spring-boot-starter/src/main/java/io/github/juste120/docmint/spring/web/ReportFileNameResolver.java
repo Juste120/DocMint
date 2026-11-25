@@ -15,21 +15,26 @@ import java.util.regex.Pattern;
  * record components, public getters or map keys. Resolved values are sanitised because they end up
  * in an HTTP header: path separators, quotes, semicolons and control characters (including CR and
  * LF, which would allow header injection) are replaced by {@code _}. The result is at most {@value
- * #MAX_LENGTH} characters and always ends with {@code .pdf}.
+ * #MAX_LENGTH} characters and always ends with the extension of the format ({@code .pdf}, {@code
+ * .png}).
  */
 final class ReportFileNameResolver {
 
   static final int MAX_LENGTH = 150;
 
   private static final Pattern PLACEHOLDER = Pattern.compile("\\{([A-Za-z_][\\w.]*)}");
-  private static final String EXTENSION = ".pdf";
+  private static final String PDF = ".pdf";
 
   private ReportFileNameResolver() {}
 
   static String resolve(String pattern, String templateName, Object data) {
-    String fallback = templateName.substring(templateName.lastIndexOf('/') + 1) + EXTENSION;
+    return resolve(pattern, templateName, data, PDF);
+  }
+
+  static String resolve(String pattern, String templateName, Object data, String extension) {
+    String fallback = templateName.substring(templateName.lastIndexOf('/') + 1) + extension;
     if (pattern == null || pattern.isBlank()) {
-      return sanitise(fallback);
+      return sanitise(fallback, extension);
     }
     Matcher matcher = PLACEHOLDER.matcher(pattern);
     StringBuilder name = new StringBuilder();
@@ -39,14 +44,18 @@ final class ReportFileNameResolver {
           name, Matcher.quoteReplacement(value == null ? "" : value.toString()));
     }
     matcher.appendTail(name);
-    String result = sanitise(name.toString());
-    if (result.isEmpty() || result.equalsIgnoreCase(EXTENSION)) {
-      return sanitise(fallback);
+    String result = sanitise(name.toString(), extension);
+    if (result.isEmpty() || result.equalsIgnoreCase(extension)) {
+      return sanitise(fallback, extension);
     }
     return result;
   }
 
   static String sanitise(String raw) {
+    return sanitise(raw, PDF);
+  }
+
+  static String sanitise(String raw, String extension) {
     StringBuilder safe = new StringBuilder();
     raw.codePoints()
         .forEach(
@@ -65,11 +74,11 @@ final class ReportFileNameResolver {
     while (name.startsWith(".")) {
       name = name.substring(1);
     }
-    if (!name.toLowerCase(Locale.ROOT).endsWith(EXTENSION) && !name.isEmpty()) {
-      name = name + EXTENSION;
+    if (!name.toLowerCase(Locale.ROOT).endsWith(extension) && !name.isEmpty()) {
+      name = name + extension;
     }
     if (name.length() > MAX_LENGTH) {
-      name = name.substring(0, MAX_LENGTH - EXTENSION.length()) + EXTENSION;
+      name = name.substring(0, MAX_LENGTH - extension.length()) + extension;
     }
     return name;
   }

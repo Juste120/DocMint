@@ -18,6 +18,7 @@ import org.springframework.util.unit.DataSize;
  * @param limits resource limits
  * @param resources resource loading settings
  * @param web web settings for {@code @Report} endpoints
+ * @param watermark default watermark applied to every document (none by default)
  */
 @ConfigurationProperties("docmint")
 public record DocMintProperties(
@@ -27,7 +28,8 @@ public record DocMintProperties(
     List<Font> fonts,
     @DefaultValue Limits limits,
     @DefaultValue Resources resources,
-    @DefaultValue Web web) {
+    @DefaultValue Web web,
+    @DefaultValue WatermarkDefaults watermark) {
 
   /**
    * Creates the properties, replacing a missing font list by an empty list.
@@ -39,6 +41,7 @@ public record DocMintProperties(
    * @param limits resource limits
    * @param resources resource loading settings
    * @param web web settings
+   * @param watermark default watermark
    */
   public DocMintProperties {
     fonts = fonts == null ? List.of() : List.copyOf(fonts);
@@ -68,11 +71,27 @@ public record DocMintProperties(
    * @param maxTemplateSize maximum size of each template file
    * @param maxPages maximum number of pages of a document
    * @param maxRenderTime maximum duration of a render
+   * @param maxImagePixels maximum number of pixels of a PNG preview
    */
   public record Limits(
       @DefaultValue("1MB") DataSize maxTemplateSize,
       @DefaultValue("500") int maxPages,
-      @DefaultValue("30s") Duration maxRenderTime) {}
+      @DefaultValue("30s") Duration maxRenderTime,
+      @DefaultValue("25000000") long maxImagePixels) {}
+
+  /**
+   * Default watermark, e.g. {@code TEST} on a staging server.
+   *
+   * @param text the text; empty (default) for no watermark
+   * @param angle the angle in degrees
+   * @param opacity the opacity, 0.05 to 1
+   * @param color the colour, {@code #RRGGBB}
+   */
+  public record WatermarkDefaults(
+      String text,
+      @DefaultValue("45") double angle,
+      @DefaultValue("0.15") double opacity,
+      @DefaultValue("#808080") String color) {}
 
   /**
    * Resource loading settings.

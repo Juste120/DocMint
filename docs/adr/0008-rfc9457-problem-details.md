@@ -12,7 +12,7 @@ stable (public contract) and never leak stack traces or paths (Principle VIII).
 
 DocMint errors in Spring MVC become **RFC 9457** responses (`application/problem+json`) built
 with Spring's `ProblemDetail`: `type` (link to the user guide), `title`, `status`, `detail`
-(actionable message), `instance`, plus an DocMint-specific `code` member
+(actionable message), `instance`, plus a DocMint-specific `code` member
 (`DOCMINT_TEMPLATE_NOT_FOUND`, …). Template and render errors are developer/server errors → 500;
 a client that does not accept PDF → 406. The handler is a `@RestControllerAdvice` with highest
 precedence, limited to `DocMintException`, and can be disabled

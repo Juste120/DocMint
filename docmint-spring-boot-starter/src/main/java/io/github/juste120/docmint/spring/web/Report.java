@@ -1,5 +1,6 @@
 package io.github.juste120.docmint.spring.web;
 
+import io.github.juste120.docmint.domain.OutputFormat;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,7 +9,7 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Renders the object returned by a controller method with an DocMint template and writes the PDF to
+ * Renders the object returned by a controller method with a DocMint template and writes the PDF to
  * the HTTP response.
  *
  * <pre>{@code
@@ -58,4 +59,12 @@ public @interface Report {
    * @return the disposition
    */
   Disposition disposition() default Disposition.INLINE;
+
+  /**
+   * The output format: {@link OutputFormat#PDF} (default) or {@link OutputFormat#PNG} for an image
+   * preview of a page.
+   *
+   * @return the format
+   */
+  OutputFormat format() default OutputFormat.PDF;
 }

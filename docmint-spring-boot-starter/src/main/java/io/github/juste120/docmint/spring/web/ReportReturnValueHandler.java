@@ -5,6 +5,7 @@ import io.github.juste120.docmint.api.RenderException;
 import io.github.juste120.docmint.api.RenderOptions;
 import io.github.juste120.docmint.api.RenderRequest;
 import io.github.juste120.docmint.api.RenderResponse;
+import io.github.juste120.docmint.domain.OutputFormat;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -64,13 +65,20 @@ public final class ReportReturnValueHandler implements HandlerMethodReturnValueH
     if (request == null || response == null) {
       throw new InvalidReportMethodException("@Report only works in servlet web applications.");
     }
-    checkAccept(request);
+    checkAccept(request, report.format());
     String template = report.value();
     if (template.isBlank()) {
       throw new InvalidReportMethodException(
           "@Report on method '" + method + "' has no template name: use @Report(\"invoice\").");
     }
-    Object data = returnValue instanceof Optional<?> optional ? optional.orElse(null) : returnValue;
+    Object value =
+        returnValue instanceof Optional<?> optional ? optional.orElse(null) : returnValue;
+    RenderOptions options = RenderOptions.defaults();
+    Object data = value;
+    if (value instanceof ReportContent content) {
+      data = content.data();
+      options = content.options();
+    }
     if (data == null) {
       throw new RenderException(
           "@Report method '"
@@ -79,11 +87,14 @@ public final class ReportReturnValueHandler implements HandlerMethodReturnValueH
           null);
     }
 
-    String fileName = ReportFileNameResolver.resolve(report.filename(), template, data);
+    String extension = "." + report.format().fileExtension();
+    String fileName =
+        options.fileName() != null
+            ? ReportFileNameResolver.sanitise(options.fileName(), extension)
+            : ReportFileNameResolver.resolve(report.filename(), template, data, extension);
     RenderResponse document =
         docMint.render(
-            RenderRequest.of(template, data)
-                .withOptions(RenderOptions.defaults().withFileName(fileName)));
+            new RenderRequest(template, data, report.format(), options.withFileName(fileName)));
 
     ContentDisposition disposition =
         (report.disposition() == Disposition.ATTACHMENT
@@ -117,7 +128,7 @@ public final class ReportReturnValueHandler implements HandlerMethodReturnValueH
     }
   }
 
-  private static void checkAccept(HttpServletRequest request) {
+  private static void checkAccept(HttpServletRequest request, OutputFormat format) {
     String accept = request.getHeader(HttpHeaders.ACCEPT);
     if (accept == null || accept.isBlank()) {
       return;
@@ -128,8 +139,9 @@ public final class ReportReturnValueHandler implements HandlerMethodReturnValueH
     } catch (InvalidMediaTypeException e) {
       return;
     }
-    if (accepted.stream().noneMatch(type -> type.isCompatibleWith(MediaType.APPLICATION_PDF))) {
-      throw new ReportNotAcceptableException();
+    MediaType produced = MediaType.parseMediaType(format.mediaType());
+    if (accepted.stream().noneMatch(type -> type.isCompatibleWith(produced))) {
+      throw new ReportNotAcceptableException(format.mediaType());
     }
   }
 }

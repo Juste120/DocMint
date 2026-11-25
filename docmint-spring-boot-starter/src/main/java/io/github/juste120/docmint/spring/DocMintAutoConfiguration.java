@@ -4,6 +4,7 @@ import io.github.juste120.docmint.api.DocMint;
 import io.github.juste120.docmint.api.DocMintBuilder;
 import io.github.juste120.docmint.domain.FontDefinition;
 import io.github.juste120.docmint.domain.ResourceLimits;
+import io.github.juste120.docmint.domain.Watermark;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -37,8 +38,17 @@ public class DocMintAutoConfiguration {
                 new ResourceLimits(
                     properties.limits().maxTemplateSize().toBytes(),
                     properties.limits().maxPages(),
-                    properties.limits().maxRenderTime()))
+                    properties.limits().maxRenderTime(),
+                    properties.limits().maxImagePixels()))
             .missingResources(properties.resources().missing());
+    DocMintProperties.WatermarkDefaults watermark = properties.watermark();
+    if (watermark.text() != null && !watermark.text().isBlank()) {
+      builder.defaultWatermark(
+          Watermark.text(watermark.text())
+              .withAngle(watermark.angle())
+              .withOpacity(watermark.opacity())
+              .withColor(watermark.color()));
+    }
     ClassLoader classLoader = resourceLoader.getClassLoader();
     if (classLoader != null) {
       builder.classLoader(classLoader);

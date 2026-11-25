@@ -1,7 +1,12 @@
 package io.github.juste120.docmint.spring.testapp;
 
+import io.github.juste120.docmint.domain.OutputFormat;
+import io.github.juste120.docmint.domain.PreviewSettings;
+import io.github.juste120.docmint.domain.Protection;
+import io.github.juste120.docmint.domain.Watermark;
 import io.github.juste120.docmint.spring.web.Disposition;
 import io.github.juste120.docmint.spring.web.Report;
+import io.github.juste120.docmint.spring.web.ReportContent;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
@@ -109,6 +114,32 @@ public class TestApplication {
     @Report
     public InvoiceResponse noTemplate() {
       return invoice("1");
+    }
+
+    @GetMapping("/v2/watermark")
+    @Report("invoice")
+    public ReportContent watermarked() {
+      return ReportContent.of(invoice("W-1")).withWatermark(Watermark.text("PAYÉE"));
+    }
+
+    @GetMapping("/v2/protected")
+    @Report(value = "invoice", filename = "bulletin-{number}.pdf")
+    public ReportContent protectedPdf() {
+      return ReportContent.of(invoice("P-1"))
+          .withProtection(Protection.openPassword("1234".toCharArray()))
+          .withFileName("confidentiel.pdf");
+    }
+
+    @GetMapping("/v2/preview")
+    @Report(value = "invoice", filename = "apercu-{number}", format = OutputFormat.PNG)
+    public InvoiceResponse preview() {
+      return invoice("I-1");
+    }
+
+    @GetMapping("/v2/preview-page-2")
+    @Report(value = "invoice", format = OutputFormat.PNG)
+    public ReportContent previewMissingPage() {
+      return ReportContent.of(invoice("I-2")).withPreview(new PreviewSettings(2, 96));
     }
 
     @GetMapping("/json")

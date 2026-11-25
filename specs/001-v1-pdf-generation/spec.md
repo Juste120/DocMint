@@ -198,7 +198,7 @@ annotated controller, call the endpoint and check the HTTP status, the content t
 **Acceptance Scenarios**:
 
 1. **Given** a Spring Boot application with the starter and no DocMint property, **When** it
-   starts, **Then** an DocMint component is available for injection and `docMint.pdf("invoice",
+   starts, **Then** a DocMint component is available for injection and `docMint.pdf("invoice",
    data)` works anywhere in the application.
 2. **Given** a controller method annotated `@Report("invoice")` returning an invoice Response
    DTO, **When** a client calls the endpoint, **Then** the response is `200`, content type
@@ -429,7 +429,7 @@ build; the release pipeline produces signed artifacts accepted by the Maven Cent
   attempts.
 - **FR-032**: Rendering errors in the web layer MUST be returned as RFC 9457 Problem Details
   (`application/problem+json`) with the standard members `type`, `title`, `status` and
-  `detail` (actionable message), plus an DocMint-specific `code` member holding a stable,
+  `detail` (actionable message), plus a DocMint-specific `code` member holding a stable,
   documented error code (e.g. `DOCMINT_TEMPLATE_NOT_FOUND`). The body MUST never contain a stack
   trace or internal path. The list of error codes is part of the public contract. Template and
   rendering errors (not found, syntax, refused/missing resource, limit exceeded) are developer

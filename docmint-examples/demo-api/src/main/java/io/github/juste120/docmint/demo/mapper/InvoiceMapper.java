@@ -18,12 +18,16 @@ public interface InvoiceMapper {
 
   BigDecimal VAT_RATE = new BigDecimal("0.18");
 
+  /** Where a customer checks that an invoice is genuine (encoded in the QR code). */
+  String VERIFY_URL = "https://docmint.example/verify/";
+
   @Mapping(target = "totalExcludingTax", expression = "java(totalExcludingTax(invoice))")
   @Mapping(target = "vatRate", expression = "java(VAT_RATE)")
   @Mapping(target = "vat", expression = "java(vat(invoice))")
   @Mapping(
       target = "totalIncludingTax",
       expression = "java(totalExcludingTax(invoice).add(vat(invoice)))")
+  @Mapping(target = "verificationUrl", expression = "java(VERIFY_URL + invoice.getNumber())")
   InvoiceResponse toResponse(Invoice invoice);
 
   @Mapping(target = "customerName", source = "customer.name")

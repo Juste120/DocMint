@@ -9,7 +9,9 @@ import org.jsoup.nodes.Element;
  * <p>An element with class {@code docmint-header} (or {@code docmint-footer}) is moved to the top
  * (or bottom) margin of every page with CSS running elements. The modifier {@code
  * docmint-first-page} restricts it to page 1, {@code docmint-not-first-page} excludes page 1.
- * Without any custom footer, the default "Page X / Y" footer is used, exactly as in V1.
+ * Without any custom footer, the default "Page X / Y" footer is used, exactly as in V1. The
+ * elements may be written anywhere in the template (typically the footer at the end): they are
+ * moved to the start of the body, because a running element only exists from its own page on.
  */
 final class PageMarginBoxes {
 
@@ -48,9 +50,12 @@ final class PageMarginBoxes {
     if (all == null && onlyFirst == null && notFirst == null) {
       return false;
     }
-    String other = notFirst != null ? run(notFirst, name + "Other") : run(all, name);
+    String other =
+        notFirst != null ? run(document, notFirst, name + "Other") : run(document, all, name);
     String firstPage =
-        onlyFirst != null ? run(onlyFirst, name + "First") : notFirst != null ? null : other;
+        onlyFirst != null
+            ? run(document, onlyFirst, name + "First")
+            : notFirst != null ? null : other;
     css.append(rule("@page", marginBox, other));
     css.append(rule("@page :first", marginBox, firstPage));
     return true;
@@ -71,10 +76,14 @@ final class PageMarginBoxes {
     return null;
   }
 
-  private static String run(Element element, String runningName) {
+  private static String run(Document document, Element element, String runningName) {
     if (element == null) {
       return null;
     }
+    // A running element only exists from the page where it appears in the flow: move it to the
+    // start of the body so that it is on every page, wherever the template author put it.
+    element.remove();
+    document.body().prependChild(element);
     String style = element.attr("style");
     element.attr("style", "position: running(" + runningName + "); " + style);
     return runningName;

@@ -40,6 +40,15 @@ class HeaderFooterTest {
   }
 
   @Test
+  void footerWrittenAtTheEndIsOnEveryPage() {
+    byte[] pdf = docMint.pdf("v2/footer-at-end", Map.of());
+
+    for (int page = 1; page <= 3; page++) {
+      assertThat(sortedPageText(pdf, page)).contains("Pied final " + page + "/3");
+    }
+  }
+
+  @Test
   void templatesWithoutHeaderRenderAsInV1() {
     assertThat(pageText(docMint.pdf("pages", Map.of()), 1)).contains("Page 1 / 3");
   }

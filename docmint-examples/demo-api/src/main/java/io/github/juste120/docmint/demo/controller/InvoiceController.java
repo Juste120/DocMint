@@ -3,7 +3,10 @@ package io.github.juste120.docmint.demo.controller;
 import io.github.juste120.docmint.demo.dto.response.InvoiceResponse;
 import io.github.juste120.docmint.demo.dto.response.InvoiceSummaryResponse;
 import io.github.juste120.docmint.demo.service.InvoiceService;
+import io.github.juste120.docmint.domain.OutputFormat;
+import io.github.juste120.docmint.domain.Watermark;
 import io.github.juste120.docmint.spring.web.Report;
+import io.github.juste120.docmint.spring.web.ReportContent;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,10 +29,22 @@ public class InvoiceController {
     return service.findAll();
   }
 
-  /** The whole PDF endpoint: one annotation on a method returning a response DTO. */
+  /**
+   * The PDF endpoint: one annotation. Returning a {@link ReportContent} instead of the DTO adds a
+   * watermark on unpaid invoices.
+   */
   @GetMapping("/{id}/pdf")
   @Report(value = "facture", filename = "facture-{number}.pdf")
-  public InvoiceResponse pdf(@PathVariable Long id) {
+  public ReportContent pdf(@PathVariable Long id) {
+    InvoiceResponse invoice = service.findById(id);
+    return ReportContent.of(invoice)
+        .withWatermark(invoice.paid() ? null : Watermark.text("NON PAYÉE").withColor("#C00000"));
+  }
+
+  /** PNG preview of the first page, e.g. for a thumbnail. */
+  @GetMapping("/{id}/preview")
+  @Report(value = "facture", filename = "apercu-{number}", format = OutputFormat.PNG)
+  public InvoiceResponse preview(@PathVariable Long id) {
     return service.findById(id);
   }
 }

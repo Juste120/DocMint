@@ -36,6 +36,14 @@ class DemoApiTest {
     }
   }
 
+  private static String text(byte[] pdf, String password) throws IOException {
+    try (PDDocument document = Loader.loadPDF(pdf, password)) {
+      PDFTextStripper stripper = new PDFTextStripper();
+      stripper.setSortByPosition(true);
+      return stripper.getText(document).replace('\u00A0', ' ').replaceAll("\\s+", " ");
+    }
+  }
+
   private static int pages(byte[] pdf) throws IOException {
     try (PDDocument document = Loader.loadPDF(pdf)) {
       return document.getNumberOfPages();
@@ -75,16 +83,54 @@ class DemoApiTest {
         .contains("TVA (18 %) 65 115 FCFA")
         .contains("426 865 FCFA")
         .contains("24 novembre 2026")
-        .contains("Quincaillerie du Golfe SARL");
+        .contains("Quincaillerie du Golfe SARL")
+        .contains("quatre cent vingt-six mille huit cent soixante-cinq francs CFA")
+        .doesNotContain("NON PAYÉE");
+  }
+
+  @Test
+  void unpaidInvoiceIsWatermarkedAndPreviewIsAnImage() throws Exception {
+    byte[] unpaid =
+        mvc.perform(get("/api/invoices/2/pdf")).andReturn().getResponse().getContentAsByteArray();
+    assertThat(text(unpaid).replace(" ", "")).contains("NONPAYÉE");
+
+    mvc.perform(get("/api/invoices/1/preview"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.IMAGE_PNG))
+        .andExpect(
+            header()
+                .string(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    startsWith("inline; filename=\"apercu-F-2026-001.png\"")));
   }
 
   @Test
   void longInvoiceSpansSeveralPagesWithHeaders() throws Exception {
     byte[] pdf =
-        mvc.perform(get("/api/invoices/2/pdf")).andReturn().getResponse().getContentAsByteArray();
+        keep(
+            "facture-longue.pdf",
+            mvc.perform(get("/api/invoices/2/pdf"))
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray());
 
     assertThat(pages(pdf)).isGreaterThan(1);
-    assertThat(text(pdf)).contains("Akossiwa Ɖogbe").contains("Page 2 / ");
+    int pages = pages(pdf);
+    assertThat(text(pdf)).contains("Akossiwa Ɖogbe");
+    // Header and footer of the layout are repeated on every page (compared without whitespace:
+    // the diagonal watermark splits the extracted words).
+    try (PDDocument document = Loader.loadPDF(pdf)) {
+      for (int page = 1; page <= pages; page++) {
+        PDFTextStripper stripper = new PDFTextStripper();
+        stripper.setStartPage(page);
+        stripper.setEndPage(page);
+        String text = stripper.getText(document).replaceAll("[\\s\\u00A0]", "");
+        assertThat(text)
+            .as("page %d", page)
+            .contains("NIF1000000000")
+            .contains("Capital10000000FCFA");
+      }
+    }
   }
 
   @Test
@@ -112,7 +158,7 @@ class DemoApiTest {
             .getResponse()
             .getContentAsByteArray();
     keep("attestation.pdf", attestation);
-    assertThat(text(attestation))
+    assertThat(text(attestation, "MAT-0042"))
         .contains("ATTESTATION DE TRAVAIL")
         .contains("Yawo Agbeko")
         .contains("1 mars 2021")

@@ -1,6 +1,8 @@
 package io.github.juste120.docmint.spring.web;
 
+import io.github.juste120.docmint.api.CodeGenerationException;
 import io.github.juste120.docmint.api.DocMintException;
+import io.github.juste120.docmint.api.InvalidOptionsException;
 import io.github.juste120.docmint.api.InvalidTemplateNameException;
 import io.github.juste120.docmint.api.LimitExceededException;
 import io.github.juste120.docmint.api.RenderException;
@@ -36,19 +38,23 @@ public class DocMintProblemDetailsHandler {
       "https://github.com/Juste120/DocMint/blob/main/docs/user-guide.md#error-";
 
   private static final Map<String, String> TITLES =
-      Map.of(
-          TemplateNotFoundException.CODE, "Template not found",
-          TemplateSyntaxException.CODE, "Template syntax error",
-          RenderException.EVALUATION_CODE, "Template evaluation error",
-          InvalidTemplateNameException.CODE, "Invalid template name",
-          ResourceRefusedException.CODE, "Resource refused",
-          ResourceMissingException.CODE, "Resource missing",
-          LimitExceededException.CODE, "Limit exceeded",
-          InvalidReportMethodException.CODE, "Invalid @Report method",
-          ReportNotAcceptableException.CODE, "Not acceptable");
+      Map.ofEntries(
+          Map.entry(TemplateNotFoundException.CODE, "Template not found"),
+          Map.entry(TemplateSyntaxException.CODE, "Template syntax error"),
+          Map.entry(RenderException.EVALUATION_CODE, "Template evaluation error"),
+          Map.entry(InvalidTemplateNameException.CODE, "Invalid template name"),
+          Map.entry(ResourceRefusedException.CODE, "Resource refused"),
+          Map.entry(ResourceMissingException.CODE, "Resource missing"),
+          Map.entry(LimitExceededException.CODE, "Limit exceeded"),
+          Map.entry(InvalidReportMethodException.CODE, "Invalid @Report method"),
+          Map.entry(ReportNotAcceptableException.CODE, "Not acceptable"),
+          Map.entry(CodeGenerationException.CODE, "Invalid QR code or barcode"),
+          Map.entry(InvalidOptionsException.PREVIEW_PAGE_OUT_OF_RANGE, "Preview page out of range"),
+          Map.entry(InvalidOptionsException.PROTECTION_INVALID, "Invalid protection"),
+          Map.entry(InvalidOptionsException.WATERMARK_INVALID, "Invalid watermark"));
 
   /**
-   * Converts an DocMint error.
+   * Converts a DocMint error.
    *
    * @param error the error
    * @param request the current request

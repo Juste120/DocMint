@@ -12,5 +12,6 @@
       <tr><td>Facture concernée</td><td class="right">{{ invoiceNumber }}</td></tr>
     </tbody>
   </table>
-  <p style="margin-top: 15mm" class="right">Le caissier</p>
+  <p style="margin-top: 8mm">{{ barcode(number, text=true) }}</p>
+  <p style="margin-top: 10mm" class="right">Le caissier</p>
 {% endblock %}

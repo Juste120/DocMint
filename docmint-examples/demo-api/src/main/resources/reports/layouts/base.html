@@ -5,20 +5,23 @@
   <title>{% block title %}Document{% endblock %}</title>
   <style>
     body { color: #222; }
-    .company { display: table; width: 100%; border-bottom: 2px solid #006a4e; padding-bottom: 4mm; margin-bottom: 8mm; }
-    .company .logo, .company .identity { display: table-cell; vertical-align: middle; }
-    .company .identity { text-align: right; font-size: 9pt; color: #444; }
+    .company { border-bottom: 2px solid #006a4e; padding-bottom: 3mm; height: 16mm; }
+    .company .logo { float: left; }
+    .company .identity { float: right; text-align: right; font-size: 9pt; color: #444; }
     h1 { color: #006a4e; font-size: 18pt; margin: 0 0 4mm 0; }
     table.lines { width: 100%; margin-top: 6mm; }
     table.lines th { background: #006a4e; color: #fff; text-align: left; padding: 2mm; }
     table.lines td { border-bottom: 1px solid #ddd; padding: 2mm; }
     .right, table.lines th.right { text-align: right; }
     .muted { color: #666; font-size: 9pt; }
-    footer { margin-top: 10mm; font-size: 8pt; color: #666; text-align: center; }
+    @page { margin-top: 38mm; margin-bottom: 22mm; }
+    .company { width: 180mm; }
+    .legal { font-size: 7.5pt; color: #666; text-align: center; width: 180mm; }
   </style>
   {% block styles %}{% endblock %}
 </head>
 <body>
+  <div class="docmint-header">
   <div class="company">
     <div class="logo"><img src="/images/logo.png" alt="Logo" width="120"></div>
     <div class="identity">
@@ -27,7 +30,11 @@
       NIF 1000000000 · RCCM TG-LOM 2026 B 0001
     </div>
   </div>
+  </div>
   {% block content %}{% endblock %}
-  <footer>Document généré avec DocMint — Business documents from HTML, in one line of Java.</footer>
+  <div class="docmint-footer legal">
+    Quincaillerie du Golfe SARL · Capital 10 000 000 FCFA · Page <span class="docmint-page"></span> / <span class="docmint-pages"></span><br>
+    Document généré avec DocMint — Business documents from HTML, in one line of Java.
+  </div>
 </body>
 </html>

@@ -41,5 +41,14 @@
     <tr><td><strong>Total TTC</strong></td><td class="right"><strong>{{ totalIncludingTax | fcfa }}</strong></td></tr>
   </table>
 
-  <p class="muted">Arrêtée la présente facture à la somme de {{ totalIncludingTax | fcfa }}. Paiement par Mobile Money ou virement.</p>
+  <table style="width: 100%; margin-top: 8mm">
+    <tr>
+      <td>
+        <p>Arrêtée la présente facture à la somme de <strong>{{ totalIncludingTax | words("XOF") }}</strong>
+          ({{ totalIncludingTax | fcfa }}).</p>
+        <p class="muted">Paiement par Mobile Money ou virement. Scannez le code pour vérifier l'authenticité de la facture.</p>
+      </td>
+      <td class="right" style="width: 32mm">{{ qr(verificationUrl, size="28mm") }}</td>
+    </tr>
+  </table>
 {% endblock %}

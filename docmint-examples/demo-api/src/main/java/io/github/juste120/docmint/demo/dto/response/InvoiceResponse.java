@@ -14,4 +14,6 @@ public record InvoiceResponse(
     BigDecimal totalExcludingTax,
     BigDecimal vatRate,
     BigDecimal vat,
-    BigDecimal totalIncludingTax) {}
+    BigDecimal totalIncludingTax,
+    boolean paid,
+    String verificationUrl) {}

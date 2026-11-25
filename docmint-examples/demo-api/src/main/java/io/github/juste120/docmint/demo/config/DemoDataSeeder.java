@@ -40,7 +40,8 @@ public class DemoDataSeeder {
           new Invoice("F-2026-001", LocalDate.of(2026, 11, 24), LocalDate.of(2026, 12, 24), kossi)
               .addLine(new InvoiceLine("Ciment CPJ 45 (sac de 50 kg)", 40, new BigDecimal("5200")))
               .addLine(new InvoiceLine("Fer à béton Ø12", 25, new BigDecimal("4750")))
-              .addLine(new InvoiceLine("Transport Lomé – Kpalimé", 1, new BigDecimal("35000")));
+              .addLine(new InvoiceLine("Transport Lomé – Kpalimé", 1, new BigDecimal("35000")))
+              .markPaid();
       invoices.save(first);
       Invoice second =
           new Invoice(
