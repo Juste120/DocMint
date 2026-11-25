@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: agbale-demo-api
+  jpa:
+    open-in-view: false
+  datasource:
+    url: jdbc:h2:mem:agbale-demo;DB_CLOSE_DELAY=-1
+
+# Agbale works with zero configuration. These are the defaults, shown for reference:
+agbale:
+  templates-path: reports
+  locale: fr
+  cache:
+    enabled: true

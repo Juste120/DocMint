@@ -1,0 +1,45 @@
+{% extends "layouts/base" %}
+
+{% block title %}Facture {{ number }}{% endblock %}
+
+{% block content %}
+  <h1>Facture n° {{ number }}</h1>
+  <table style="width: 100%">
+    <tr>
+      <td>
+        <strong>Client</strong><br>
+        {{ customer.name }} ({{ customer.code }})<br>
+        {{ customer.address }}, {{ customer.city }}<br>
+        {{ customer.phone }}
+      </td>
+      <td class="right">
+        Date : {{ issueDate | date }}<br>
+        Échéance : {{ dueDate | date }}
+      </td>
+    </tr>
+  </table>
+
+  <table class="lines">
+    <thead>
+      <tr><th>Désignation</th><th class="right">Qté</th><th class="right">Prix unitaire</th><th class="right">Montant</th></tr>
+    </thead>
+    <tbody>
+      {% for line in lines %}
+      <tr>
+        <td>{{ line.description }}</td>
+        <td class="right">{{ line.quantity }}</td>
+        <td class="right">{{ line.unitPrice | fcfa }}</td>
+        <td class="right">{{ line.amount | fcfa }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table style="width: 60%; margin-left: 40%; margin-top: 6mm; white-space: nowrap">
+    <tr><td>Total HT</td><td class="right">{{ totalExcludingTax | fcfa }}</td></tr>
+    <tr><td>TVA ({{ (vatRate * 100) | numberformat("#") }} %)</td><td class="right">{{ vat | fcfa }}</td></tr>
+    <tr><td><strong>Total TTC</strong></td><td class="right"><strong>{{ totalIncludingTax | fcfa }}</strong></td></tr>
+  </table>
+
+  <p class="muted">Arrêtée la présente facture à la somme de {{ totalIncludingTax | fcfa }}. Paiement par Mobile Money ou virement.</p>
+{% endblock %}

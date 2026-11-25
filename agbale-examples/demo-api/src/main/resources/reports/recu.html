@@ -1,0 +1,16 @@
+{% extends "layouts/base" %}
+
+{% block title %}Reçu {{ number }}{% endblock %}
+
+{% block content %}
+  <h1>Reçu de paiement n° {{ number }}</h1>
+  <p>Reçu de <strong>{{ payerName }}</strong> la somme de <strong>{{ amount | fcfa }}</strong>.</p>
+  <table class="lines">
+    <tbody>
+      <tr><td>Date du paiement</td><td class="right">{{ paidAt | date("dd/MM/yyyy 'à' HH:mm") }}</td></tr>
+      <tr><td>Mode de paiement</td><td class="right">{{ method }}</td></tr>
+      <tr><td>Facture concernée</td><td class="right">{{ invoiceNumber }}</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top: 15mm" class="right">Le caissier</p>
+{% endblock %}
