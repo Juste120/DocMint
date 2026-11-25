@@ -10,9 +10,14 @@ import java.util.Objects;
  * @param maxPages maximum number of pages of a generated document
  * @param maxRenderTime maximum duration of one render
  * @param maxImagePixels maximum number of pixels of a generated image (PNG preview)
+ * @param maxExportRows maximum number of rows of a CSV or Excel export
  */
 public record ResourceLimits(
-    long maxTemplateBytes, int maxPages, Duration maxRenderTime, long maxImagePixels) {
+    long maxTemplateBytes,
+    int maxPages,
+    Duration maxRenderTime,
+    long maxImagePixels,
+    int maxExportRows) {
 
   /** Default maximum template size: 1 MiB. */
   public static final long DEFAULT_MAX_TEMPLATE_BYTES = 1024L * 1024L;
@@ -25,6 +30,9 @@ public record ResourceLimits(
 
   /** Default maximum image size: 25 megapixels. */
   public static final long DEFAULT_MAX_IMAGE_PIXELS = 25_000_000L;
+
+  /** Default maximum number of exported rows: 100 000. */
+  public static final int DEFAULT_MAX_EXPORT_ROWS = 100_000;
 
   /** Ratio between the maximum rendered HTML size and the maximum template size. */
   private static final int RENDERED_SIZE_RATIO = 8;
@@ -51,6 +59,22 @@ public record ResourceLimits(
     if (maxImagePixels <= 0) {
       throw new IllegalArgumentException("maxImagePixels must be > 0");
     }
+    if (maxExportRows <= 0) {
+      throw new IllegalArgumentException("maxExportRows must be > 0");
+    }
+  }
+
+  /**
+   * Creates limits with the default export row limit (V2 constructor).
+   *
+   * @param maxTemplateBytes maximum size in bytes of each template file
+   * @param maxPages maximum number of pages
+   * @param maxRenderTime maximum duration of one render
+   * @param maxImagePixels maximum number of pixels of a generated image
+   */
+  public ResourceLimits(
+      long maxTemplateBytes, int maxPages, Duration maxRenderTime, long maxImagePixels) {
+    this(maxTemplateBytes, maxPages, maxRenderTime, maxImagePixels, DEFAULT_MAX_EXPORT_ROWS);
   }
 
   /**
@@ -61,7 +85,12 @@ public record ResourceLimits(
    * @param maxRenderTime maximum duration of one render
    */
   public ResourceLimits(long maxTemplateBytes, int maxPages, Duration maxRenderTime) {
-    this(maxTemplateBytes, maxPages, maxRenderTime, DEFAULT_MAX_IMAGE_PIXELS);
+    this(
+        maxTemplateBytes,
+        maxPages,
+        maxRenderTime,
+        DEFAULT_MAX_IMAGE_PIXELS,
+        DEFAULT_MAX_EXPORT_ROWS);
   }
 
   /**
@@ -91,7 +120,7 @@ public record ResourceLimits(
    * @return the new limits
    */
   public ResourceLimits withMaxTemplateBytes(long bytes) {
-    return new ResourceLimits(bytes, maxPages, maxRenderTime, maxImagePixels);
+    return new ResourceLimits(bytes, maxPages, maxRenderTime, maxImagePixels, maxExportRows);
   }
 
   /**
@@ -101,7 +130,8 @@ public record ResourceLimits(
    * @return the new limits
    */
   public ResourceLimits withMaxPages(int pages) {
-    return new ResourceLimits(maxTemplateBytes, pages, maxRenderTime, maxImagePixels);
+    return new ResourceLimits(
+        maxTemplateBytes, pages, maxRenderTime, maxImagePixels, maxExportRows);
   }
 
   /**
@@ -111,7 +141,7 @@ public record ResourceLimits(
    * @return the new limits
    */
   public ResourceLimits withMaxRenderTime(Duration duration) {
-    return new ResourceLimits(maxTemplateBytes, maxPages, duration, maxImagePixels);
+    return new ResourceLimits(maxTemplateBytes, maxPages, duration, maxImagePixels, maxExportRows);
   }
 
   /**
@@ -121,6 +151,16 @@ public record ResourceLimits(
    * @return the new limits
    */
   public ResourceLimits withMaxImagePixels(long pixels) {
-    return new ResourceLimits(maxTemplateBytes, maxPages, maxRenderTime, pixels);
+    return new ResourceLimits(maxTemplateBytes, maxPages, maxRenderTime, pixels, maxExportRows);
+  }
+
+  /**
+   * Returns a copy with another export row limit.
+   *
+   * @param rows the new limit
+   * @return the new limits
+   */
+  public ResourceLimits withMaxExportRows(int rows) {
+    return new ResourceLimits(maxTemplateBytes, maxPages, maxRenderTime, maxImagePixels, rows);
   }
 }

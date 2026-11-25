@@ -49,10 +49,11 @@
     <module>docmint-bom</module>
     <module>docmint-core</module>
     <module>docmint-spring-boot-starter</module>
+    <module>docmint-excel</module>
   </modules>
 
   <properties>
-    <revision>0.2.0-SNAPSHOT</revision>
+    <revision>0.3.0-SNAPSHOT</revision>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -64,6 +65,7 @@
     <pdfbox.version>3.0.8</pdfbox.version>
     <jsoup.version>1.24.1</jsoup.version>
     <zxing.version>3.5.4</zxing.version>
+    <poi.version>6.0.0</poi.version>
     <slf4j.version>2.0.20</slf4j.version>
     <spring-boot.version>4.2.0</spring-boot.version>
 
@@ -110,6 +112,16 @@
         <groupId>io.github.juste120</groupId>
         <artifactId>docmint-spring-boot-starter</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.juste120</groupId>
+        <artifactId>docmint-excel</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml</artifactId>
+        <version>${poi.version}</version>
       </dependency>
       <dependency>
         <groupId>io.pebbletemplates</groupId>

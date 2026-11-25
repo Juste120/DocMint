@@ -1,5 +1,6 @@
 package io.github.juste120.docmint.api;
 
+import io.github.juste120.docmint.domain.CsvSettings;
 import io.github.juste120.docmint.domain.DocumentOptions;
 import io.github.juste120.docmint.domain.PreviewSettings;
 import io.github.juste120.docmint.domain.Protection;
@@ -21,7 +22,26 @@ public record RenderOptions(
     String fileName,
     Watermark watermark,
     Protection protection,
-    PreviewSettings preview) {
+    PreviewSettings preview,
+    CsvSettings csv) {
+
+  /**
+   * Creates options without CSV settings (V2 constructor).
+   *
+   * @param locale the locale, or {@code null}
+   * @param fileName the file name, or {@code null}
+   * @param watermark the watermark, or {@code null}
+   * @param protection the protection, or {@code null}
+   * @param preview the preview settings, or {@code null}
+   */
+  public RenderOptions(
+      Locale locale,
+      String fileName,
+      Watermark watermark,
+      Protection protection,
+      PreviewSettings preview) {
+    this(locale, fileName, watermark, protection, preview, null);
+  }
 
   /**
    * Creates options with a locale and a file name only (V1 constructor).
@@ -30,7 +50,7 @@ public record RenderOptions(
    * @param fileName the file name, or {@code null}
    */
   public RenderOptions(Locale locale, String fileName) {
-    this(locale, fileName, null, null, null);
+    this(locale, fileName, null, null, null, null);
   }
 
   /**
@@ -39,7 +59,7 @@ public record RenderOptions(
    * @return the default options
    */
   public static RenderOptions defaults() {
-    return new RenderOptions(null, null, null, null, null);
+    return new RenderOptions(null, null, null, null, null, null);
   }
 
   /**
@@ -49,7 +69,7 @@ public record RenderOptions(
    * @return the new options
    */
   public RenderOptions withLocale(Locale newLocale) {
-    return new RenderOptions(newLocale, fileName, watermark, protection, preview);
+    return new RenderOptions(newLocale, fileName, watermark, protection, preview, csv);
   }
 
   /**
@@ -59,7 +79,7 @@ public record RenderOptions(
    * @return the new options
    */
   public RenderOptions withFileName(String newFileName) {
-    return new RenderOptions(locale, newFileName, watermark, protection, preview);
+    return new RenderOptions(locale, newFileName, watermark, protection, preview, csv);
   }
 
   /**
@@ -69,7 +89,7 @@ public record RenderOptions(
    * @return the new options
    */
   public RenderOptions withWatermark(Watermark newWatermark) {
-    return new RenderOptions(locale, fileName, newWatermark, protection, preview);
+    return new RenderOptions(locale, fileName, newWatermark, protection, preview, csv);
   }
 
   /**
@@ -79,7 +99,7 @@ public record RenderOptions(
    * @return the new options
    */
   public RenderOptions withProtection(Protection newProtection) {
-    return new RenderOptions(locale, fileName, watermark, newProtection, preview);
+    return new RenderOptions(locale, fileName, watermark, newProtection, preview, csv);
   }
 
   /**
@@ -89,7 +109,17 @@ public record RenderOptions(
    * @return the new options
    */
   public RenderOptions withPreview(PreviewSettings newPreview) {
-    return new RenderOptions(locale, fileName, watermark, protection, newPreview);
+    return new RenderOptions(locale, fileName, watermark, protection, newPreview, csv);
+  }
+
+  /**
+   * Returns a copy with another CSV dialect.
+   *
+   * @param newCsv the separator and BOM settings
+   * @return the new options
+   */
+  public RenderOptions withCsv(CsvSettings newCsv) {
+    return new RenderOptions(locale, fileName, watermark, protection, preview, newCsv);
   }
 
   /**
@@ -100,6 +130,6 @@ public record RenderOptions(
    */
   public DocumentOptions documentOptions(Watermark defaultWatermark) {
     return new DocumentOptions(
-        watermark != null ? watermark : defaultWatermark, protection, preview);
+        watermark != null ? watermark : defaultWatermark, protection, preview, csv);
   }
 }

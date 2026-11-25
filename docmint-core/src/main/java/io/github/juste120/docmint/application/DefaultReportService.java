@@ -4,6 +4,7 @@ import io.github.juste120.docmint.api.InvalidOptionsException;
 import io.github.juste120.docmint.api.InvalidTemplateNameException;
 import io.github.juste120.docmint.api.LimitExceededException;
 import io.github.juste120.docmint.api.RenderException;
+import io.github.juste120.docmint.api.RenderOptions;
 import io.github.juste120.docmint.api.RenderRequest;
 import io.github.juste120.docmint.api.RenderResponse;
 import io.github.juste120.docmint.api.TemplateNotFoundException;
@@ -16,10 +17,15 @@ import io.github.juste120.docmint.domain.Watermark;
 import io.github.juste120.docmint.port.PostProcessContext;
 import io.github.juste120.docmint.port.PostProcessor;
 import io.github.juste120.docmint.port.RenderContext;
+import io.github.juste120.docmint.port.TableData;
+import io.github.juste120.docmint.port.TableWriter;
 import io.github.juste120.docmint.port.TemplateEngine;
 import io.github.juste120.docmint.port.TemplateResolver;
+import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +49,7 @@ public final class DefaultReportService implements ReportService {
   private final TimeLimiter timeLimiter;
   private final List<PostProcessor> postProcessors;
   private final Watermark defaultWatermark;
+  private final Map<OutputFormat, TableWriter> tableWriters = new EnumMap<>(OutputFormat.class);
 
   /**
    * Creates the service.
@@ -55,6 +62,7 @@ public final class DefaultReportService implements ReportService {
    * @param classLoader the class loader set as context class loader during renders
    * @param postProcessors the post-processors, in order
    * @param defaultWatermark the watermark applied when a request has none, or {@code null}
+   * @param tableWriters the writers of tabular formats (CSV, Excel...)
    */
   public DefaultReportService(
       TemplateResolver resolver,
@@ -64,7 +72,8 @@ public final class DefaultReportService implements ReportService {
       ResourceLimits limits,
       ClassLoader classLoader,
       List<PostProcessor> postProcessors,
-      Watermark defaultWatermark) {
+      Watermark defaultWatermark,
+      List<TableWriter> tableWriters) {
     this.resolver = Objects.requireNonNull(resolver, "resolver");
     this.engine = Objects.requireNonNull(engine, "engine");
     this.renderers = Objects.requireNonNull(renderers, "renderers");
@@ -73,6 +82,9 @@ public final class DefaultReportService implements ReportService {
     this.timeLimiter = new TimeLimiter(classLoader);
     this.postProcessors = List.copyOf(postProcessors);
     this.defaultWatermark = defaultWatermark;
+    for (TableWriter writer : tableWriters) {
+      this.tableWriters.put(writer.format(), writer);
+    }
   }
 
   @Override
@@ -123,6 +135,32 @@ public final class DefaultReportService implements ReportService {
     return responseMapper.toResponse(document, name, request.options());
   }
 
+  @Override
+  public RenderResponse export(Collection<?> rows, OutputFormat format, RenderOptions options) {
+    Objects.requireNonNull(rows, "rows");
+    TableWriter writer = tableWriters.get(format);
+    if (writer == null) {
+      throw new RenderException(missingConverter(OutputFormat.HTML, format), null);
+    }
+    TableData table = ColumnModel.toTable(rows, "Export");
+    if (table.dataRowCount() > limits.maxExportRows()) {
+      throw new LimitExceededException(
+          "export", LimitExceededException.Limit.EXPORT_ROWS, limits.maxExportRows() + " rows");
+    }
+    RenderOptions effective = options == null ? RenderOptions.defaults() : options;
+    byte[] content = writer.write(List.of(table), effective.documentOptions(null));
+    return responseMapper.toResponse(
+        new RenderedDocument(content, format, 1), TemplateName.of("export"), effective);
+  }
+
+  private static String missingConverter(OutputFormat from, OutputFormat to) {
+    String hint =
+        to == OutputFormat.XLSX
+            ? " Add the dependency io.github.juste120:docmint-excel to produce Excel files."
+            : " Register a PostProcessor or TableWriter for this format.";
+    return "Nothing converts " + from + " to " + to + "." + hint;
+  }
+
   private RenderedDocument postProcess(RenderedDocument rendered, PostProcessContext context) {
     RenderedDocument document = rendered;
     for (PostProcessor postProcessor : postProcessors) {
@@ -132,12 +170,7 @@ public final class DefaultReportService implements ReportService {
     }
     if (document.format() != context.requestedFormat()) {
       throw new RenderException(
-          "No post-processor converts "
-              + document.format()
-              + " to "
-              + context.requestedFormat()
-              + ". Register a PostProcessor for this format.",
-          null);
+          missingConverter(document.format(), context.requestedFormat()), null);
     }
     return document;
   }

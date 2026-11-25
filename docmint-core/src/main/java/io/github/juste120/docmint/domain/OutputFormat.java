@@ -12,7 +12,16 @@ public enum OutputFormat {
   PDF("application/pdf", "pdf", null),
 
   /** PNG image of one page, produced from the PDF (preview). */
-  PNG("image/png", "png", PDF);
+  PNG("image/png", "png", PDF),
+
+  /** The HTML produced by the template, before any conversion. */
+  HTML("text/html", "html", null),
+
+  /** Comma (or semicolon) separated values, produced from a table of the template. */
+  CSV("text/csv", "csv", HTML),
+
+  /** Excel workbook, produced from the tables of the template (module {@code docmint-excel}). */
+  XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", HTML);
 
   private final String mediaType;
   private final String fileExtension;

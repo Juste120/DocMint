@@ -8,6 +8,9 @@ import io.github.juste120.docmint.domain.PageSettings;
 import io.github.juste120.docmint.domain.ResourceAccessPolicy;
 import io.github.juste120.docmint.domain.ResourceLimits;
 import io.github.juste120.docmint.domain.Watermark;
+import io.github.juste120.docmint.infrastructure.export.CsvTableWriter;
+import io.github.juste120.docmint.infrastructure.export.HtmlDocumentRenderer;
+import io.github.juste120.docmint.infrastructure.export.TablePostProcessor;
 import io.github.juste120.docmint.infrastructure.pdf.FontRegistry;
 import io.github.juste120.docmint.infrastructure.pdf.OpenHtmlPdfRenderer;
 import io.github.juste120.docmint.infrastructure.pdf.PdfProtectionPostProcessor;
@@ -18,11 +21,13 @@ import io.github.juste120.docmint.infrastructure.template.ClasspathTemplateResol
 import io.github.juste120.docmint.infrastructure.template.ConcurrentTemplateCache;
 import io.github.juste120.docmint.port.DocumentRenderer;
 import io.github.juste120.docmint.port.PostProcessor;
+import io.github.juste120.docmint.port.TableWriter;
 import io.github.juste120.docmint.port.TemplateResolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -246,6 +251,7 @@ public final class DocMintBuilder {
             missingResources,
             pageSettings,
             new FontRegistry(fonts, loader)));
+    renderers.add(new HtmlDocumentRenderer());
     renderers.addAll(customRenderers);
     if (policy.hasWildcard()) {
       LOG.warn(
@@ -258,6 +264,13 @@ public final class DocMintBuilder {
     postProcessors.add(new PdfWatermarkPostProcessor(templatesPath, loader));
     postProcessors.add(new PdfProtectionPostProcessor());
     postProcessors.addAll(customPostProcessors);
+    // Tabular formats: CSV built in, others (Excel) discovered on the class path.
+    List<TableWriter> tableWriters = new ArrayList<>();
+    tableWriters.add(new CsvTableWriter());
+    ServiceLoader.load(TableWriter.class, loader).forEach(tableWriters::add);
+    for (TableWriter writer : tableWriters) {
+      postProcessors.add(new TablePostProcessor(writer));
+    }
     postProcessors.add(new PngPreviewPostProcessor());
     return new DocMint(
         new DefaultReportService(
@@ -268,7 +281,8 @@ public final class DocMintBuilder {
             limits,
             loader,
             postProcessors,
-            defaultWatermark));
+            defaultWatermark,
+            tableWriters));
   }
 
   private static ClassLoader defaultClassLoader() {

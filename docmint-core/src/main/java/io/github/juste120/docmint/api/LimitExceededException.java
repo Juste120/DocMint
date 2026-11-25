@@ -24,7 +24,9 @@ public final class LimitExceededException extends RenderException {
     /** Duration of the render. */
     RENDER_TIME("max render time", "maxRenderTime", "docmint.limits.max-render-time"),
     /** Number of pixels of a generated image. */
-    IMAGE_SIZE("max image size", "maxImagePixels", "docmint.limits.max-image-pixels");
+    IMAGE_SIZE("max image size", "maxImagePixels", "docmint.limits.max-image-pixels"),
+    /** Number of rows of a CSV or Excel export. */
+    EXPORT_ROWS("max export rows", "maxExportRows", "docmint.limits.max-export-rows");
 
     private final String label;
     private final String builderSetting;

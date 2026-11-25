@@ -2,6 +2,7 @@ package io.github.juste120.docmint.api;
 
 import io.github.juste120.docmint.application.ReportService;
 import io.github.juste120.docmint.domain.OutputFormat;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -88,6 +89,32 @@ public final class DocMint {
   public byte[] png(String templateName, Object data) {
     return render(new RenderRequest(templateName, data, OutputFormat.PNG, RenderOptions.defaults()))
         .content();
+  }
+
+  /**
+   * Exports a collection of objects as CSV ({@code ;} separator and UTF-8 BOM by default). Columns
+   * come from {@link ExcelColumn} annotations, or every property when none is annotated.
+   *
+   * @param rows the rows (records, objects with getters or maps)
+   * @return the CSV bytes
+   * @throws DocMintException if the rows cannot be read or exceed the row limit
+   */
+  public byte[] csv(Collection<?> rows) {
+    return export(rows, OutputFormat.CSV, RenderOptions.defaults()).content();
+  }
+
+  /**
+   * Exports a collection of objects in a tabular format: {@link OutputFormat#CSV}, or {@link
+   * OutputFormat#XLSX} with the {@code docmint-excel} module.
+   *
+   * @param rows the rows
+   * @param format the format
+   * @param options file name and CSV dialect
+   * @return the file with its media type and file name
+   * @throws DocMintException if the format is not available or the rows cannot be read
+   */
+  public RenderResponse export(Collection<?> rows, OutputFormat format, RenderOptions options) {
+    return service.export(rows, format, options);
   }
 
   /**

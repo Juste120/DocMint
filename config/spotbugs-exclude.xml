@@ -16,6 +16,11 @@
     </Or>
     <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
   </Match>
+  <!-- Post-processors hold their strategy (an injected, stateless TableWriter service). -->
+  <Match>
+    <Class name="io.github.juste120.docmint.infrastructure.export.TablePostProcessor"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
   <!-- Demo application is never published. -->
   <Match>
     <Package name="~io\.github\.juste120\.docmint\.demo.*"/>
