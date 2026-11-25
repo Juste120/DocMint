@@ -1,0 +1,13 @@
+<html><body>
+{% set p = pivot(sales, rows="city", columns="month", value="amount", aggregate=aggregate, sort=sort) %}
+<table class="docmint-export">
+  <thead><tr><th>Ville</th>{% for c in p.columnKeys %}<th>{{ c }}</th>{% endfor %}<th>Total</th></tr></thead>
+  <tbody>
+  {% for r in p.rowKeys %}
+    {% set ri = loop.index %}
+    <tr><td>{{ r }}</td>{% for c in p.columnKeys %}<td>{{ p.cells[ri][loop.index] | default("-") }}</td>{% endfor %}<td>{{ p.rowTotals[ri] }}</td></tr>
+  {% endfor %}
+  </tbody>
+  <tfoot><tr><td>Total</td>{% for t in p.columnTotals %}<td>{{ t }}</td>{% endfor %}<td>{{ p.total }}</td></tr></tfoot>
+</table>
+</body></html>

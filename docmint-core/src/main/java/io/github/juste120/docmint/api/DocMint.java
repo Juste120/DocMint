@@ -1,11 +1,18 @@
 package io.github.juste120.docmint.api;
 
 import io.github.juste120.docmint.application.ReportService;
+import io.github.juste120.docmint.domain.CsvSettings;
 import io.github.juste120.docmint.domain.OutputFormat;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.stream.Stream;
 
 /**
  * Entry point of DocMint: generates business documents from HTML/CSS templates.
@@ -24,9 +31,11 @@ import java.util.Objects;
 public final class DocMint {
 
   private final ReportService service;
+  private final Executor executor;
 
-  DocMint(ReportService service) {
+  DocMint(ReportService service, Executor executor) {
     this.service = service;
+    this.executor = executor;
   }
 
   /**
@@ -126,6 +135,50 @@ public final class DocMint {
    */
   public RenderResponse render(RenderRequest request) {
     return service.render(request);
+  }
+
+  /**
+   * Renders a document directly into a stream (e.g. an HTTP response or a file).
+   *
+   * @param request the request
+   * @param out where to write; not closed
+   * @return the metadata of the document (media type, file name, page count)
+   * @throws DocMintException if the template cannot be found or rendered
+   * @throws UncheckedIOException if writing to the stream fails
+   */
+  public RenderResponse render(RenderRequest request, OutputStream out) {
+    RenderResponse response = render(request);
+    try {
+      out.write(response.content());
+      out.flush();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+    return response;
+  }
+
+  /**
+   * Streams a list of objects as CSV, row by row: memory does not grow with the number of rows (for
+   * large exports from a database cursor). The row limit does not apply.
+   *
+   * @param rows the rows, e.g. a Spring Data {@code Stream} (closed after use)
+   * @param out where to write; not closed
+   * @param settings the CSV dialect, or {@code null} for {@code ;} and BOM
+   * @return the number of data rows written
+   * @throws DocMintException if a row cannot be read
+   */
+  public long exportCsv(Stream<?> rows, OutputStream out, CsvSettings settings) {
+    return service.exportCsv(rows, out, settings);
+  }
+
+  /**
+   * Renders a document without blocking the calling thread, on the configured executor.
+   *
+   * @param request the request
+   * @return a future completed with the document, or exceptionally with a {@link DocMintException}
+   */
+  public CompletableFuture<RenderResponse> renderAsync(RenderRequest request) {
+    return CompletableFuture.supplyAsync(() -> render(request), executor);
   }
 
   /**

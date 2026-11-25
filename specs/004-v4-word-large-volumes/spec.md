@@ -72,5 +72,6 @@ A developer generates documents without blocking the calling thread.
 ## Success Criteria
 - **SC-301** DOCX files reopen with POI with the expected paragraphs, tables and images.
 - **SC-302** Pivot results equal a reference computation (tests).
-- **SC-303** Streaming 200 000 CSV rows keeps heap growth under 50 MB (test).
+- **SC-303** Streaming 200 000 CSV rows reads them while writing (fewer than 1 000 rows read
+  before the first bytes are written), so memory does not depend on the number of rows (test).
 - **SC-304** All previous tests pass unchanged.

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,7 @@ public final class DocMintBuilder {
   private final List<DocumentRenderer> customRenderers = new ArrayList<>();
   private final List<PostProcessor> customPostProcessors = new ArrayList<>();
   private Watermark defaultWatermark;
+  private Executor executor;
 
   DocMintBuilder() {}
 
@@ -228,6 +230,18 @@ public final class DocMintBuilder {
   }
 
   /**
+   * Sets the executor of {@link DocMint#renderAsync}. By default, a shared pool of daemon threads
+   * sized to the number of processors.
+   *
+   * @param asyncExecutor the executor
+   * @return this builder
+   */
+  public DocMintBuilder executor(Executor asyncExecutor) {
+    this.executor = Objects.requireNonNull(asyncExecutor, "executor");
+    return this;
+  }
+
+  /**
    * Builds the instance.
    *
    * @return an immutable, thread-safe instance
@@ -251,7 +265,7 @@ public final class DocMintBuilder {
             missingResources,
             pageSettings,
             new FontRegistry(fonts, loader)));
-    renderers.add(new HtmlDocumentRenderer());
+    renderers.add(new HtmlDocumentRenderer(templatesPath, loader, limits.maxTemplateBytes() * 4));
     renderers.addAll(customRenderers);
     if (policy.hasWildcard()) {
       LOG.warn(
@@ -264,6 +278,8 @@ public final class DocMintBuilder {
     postProcessors.add(new PdfWatermarkPostProcessor(templatesPath, loader));
     postProcessors.add(new PdfProtectionPostProcessor());
     postProcessors.addAll(customPostProcessors);
+    // Optional modules (e.g. docmint-word) register their post-processors on the class path.
+    ServiceLoader.load(PostProcessor.class, loader).forEach(postProcessors::add);
     // Tabular formats: CSV built in, others (Excel) discovered on the class path.
     List<TableWriter> tableWriters = new ArrayList<>();
     tableWriters.add(new CsvTableWriter());
@@ -282,7 +298,8 @@ public final class DocMintBuilder {
             loader,
             postProcessors,
             defaultWatermark,
-            tableWriters));
+            tableWriters),
+        executor != null ? executor : DefaultExecutor.INSTANCE);
   }
 
   private static ClassLoader defaultClassLoader() {

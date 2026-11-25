@@ -50,10 +50,11 @@
     <module>docmint-core</module>
     <module>docmint-spring-boot-starter</module>
     <module>docmint-excel</module>
+    <module>docmint-word</module>
   </modules>
 
   <properties>
-    <revision>0.3.0-SNAPSHOT</revision>
+    <revision>0.4.0-SNAPSHOT</revision>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -116,6 +117,11 @@
       <dependency>
         <groupId>io.github.juste120</groupId>
         <artifactId>docmint-excel</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.juste120</groupId>
+        <artifactId>docmint-word</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

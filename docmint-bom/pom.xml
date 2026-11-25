@@ -32,6 +32,11 @@
         <artifactId>docmint-excel</artifactId>
         <version>${revision}</version>
       </dependency>
+      <dependency>
+        <groupId>io.github.juste120</groupId>
+        <artifactId>docmint-word</artifactId>
+        <version>${revision}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

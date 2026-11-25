@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,49 @@ final class ColumnModel {
   }
 
   private ColumnModel() {}
+
+  /** A header and lazily computed rows. */
+  record Streamed(List<Cell> header, Iterator<List<Cell>> rows) {}
+
+  /** Reads columns from the first element, then converts the following ones lazily. */
+  static Streamed stream(Iterator<?> source) {
+    Object first = null;
+    while (first == null && source.hasNext()) {
+      first = source.next();
+    }
+    if (first == null) {
+      return new Streamed(List.of(), java.util.Collections.emptyIterator());
+    }
+    List<Column> columns = columns(first);
+    Object head = first;
+    Iterator<List<Cell>> rows =
+        new Iterator<>() {
+          private Object pending = head;
+
+          @Override
+          public boolean hasNext() {
+            while (pending == null && source.hasNext()) {
+              pending = source.next();
+            }
+            return pending != null;
+          }
+
+          @Override
+          public List<Cell> next() {
+            if (!hasNext()) {
+              throw new java.util.NoSuchElementException();
+            }
+            Object row = pending;
+            pending = null;
+            List<Cell> cells = new ArrayList<>(columns.size());
+            for (Column column : columns) {
+              cells.add(cell(read(column, row)));
+            }
+            return cells;
+          }
+        };
+    return new Streamed(columns.stream().map(c -> Cell.text(c.header())).toList(), rows);
+  }
 
   static TableData toTable(Collection<?> rows, String sheetName) {
     Object sample = rows.stream().filter(r -> r != null).findFirst().orElse(null);

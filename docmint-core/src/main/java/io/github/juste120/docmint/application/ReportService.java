@@ -3,9 +3,12 @@ package io.github.juste120.docmint.application;
 import io.github.juste120.docmint.api.RenderOptions;
 import io.github.juste120.docmint.api.RenderRequest;
 import io.github.juste120.docmint.api.RenderResponse;
+import io.github.juste120.docmint.domain.CsvSettings;
 import io.github.juste120.docmint.domain.OutputFormat;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 /** Use cases of DocMint: render a document, list templates, clear the cache. */
 public interface ReportService {
@@ -28,6 +31,16 @@ public interface ReportService {
    * @return the file
    */
   RenderResponse export(Collection<?> rows, OutputFormat format, RenderOptions options);
+
+  /**
+   * Streams a list of objects as CSV, row by row, with constant memory.
+   *
+   * @param rows the rows (closed after use)
+   * @param out where to write; not closed
+   * @param settings the CSV dialect, or {@code null} for the defaults
+   * @return the number of data rows written
+   */
+  long exportCsv(Stream<?> rows, OutputStream out, CsvSettings settings);
 
   /**
    * Lists the available templates.

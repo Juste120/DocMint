@@ -1,0 +1,15 @@
+<html><head><style>p { color: red; }</style></head><body>
+<div class="docmint-header"><img src="/images/logo.png" style="height: 8mm"> Société du Golfe</div>
+<h1>Contrat de prestation</h1>
+<p>Entre <b>{{ client }}</b> et <i>la société</i>, il est <u>convenu</u> :<br>ligne deux</p>
+<ul><li>Premier point</li><li>Second point</li></ul>
+<ol><li>Un</li><li>Deux</li></ol>
+<table>
+  <thead><tr><th>Désignation</th><th>Montant</th></tr></thead>
+  <tbody><tr><td>Service</td><td>{{ 150000 | fcfa }}</td></tr><tr><td colspan="2">Total en lettres : {{ 150000 | words("XOF") }}</td></tr></tbody>
+</table>
+{{ qr("https://docmint.example/c/1") }}
+<div class="page-break"></div>
+<p>Signature : {{ signature }}</p>
+<div class="docmint-footer">Page <span class="docmint-page"></span> / <span class="docmint-pages"></span></div>
+</body></html>

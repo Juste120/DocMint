@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Registers DocMint's business filters ({@code fcfa}, {@code money}, {@code sum}, {@code date},
- * {@code words}) and functions ({@code qr}, {@code barcode}, {@code chart}).
+ * {@code words}) and functions ({@code qr}, {@code barcode}, {@code chart}, {@code pivot}).
  */
 final class DocMintExtension extends AbstractExtension {
 
@@ -26,6 +26,7 @@ final class DocMintExtension extends AbstractExtension {
     return Map.of(
         CodeFunctions.Qr.NAME, new CodeFunctions.Qr(),
         CodeFunctions.Barcode.NAME, new CodeFunctions.Barcode(),
-        ChartFunction.NAME, new ChartFunction());
+        ChartFunction.NAME, new ChartFunction(),
+        PivotFunction.NAME, new PivotFunction());
   }
 }

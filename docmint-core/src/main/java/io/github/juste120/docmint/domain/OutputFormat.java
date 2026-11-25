@@ -21,7 +21,10 @@ public enum OutputFormat {
   CSV("text/csv", "csv", HTML),
 
   /** Excel workbook, produced from the tables of the template (module {@code docmint-excel}). */
-  XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", HTML);
+  XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", HTML),
+
+  /** Word document, produced from the HTML of the template (module {@code docmint-word}). */
+  DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx", HTML);
 
   private final String mediaType;
   private final String fileExtension;

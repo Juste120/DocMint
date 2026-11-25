@@ -8,6 +8,7 @@ import io.github.juste120.docmint.api.RenderOptions;
 import io.github.juste120.docmint.api.RenderRequest;
 import io.github.juste120.docmint.api.RenderResponse;
 import io.github.juste120.docmint.api.TemplateNotFoundException;
+import io.github.juste120.docmint.domain.CsvSettings;
 import io.github.juste120.docmint.domain.DocumentOptions;
 import io.github.juste120.docmint.domain.OutputFormat;
 import io.github.juste120.docmint.domain.RenderedDocument;
@@ -21,12 +22,14 @@ import io.github.juste120.docmint.port.TableData;
 import io.github.juste120.docmint.port.TableWriter;
 import io.github.juste120.docmint.port.TemplateEngine;
 import io.github.juste120.docmint.port.TemplateResolver;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,11 +156,27 @@ public final class DefaultReportService implements ReportService {
         new RenderedDocument(content, format, 1), TemplateName.of("export"), effective);
   }
 
+  @Override
+  public long exportCsv(Stream<?> rows, OutputStream out, CsvSettings settings) {
+    Objects.requireNonNull(rows, "rows");
+    Objects.requireNonNull(out, "out");
+    TableWriter writer = tableWriters.get(OutputFormat.CSV);
+    DocumentOptions options =
+        new DocumentOptions(null, null, null, settings == null ? CsvSettings.defaults() : settings);
+    try (Stream<?> stream = rows) {
+      ColumnModel.Streamed table = ColumnModel.stream(stream.iterator());
+      return writer.writeRows(table.header(), table.rows(), out, options);
+    }
+  }
+
   private static String missingConverter(OutputFormat from, OutputFormat to) {
     String hint =
-        to == OutputFormat.XLSX
-            ? " Add the dependency io.github.juste120:docmint-excel to produce Excel files."
-            : " Register a PostProcessor or TableWriter for this format.";
+        switch (to) {
+          case XLSX ->
+              " Add the dependency io.github.juste120:docmint-excel to produce Excel files.";
+          case DOCX -> " Add the dependency io.github.juste120:docmint-word to produce Word files.";
+          default -> " Register a PostProcessor or TableWriter for this format.";
+        };
     return "Nothing converts " + from + " to " + to + "." + hint;
   }
 

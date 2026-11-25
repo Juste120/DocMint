@@ -6,8 +6,16 @@ import io.github.juste120.docmint.domain.OutputFormat;
 import io.github.juste120.docmint.port.TableData;
 import io.github.juste120.docmint.port.TableData.Cell;
 import io.github.juste120.docmint.port.TableWriter;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -27,27 +35,69 @@ public final class CsvTableWriter implements TableWriter {
 
   @Override
   public byte[] write(List<TableData> tables, DocumentOptions options) {
-    CsvSettings settings = options.csvOrDefault();
-    StringBuilder csv = new StringBuilder();
-    if (settings.byteOrderMark()) {
-      csv.append('﻿');
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    TableData table = tables.get(0);
+    write(table.rows().iterator(), out, options.csvOrDefault());
+    return out.toByteArray();
+  }
+
+  @Override
+  public long writeRows(
+      List<Cell> header, Iterator<List<Cell>> rows, OutputStream out, DocumentOptions options) {
+    Iterator<List<Cell>> all =
+        new Iterator<>() {
+          private boolean headerDone = header.isEmpty();
+
+          @Override
+          public boolean hasNext() {
+            return !headerDone || rows.hasNext();
+          }
+
+          @Override
+          public List<Cell> next() {
+            if (!headerDone) {
+              headerDone = true;
+              return header;
+            }
+            return rows.next();
+          }
+        };
+    return write(all, out, options.csvOrDefault()) - (header.isEmpty() ? 0 : 1);
+  }
+
+  private static long write(Iterator<List<Cell>> rows, OutputStream out, CsvSettings settings) {
+    Writer writer = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
+    long count = 0;
+    try {
+      if (settings.byteOrderMark()) {
+        writer.write('\uFEFF');
+      }
+      while (rows.hasNext()) {
+        writer.write(line(rows.next(), settings.separator()));
+        count++;
+      }
+      writer.flush();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
-    for (List<Cell> row : tables.get(0).rows()) {
-      boolean first = true;
-      for (Cell cell : row) {
-        for (int span = 0; span < cell.colspan(); span++) {
-          if (!first) {
-            csv.append(settings.separator());
-          }
-          first = false;
-          if (span == 0) {
-            csv.append(field(cell, settings.separator()));
-          }
+    return count;
+  }
+
+  private static String line(List<Cell> row, char separator) {
+    StringBuilder csv = new StringBuilder();
+    boolean first = true;
+    for (Cell cell : row) {
+      for (int span = 0; span < cell.colspan(); span++) {
+        if (!first) {
+          csv.append(separator);
+        }
+        first = false;
+        if (span == 0) {
+          csv.append(field(cell, separator));
         }
       }
-      csv.append("\r\n");
     }
-    return csv.toString().getBytes(StandardCharsets.UTF_8);
+    return csv.append("\r\n").toString();
   }
 
   private static String field(Cell cell, char separator) {
