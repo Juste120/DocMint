@@ -15,3 +15,6 @@ alternatives). A decision is never edited after acceptance: a new ADR supersedes
 | [0008](0008-rfc9457-problem-details.md) | RFC 9457 Problem Details for HTTP errors | Accepted |
 | [0009](0009-quality-tooling.md) | Quality tooling: Spotless + SpotBugs + JaCoCo + ArchUnit | Accepted |
 | [0010](0010-release-maven-central-portal.md) | Release through the Maven Central Portal | Accepted |
+| [0011](0011-post-processor-chain.md) | Post-processor chain (watermark, protection, preview) | Accepted |
+| [0012](0012-zxing-codes.md) | ZXing for QR codes and barcodes | Accepted |
+| [0013](0013-angular-library.md) | Angular helper library | Accepted |

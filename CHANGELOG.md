@@ -8,6 +8,29 @@ minor versions may change the public API; every such change is listed here.
 
 ## [Unreleased]
 
+## [0.2.0] - Not yet released
+
+### Added
+
+- Page headers and footers from HTML: classes `docmint-header` / `docmint-footer`, variants
+  `docmint-first-page` / `docmint-not-first-page`, page numbers `docmint-page` / `docmint-pages`.
+- Template functions `qr(...)` and `barcode(...)` (Code 128, EAN-13), generated locally with ZXing.
+- `words` filter: amounts in words in French (traditional and 1990 spelling) and English, with
+  CFA franc, euro and dollar.
+- Watermarks (text or image) and AES-256 password protection with permissions, as render
+  options; `DocMintBuilder.defaultWatermark`.
+- PNG preview: `DocMint.png(...)`, `OutputFormat.PNG`, `PreviewSettings`, image size limit.
+- `PostProcessor` SPI (ordered chain after rendering).
+- Starter: `ReportContent`, `@Report(format = PNG)`, properties `docmint.watermark.*` and
+  `docmint.limits.max-image-pixels`; new error codes `DOCMINT_CODE_INVALID`,
+  `DOCMINT_PREVIEW_PAGE_OUT_OF_RANGE`, `DOCMINT_PROTECTION_INVALID`, `DOCMINT_WATERMARK_INVALID`.
+- Angular library `@juste120/docmint-angular`.
+
+### Changed
+
+- The default "Page X / Y" footer is replaced when a template defines its own footer
+  (templates without one render as in 0.1.0).
+
 ## [0.1.0] - Not yet released
 
 ### Added
@@ -29,5 +52,6 @@ minor versions may change the public API; every such change is listed here.
 - `docmint-bom`.
 - Demo Spring Boot API and Angular application (not published).
 
-[Unreleased]: https://github.com/Juste120/DocMint/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Juste120/DocMint/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Juste120/DocMint/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Juste120/DocMint/releases/tag/v0.1.0

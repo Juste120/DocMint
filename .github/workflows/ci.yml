@@ -73,18 +73,26 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  demo-angular:
-    name: Angular demo
+  angular:
+    name: Angular library and demo
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: docmint-examples/demo-angular
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: docmint-examples/demo-angular/package-lock.json
-      - run: npm ci
-      - run: npm run build
+          cache-dependency-path: |
+            docmint-angular/package-lock.json
+            docmint-examples/demo-angular/package-lock.json
+      - name: Test and build @juste120/docmint-angular
+        working-directory: docmint-angular
+        run: |
+          npm ci
+          npm test
+          npm run build
+      - name: Build the demo with the library
+        working-directory: docmint-examples/demo-angular
+        run: |
+          npm ci
+          npm run build

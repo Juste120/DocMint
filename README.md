@@ -22,6 +22,9 @@ byte[] pdf = docMint.pdf("invoice", invoice);
 - **Business filters**: `fcfa`, `money`, `sum`, `date` (French by default, any locale).
 - **Print-ready by default**: A4, margins, "Page X / Y", page breaks, table headers repeated on
   every page, embedded font with accents and West African letters (works the same in Docker).
+- **Professional documents**: headers and footers on every page, QR codes and barcodes, amounts
+  in words (`un million deux cent cinquante mille francs CFA`), watermarks, AES-256 password
+  protection, PNG previews, and an Angular helper library.
 - **Secure by default**: no path traversal, no remote resources (SSRF), no XXE, auto-escaping,
   sandboxed templates, size/page/time limits, clean JSON errors.
 
@@ -127,7 +130,35 @@ See [`docmint-examples/demo-api`](docmint-examples/demo-api) and
 | `money` | `{{ price \| money("EUR") }}` | `1 234,50 €` (locale of the render; `money("USD", "en-US")`) |
 | `sum` | `{{ lines \| sum("amount") }}` | exact decimal sum; nested properties: `sum("price.total")` |
 | `date` | `{{ issuedOn \| date }}` | `24 novembre 2026`; `date("dd/MM/yyyy")`, `date("d MMMM yyyy", "en")` |
+| `words` | `{{ total \| words("XOF") }}` | `un million deux cent cinquante mille francs CFA`; `words("EUR", "en")`, `words(spelling="1990")` |
 | `raw` | `{{ html \| raw }}` | disables HTML escaping — only for trusted content |
+
+**Functions**: `{{ qr(url, size="30mm", level="M") }}` and
+`{{ barcode("F-2026-001", format="code128", text=true) }}` (`code128`, `ean13`) draw codes
+locally, without any network call.
+
+## Professional documents
+
+```html
+<!-- repeated on every page; docmint-first-page / docmint-not-first-page for variants -->
+<div class="docmint-header"><img src="/images/logo.png"> ACME SARL</div>
+<div class="docmint-footer">Page <span class="docmint-page"></span> / <span class="docmint-pages"></span></div>
+```
+
+```java
+// Watermark, password protection, PNG preview — decided in Java, never in templates
+docMint.render(RenderRequest.of("invoice", data).withOptions(RenderOptions.defaults()
+    .withWatermark(Watermark.text("COPIE"))
+    .withProtection(Protection.openPassword(pwd).withPermissions(Permission.PRINT))));
+byte[] png = docMint.png("invoice", data);
+
+// In Spring: return ReportContent from a @Report method
+return ReportContent.of(invoice).withWatermark(invoice.paid() ? null : Watermark.text("NON PAYÉE"));
+```
+
+**Angular**: `npm install @juste120/docmint-angular`, then
+`inject(DocMintClient).download('/api/invoices/1/pdf').subscribe()` — see
+[its README](docmint-angular/projects/docmint-angular/README.md).
 
 All [Pebble](https://pebbletemplates.io/wiki/) tags and filters are available (`for`, `if`,
 `extends`, `block`, `include`, `upper`, `default`, `numberformat`, …).
@@ -146,6 +177,8 @@ All [Pebble](https://pebbletemplates.io/wiki/) tags and filters are available (`
 | `docmint.resources.allowed-hosts` | empty | HTTPS hosts allowed for remote images/CSS |
 | `docmint.resources.missing` | `fail` | `fail` or `warn` when an image/CSS file is missing |
 | `docmint.web.problem-details.enabled` | `true` | RFC 9457 JSON errors for DocMint failures |
+| `docmint.watermark.text` / `.angle` / `.opacity` / `.color` | none | Watermark on every document (e.g. `TEST` on staging) |
+| `docmint.limits.max-image-pixels` | `25000000` | Maximum size of a PNG preview |
 
 Without Spring: `DocMint.builder().templatesPath("documents").locale(Locale.ENGLISH).build()`.
 
@@ -194,8 +227,8 @@ applications. See [ADR-0003](docs/adr/0003-openhtmltopdf-and-jsoup.md).
 
 | Version | Theme |
 |---|---|
-| **0.1.0** | The PDF in one line (this release) |
-| 0.2.0 | Professional documents: headers/footers, watermark, QR and barcodes, amount in words, password protection, PNG preview, Angular helper |
+| 0.1.0 | The PDF in one line |
+| **0.2.0** | Professional documents: headers/footers, watermark, QR and barcodes, amount in words, password protection, PNG preview, Angular helper (in progress) |
 | 0.3.0 | Charts and Excel: `<chart>` (SVG), Excel and CSV export |
 | 0.4.0 | Word and large volumes: `.docx`, pivot tables, streaming, async generation |
 | 0.5.0 | Official documents: e-signature, PDF/A, accessibility |
@@ -215,6 +248,9 @@ format XML, ni configuration obligatoire.
   `src/main/resources/reports/`, puis annotez une méthode de contrôleur avec
   `@Report("facture")`. Elle renvoie un DTO et le client reçoit un PDF.
 - **Java pur** : `byte[] pdf = DocMint.createDefault().pdf("facture", donnees);`
+- **Documents professionnels (0.2.0)** : en-têtes et pieds de page sur chaque page, QR codes et
+  codes-barres, montant en lettres (« Arrêtée la présente facture à la somme de… »), filigrane
+  « PAYÉE » ou « COPIE », protection par mot de passe et aperçu PNG.
 - **Pensé pour l'Afrique francophone** : le filtre `fcfa` affiche `1 250 000 FCFA`, les dates
   sont en français (`24 novembre 2026`), et la police intégrée gère les accents et les lettres
   éwé (ɖ, ɛ, ƒ, ɣ, ŋ, ɔ, ʋ), y compris dans Docker.

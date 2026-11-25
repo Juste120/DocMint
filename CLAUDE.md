@@ -11,12 +11,14 @@ Slogan: *Business documents from HTML, in one line of Java.*
 
 - Maintainer: PAKOU Komi Juste (GitHub `Juste120`), Java/Spring Boot + Angular developer in Lomé.
 - groupId `io.github.juste120`, root package `io.github.juste120.docmint`, licence Apache 2.0.
-- Current version: **0.1.0** (V1, "The PDF in one line"). See `ROADMAP.md` for later versions.
+- Versions: **0.1.0** (V1, "The PDF in one line", branch `001-v1-pdf-generation`) and **0.2.0**
+  (V2, "Professional documents", branch `002-v2-professional-documents`). See `ROADMAP.md`.
 
 ## Sources of truth (in this order)
 
 1. `.specify/memory/constitution.md` — non-negotiable principles.
-2. `specs/<feature>/spec.md` — what to build (V1: `specs/001-v1-pdf-generation/`).
+2. `specs/<feature>/spec.md` — what to build (V1: `specs/001-v1-pdf-generation/`, V2:
+   `specs/002-v2-professional-documents/`).
 3. `specs/<feature>/plan.md` (+ `research.md`, `data-model.md`, `contracts/`) — how.
 4. `specs/<feature>/tasks.md` — task breakdown.
 
@@ -47,7 +49,8 @@ explicit request.**
 | `docmint-spring-boot-starter` | `DocMintAutoConfiguration`, `DocMintProperties`, `web/` (`@Report`, return value handler, RFC 9457 errors) |
 | `docmint-bom` | Version alignment |
 | `docmint-examples/demo-api` | Layered demo API (controller, dto/request, dto/response, mapper, service/impl, entity, repository) — never published |
-| `docmint-examples/demo-angular` | Angular demo (`ReportService`, View/Download) — never published |
+| `docmint-angular` | Angular workspace of the npm library `@juste120/docmint-angular` (Vitest tests) |
+| `docmint-examples/demo-angular` | Angular demo using the library (View/Download/Preview) — never published |
 | `docs/` | User guide, architecture, ADRs |
 | `specs/`, `.specify/` | Spec Kit artifacts |
 
@@ -89,7 +92,8 @@ test** in `docmint-core/src/test/java/io/github/juste120/docmint/security/`.
 ./mvnw spotless:apply                           # format
 ./mvnw -pl docmint-core test -Dtest=FiltersTest  # one test class
 ./mvnw -pl docmint-examples/demo-api -am spring-boot:run   # demo API on :8080
-cd docmint-examples/demo-angular && npm ci && npm start    # Angular demo on :4200 (Node 22.22+/24.15+)
+cd docmint-angular && npm ci && npm test && npm run build  # Angular library (Node 22.22+/24.15+)
+cd docmint-examples/demo-angular && npm ci && npm start    # Angular demo on :4200 (build the library first)
 ```
 
 Release: GitHub Actions workflow `Release` (manual), never from a laptop.

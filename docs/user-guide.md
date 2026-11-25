@@ -1,6 +1,6 @@
 # DocMint user guide
 
-This guide covers everything in DocMint 0.1.0. For a quick start, read the [README](../README.md)
+This guide covers DocMint 0.1.0 and 0.2.0. For a quick start, read the [README](../README.md)
 first.
 
 - [1. Concepts](#1-concepts)
@@ -14,6 +14,7 @@ first.
 - [9. Errors](#9-errors)
 - [10. Security and limits](#10-security-and-limits)
 - [11. Logging](#11-logging)
+- [12. Professional documents (0.2.0)](#12-professional-documents-020)
 
 ## 1. Concepts
 
@@ -284,3 +285,73 @@ DocMint logs through SLF4J (no backend imposed):
 - `io.github.juste120.docmint.pdf.engine` — OpenHTMLtoPDF internals at DEBUG/TRACE.
 
 Data values and rendered content are never logged.
+
+## 12. Professional documents (0.2.0)
+
+### Headers and footers
+
+Mark elements anywhere in the template (they are moved to the page margins):
+
+```html
+<div class="docmint-header"><img src="/images/logo.png" height="40"> ACME SARL</div>
+<div class="docmint-footer">ACME SARL · Page <span class="docmint-page"></span> / <span class="docmint-pages"></span></div>
+```
+
+| Class | Effect |
+|---|---|
+| `docmint-header` / `docmint-footer` | repeated at the top / bottom of every page |
+| + `docmint-first-page` | only on page 1 |
+| + `docmint-not-first-page` | on every page except page 1 |
+| `docmint-page` / `docmint-pages` | current page number / page count |
+
+A custom footer replaces the default "Page X / Y". Leave enough margin for them:
+`@page { margin-top: 35mm; margin-bottom: 25mm; }`.
+
+### QR codes and barcodes
+
+```
+{{ qr("https://verify.example.com/" ~ number) }}           size 30mm, level M
+{{ qr(url, size="25mm", level="H") }}                      level L | M | Q | H
+{{ barcode(number) }}                                      Code 128
+{{ barcode("5901234123457", format="ean13", text=true) }}  EAN-13 with its digits
+```
+
+Codes are generated locally (ZXing). Invalid content (wrong EAN-13 check digit, too long) fails
+with `DOCMINT_CODE_INVALID`.
+
+### Amount in words
+
+`{{ total | words("XOF") }}` → `un million deux cent cinquante mille francs CFA`. Currencies:
+`XOF`, `XAF`, `fcfa`, `EUR` (`… euros et cinquante centimes`), `USD`; no currency →
+`mille deux cent trente-quatre virgule cinq`. English with `words("EUR", "en")`; 1990 French
+spelling with `words("XOF", spelling="1990")` (`deux-cent-cinquante-mille`). Up to
+999 999 999 999 999.
+
+### Watermark, protection and preview (Java options)
+
+```java
+RenderOptions options = RenderOptions.defaults()
+    .withWatermark(Watermark.text("COPIE").withColor("#C00000").withOpacity(0.2))
+    .withProtection(Protection.openPassword(password).withPermissions(Permission.PRINT));
+docMint.render(RenderRequest.of("payslip", data).withOptions(options));
+
+byte[] thumbnail = docMint.png("invoice", data);                       // page 1, 96 DPI
+docMint.render(new RenderRequest("invoice", data, OutputFormat.PNG,
+    RenderOptions.defaults().withPreview(new PreviewSettings(2, 150))));
+```
+
+- Watermark: text or image (`Watermark.image("images/stamp.png")`), angle −90…90, opacity
+  0.05…1, `#RRGGBB` colour, behind (default) or over the content. A default watermark can be set
+  with `DocMintBuilder.defaultWatermark(...)` or `docmint.watermark.text`.
+- Protection: AES-256 only. `openPassword(...)` requires a password to open;
+  `permissions(...)` restricts printing/copying/modification with a random owner password.
+  Passwords are `char[]`, never logged; call `protection.clear()` when done.
+- Preview: PNG of one page, 36–300 DPI, at most `maxImagePixels` (25 megapixels by default).
+
+In Spring, return `ReportContent` from a `@Report` method to set them per request, and use
+`@Report(format = OutputFormat.PNG)` for preview endpoints.
+
+### Angular
+
+See [`@juste120/docmint-angular`](../docmint-angular/projects/docmint-angular/README.md):
+`view`, `download`, `preview` and `DocMintError`.
