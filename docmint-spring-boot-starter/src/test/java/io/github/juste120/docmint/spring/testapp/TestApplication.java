@@ -174,6 +174,19 @@ public class TestApplication {
       return new Customer("x", "y");
     }
 
+    @GetMapping("/v4/stream.csv")
+    @Report(format = OutputFormat.CSV, filename = "flux.csv")
+    public java.util.stream.Stream<Customer> stream() {
+      return java.util.stream.IntStream.range(0, 3)
+          .mapToObj(i -> new Customer("Client " + i, "C-" + i));
+    }
+
+    @GetMapping("/v4/async")
+    @Report("invoice")
+    public java.util.concurrent.CompletableFuture<InvoiceResponse> async() {
+      return java.util.concurrent.CompletableFuture.supplyAsync(() -> invoice("A-1"));
+    }
+
     @GetMapping("/json")
     public InvoiceResponse json() {
       return invoice("J-1");

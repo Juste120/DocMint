@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletionStage;
+import java.util.stream.Stream;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.ContentDisposition;
@@ -43,6 +45,11 @@ public final class ReportReturnValueHandler implements HandlerMethodReturnValueH
 
   @Override
   public boolean supportsReturnType(MethodParameter returnType) {
+    // Asynchronous results (CompletableFuture...) are first handled by Spring MVC; the resolved
+    // value comes back here with the annotations of the original method.
+    if (CompletionStage.class.isAssignableFrom(returnType.getParameterType())) {
+      return false;
+    }
     return AnnotatedElementUtils.hasAnnotation(returnType.getAnnotatedElement(), Report.class)
         || returnType.hasMethodAnnotation(Report.class);
   }
@@ -85,6 +92,24 @@ public final class ReportReturnValueHandler implements HandlerMethodReturnValueH
           null);
     }
 
+    // A stream exported as CSV is written row by row, without loading it in memory.
+    if (template.isBlank()
+        && report.format() == OutputFormat.CSV
+        && data instanceof Stream<?> rows) {
+      String streamName =
+          options.fileName() != null
+              ? ReportFileNameResolver.sanitise(options.fileName(), ".csv")
+              : report.filename().isBlank()
+                  ? "export.csv"
+                  : ReportFileNameResolver.sanitise(report.filename(), ".csv");
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.setContentType("text/csv;charset=UTF-8");
+      response.setHeader(HttpHeaders.CONTENT_DISPOSITION, disposition(report, streamName));
+      docMint.exportCsv(rows, response.getOutputStream(), options.csv());
+      response.flushBuffer();
+      mavContainer.setRequestHandled(true);
+      return;
+    }
     // A list exported as CSV or Excel needs no template: columns come from @ExcelColumn.
     boolean listExport = template.isBlank() && tabular && data instanceof Collection<?>;
     if (template.isBlank() && !listExport) {
@@ -108,20 +133,23 @@ public final class ReportReturnValueHandler implements HandlerMethodReturnValueH
             ? docMint.export((Collection<?>) data, report.format(), effective)
             : docMint.render(new RenderRequest(template, data, report.format(), effective));
 
-    ContentDisposition disposition =
-        (report.disposition() == Disposition.ATTACHMENT
-                ? ContentDisposition.attachment()
-                : ContentDisposition.inline())
-            .filename(document.fileName(), StandardCharsets.UTF_8)
-            .build();
     byte[] content = document.content();
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType(document.mediaType());
     response.setContentLength(content.length);
-    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, disposition.toString());
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, disposition(report, document.fileName()));
     response.getOutputStream().write(content);
     response.flushBuffer();
     mavContainer.setRequestHandled(true);
+  }
+
+  private static String disposition(Report report, String fileName) {
+    return (report.disposition() == Disposition.ATTACHMENT
+            ? ContentDisposition.attachment()
+            : ContentDisposition.inline())
+        .filename(fileName, StandardCharsets.UTF_8)
+        .build()
+        .toString();
   }
 
   private static void checkReturnType(MethodParameter returnType, String method) {

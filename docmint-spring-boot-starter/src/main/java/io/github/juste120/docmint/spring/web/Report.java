@@ -64,7 +64,9 @@ public @interface Report {
    * The output format: {@link OutputFormat#PDF} (default), {@link OutputFormat#PNG} (preview of a
    * page), {@link OutputFormat#HTML}, {@link OutputFormat#CSV} or {@link OutputFormat#XLSX} (with
    * {@code docmint-excel}). With CSV or XLSX, a method returning a collection needs no template:
-   * columns come from {@code @ExcelColumn}.
+   * columns come from {@code @ExcelColumn}; a method returning a {@code java.util.stream.Stream}
+   * with format CSV is streamed row by row. {@link OutputFormat#DOCX} needs {@code docmint-word}.
+   * The method may also return a {@code CompletableFuture} of its result.
    *
    * @return the format
    */
