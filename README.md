@@ -171,6 +171,15 @@ the API exposes it: `registry.addMapping("/api/**").exposedHeaders("Content-Disp
 **Can templates call Java methods?** No, by design: templates only see data (maps, lists, simple
 values). Compute values in your response DTO.
 
+**`NoClassDefFoundError: org/apache/pdfbox/...` at runtime, but tests pass?** You declared
+`pdfbox` with `<scope>test</scope>` (for example to read PDFs in tests). Maven's "nearest
+declaration wins" rule then removes it from the runtime class path. PDFBox already comes with
+`agbale-core`: remove your declaration, or declare it without a scope.
+
+**SLF4J prints "No SLF4J providers were found" in a plain Java program.** Agbale logs through
+SLF4J; add a backend such as `slf4j-simple` or Logback to see its logs. Spring Boot already has
+one.
+
 **Is the LGPL dependency a problem?** OpenHTMLtoPDF is LGPL-2.1 and used as an unmodified,
 separate library, which is compatible with Agbale's Apache 2.0 licence and with closed-source
 applications. See [ADR-0003](docs/adr/0003-openhtmltopdf-and-jsoup.md).

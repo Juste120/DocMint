@@ -58,11 +58,8 @@
       <artifactId>spring-boot-starter-webmvc-test</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.pdfbox</groupId>
-      <artifactId>pdfbox</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!-- PDFBox (used by the tests to read PDFs) comes from agbale-core. Never redeclare it with
+         <scope>test</scope>: Maven would then remove it from the runtime class path. -->
   </dependencies>
 
   <build>

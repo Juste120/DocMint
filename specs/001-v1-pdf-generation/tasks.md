@@ -102,7 +102,7 @@ dependency on an unfinished task).
 - [x] T054 Concurrency test (50 parallel renders identical to sequential) and performance smoke test (< 1 s warm)
 - [x] T055 Logging (FR-047): DEBUG per render, WARN for warn-mode and wildcard hosts; test that data never appears in logs
 - [x] T056 Full `./mvnw verify` on JDK 17 and 21; coverage ≥ 80 %; SpotBugs clean; Javadoc clean
-- [ ] T057 Run quickstart.md manually; update CHANGELOG `[0.1.0]` section (CHANGELOG done; manual first-PDF check by someone new to the project — SC-001 — remains before release)
+- [x] T057 Run quickstart.md manually; update CHANGELOG `[0.1.0]` section (README quick start replayed in a blank project: first PDF in seconds; demo API run live, all endpoints OK. A check by someone new to the project — SC-001 — remains before release)
 
 ## Dependencies
 

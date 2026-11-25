@@ -93,6 +93,9 @@
 
     <!-- Spotless needs JDK 21+ (google-java-format); enabled by the 'format' profile below. -->
     <spotless.check.skip>true</spotless.check.skip>
+
+    <!-- spring-boot:run only runs the demo API, also with "-am" (see agbale-examples/demo-api). -->
+    <spring-boot.run.skip>true</spring-boot.run.skip>
   </properties>
 
   <dependencyManagement>
