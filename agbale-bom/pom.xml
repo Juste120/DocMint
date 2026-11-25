@@ -20,12 +20,12 @@
       <dependency>
         <groupId>io.github.juste120</groupId>
         <artifactId>agbale-core</artifactId>
-        <version>${project.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>io.github.juste120</groupId>
         <artifactId>agbale-spring-boot-starter</artifactId>
-        <version>${project.version}</version>
+        <version>${revision}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -37,10 +37,12 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
         <configuration>
-          <flattenMode>bom</flattenMode>
+          <!-- Keep only the BOM's own dependencyManagement, with real versions: never the
+               parent's third-party versions, which must not leak into user projects. -->
+          <flattenMode>ossrh</flattenMode>
           <pomElements>
-            <properties>remove</properties>
-            <parent>remove</parent>
+            <dependencyManagement>interpolate</dependencyManagement>
+            <build>remove</build>
           </pomElements>
         </configuration>
       </plugin>

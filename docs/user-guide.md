@@ -1,0 +1,286 @@
+# Agbale user guide
+
+This guide covers everything in Agbale 0.1.0. For a quick start, read the [README](../README.md)
+first.
+
+- [1. Concepts](#1-concepts)
+- [2. Templates](#2-templates)
+- [3. Data](#3-data)
+- [4. Filters](#4-filters)
+- [5. Layout and printing](#5-layout-and-printing)
+- [6. Images, stylesheets and fonts](#6-images-stylesheets-and-fonts)
+- [7. Java API](#7-java-api)
+- [8. Spring Boot](#8-spring-boot)
+- [9. Errors](#9-errors)
+- [10. Security and limits](#10-security-and-limits)
+- [11. Logging](#11-logging)
+
+## 1. Concepts
+
+A **template** is an HTML file in the templates folder (class path `reports/` by default).
+Agbale fills it with your **data** using the [Pebble](https://pebbletemplates.io) template
+language, then converts the HTML to **PDF** with print rules (pages, margins, page numbers).
+
+```
+reports/invoice.html  +  InvoiceResponse  ──►  HTML  ──►  PDF
+```
+
+The template name is the path relative to the templates folder, without `.html`:
+`reports/invoice.html` → `invoice`, `reports/hr/attestation.html` → `hr/attestation`.
+
+## 2. Templates
+
+Templates are standard HTML5 — you can open them in a browser. Pebble syntax:
+
+| Syntax | Purpose |
+|---|---|
+| `{{ customer.name }}` | Print a value (HTML-escaped) |
+| `{% for line in lines %} … {% endfor %}` | Loop; `loop.index`, `loop.first`, `loop.last` are available |
+| `{% if discount is not null %} … {% else %} … {% endif %}` | Condition |
+| `{{ note \| default("—") }}` | Value when missing or null |
+| `{% extends "layouts/base" %}` + `{% block content %}` | Layout inheritance |
+| `{% include "parts/signature" %}` | Include another template |
+| `{# comment #}` | Comment |
+
+**Layouts**: put the common structure (header, footer, styles) in `reports/layouts/base.html`
+with `{% block %}` placeholders; child templates `{% extends "layouts/base" %}` and override the
+blocks. Names in `extends`/`include` are always relative to the templates root.
+
+Strict mode: using a variable that does not exist is an error (`AGBALE_TEMPLATE_EVALUATION`), so
+typos are caught immediately. A property that exists but is `null` prints nothing.
+
+## 3. Data
+
+`agbale.pdf("invoice", data)` accepts:
+
+- a **record** (`record Invoice(String number, …)`) — components become variables;
+- an **object with getters** (`getNumber()`, `isPaid()`) — properties become variables;
+- a **`Map<String, ?>`** — keys become variables.
+
+Nested objects, lists, arrays and maps are converted the same way. Values reach the template as
+`String`, numbers (`BigDecimal`, `Integer`, …), `Boolean`, `java.time` dates or `null`; enums
+become their name. A root that is a list or a simple value is available as `data`:
+`agbale.pdf("list", List.of(…))` → `{% for item in data %}`.
+
+Templates **cannot call methods** on your objects. Prepare the values in a response DTO
+(totals, labels, formatted fields). Never pass JPA entities: lazy associations and
+back-references (cycles) are rejected.
+
+## 4. Filters
+
+### `fcfa`
+
+`{{ amount | fcfa }}` → `1 250 000 FCFA`. Rounded half-up to the unit (the CFA franc has no
+decimals), no-break spaces between thousands, same output for every locale. Works for XOF
+(UEMOA) and XAF (CEMAC).
+
+### `money(currency, [locale])`
+
+`{{ price | money("EUR") }}` → `1 234,50 €` in French; `money("USD", "en-US")` → `$1,234.50`;
+`money("XOF")` → `1 250 000 F CFA` (CLDR notation). The currency is an ISO 4217 code.
+
+### `sum([property])`
+
+`{{ lines | sum("amount") }}` sums a property of each item with exact decimal arithmetic
+(`0.1 + 0.2 = 0.3`). Nested properties: `sum("price.total")`. Without argument, sums a list of
+numbers. Null items and values are ignored; an empty list gives `0`. Combine with other filters:
+`{{ lines | sum("amount") | fcfa }}`.
+
+### `date([pattern], [locale])`
+
+`{{ issuedOn | date }}` → `24 novembre 2026` (long format of the locale).
+`date("dd/MM/yyyy")` → `24/11/2026`; `date("dd/MM/yyyy 'à' HH:mm")` for date-times;
+`date("d MMMM yyyy", "en")` → `24 November 2026`. Accepts `LocalDate`, `LocalDateTime`,
+`OffsetDateTime`, `ZonedDateTime`, `Instant` (UTC), `java.util.Date` and ISO-8601 strings.
+Patterns follow `java.time.format.DateTimeFormatter`.
+
+### `raw`
+
+`{{ html | raw }}` prints a value **without** HTML escaping. Use it only for content you fully
+control, never for user input.
+
+## 5. Layout and printing
+
+Agbale inserts a default print stylesheet **before** your styles, so you can override anything:
+
+| Default | How to change it |
+|---|---|
+| A4 portrait, margins 20 mm / 15 mm | `@page { size: A4 landscape; margin: 10mm; }` or `AgbaleBuilder.pageSettings(…)` |
+| "Page X / Y" at the bottom centre | `@page { @bottom-center { content: none; } }` or your own `content` |
+| `Noto Sans` 10 pt | `body { font-family: …; font-size: …; }` |
+| Table headers repeated on each page | `<thead>` rows repeat automatically |
+| Rows not split across pages | `tr { page-break-inside: auto; }` to allow it |
+
+Force a new page with `<div class="page-break"></div>`. All CSS paged-media features supported
+by OpenHTMLtoPDF are available (`@page :first`, margin boxes, `counter(page)`,
+`counter(pages)`).
+
+## 6. Images, stylesheets and fonts
+
+| Reference | Resolved to |
+|---|---|
+| `images/logo.png` | relative to the template's folder, e.g. `reports/images/logo.png` |
+| `/images/logo.png` | from the templates root: `reports/images/logo.png` |
+| `data:image/png;base64,…` | embedded image |
+| `https://cdn.example.com/x.png` | only if `cdn.example.com` is allow-listed |
+| `http://…`, `file:…`, `../../x` | always refused |
+
+The same rules apply to `<link rel="stylesheet">`, CSS `url(…)` and `@import`.
+
+**Fonts.** Noto Sans (regular, bold, italic) is embedded and used for `Noto Sans`,
+`sans-serif`, `serif`, `monospace` and any family that is not available (e.g. `Arial` on a Linux
+server). It covers French and the Latin letters of Ewe and many West African languages. Add
+other TrueType fonts from the class path:
+
+```java
+Agbale.builder()
+    .font("Inter", "fonts/Inter-Regular.ttf")
+    .font(new FontDefinition("Inter", "fonts/Inter-Bold.ttf", FontDefinition.BOLD, false))
+    .build();
+```
+
+```yaml
+agbale:
+  fonts:
+    - family: Inter
+      location: fonts/Inter-Regular.ttf
+    - family: Inter
+      location: fonts/Inter-Bold.ttf
+      weight: 700
+```
+
+## 7. Java API
+
+```java
+Agbale agbale = Agbale.builder()
+    .templatesPath("reports")                       // class path folder
+    .locale(Locale.FRENCH)                          // dates and amounts
+    .cache(true)                                    // compiled template cache
+    .limits(ResourceLimits.defaults().withMaxPages(100))
+    .allowRemoteHost("cdn.example.com")             // https only
+    .missingResources(MissingResourceMode.FAIL)     // or WARN
+    .pageSettings(PageSettings.defaults())
+    .build();                                       // immutable, thread-safe: share it
+
+byte[] pdf = agbale.pdf("invoice", data);
+byte[] english = agbale.pdf("invoice", data, Locale.ENGLISH);
+
+RenderResponse response = agbale.render(
+    RenderRequest.of("invoice", data).withOptions(RenderOptions.defaults().withFileName("F-1.pdf")));
+response.content(); response.fileName(); response.pageCount(); response.mediaType();
+
+agbale.availableTemplates();   // ["invoice", "layouts/base", …]
+agbale.clearCache();
+```
+
+**Extension points** (experts): implement `TemplateResolver` to read templates from elsewhere,
+or `DocumentRenderer` to replace the PDF renderer, and register them with
+`templateResolver(…)` / `renderer(…)`. Your resolver must never read outside its own root.
+
+## 8. Spring Boot
+
+The starter auto-configures an `Agbale` bean from `agbale.*` properties (see the
+[README](../README.md#configuration-all-optional)). Define your own `Agbale` bean to take full
+control; the starter then backs off.
+
+### `@Report`
+
+```java
+@GetMapping("/{id}/pdf")
+@Report(value = "invoice", filename = "invoice-{number}-{customer.code}.pdf",
+        disposition = Disposition.ATTACHMENT)
+public InvoiceResponse pdf(@PathVariable Long id) { … }
+```
+
+- `value` (or `template`): the template name.
+- `filename`: default `<template>.pdf`. `{property}` placeholders are read from the returned
+  object; values are sanitised (no `/`, `\`, quotes, `;`, line breaks) and `.pdf` is added.
+- `disposition`: `INLINE` (default, the browser displays it) or `ATTACHMENT` (download).
+
+The method must return a data object (record, bean, map, `Optional`), not `byte[]` or
+`ResponseEntity`. Returning `null` is an error: throw your own 404 exception instead.
+
+The response has `Content-Type: application/pdf`, `Content-Length`, and
+`Content-Disposition: inline; filename="…"; filename*=UTF-8''…`. Clients whose `Accept` header
+excludes PDF get `406`.
+
+### CORS
+
+Browsers hide `Content-Disposition` from JavaScript on cross-origin calls unless it is exposed:
+
+```java
+registry.addMapping("/api/**").allowedOrigins("http://localhost:4200")
+    .exposedHeaders(HttpHeaders.CONTENT_DISPOSITION);
+```
+
+## 9. Errors
+
+Every error is an unchecked `AgbaleException` with a stable `code()`:
+
+<a id="error-agbale-template-not-found"></a>
+<a id="error-agbale-template-syntax"></a>
+<a id="error-agbale-template-evaluation"></a>
+<a id="error-agbale-invalid-template-name"></a>
+<a id="error-agbale-resource-refused"></a>
+<a id="error-agbale-resource-missing"></a>
+<a id="error-agbale-limit-exceeded"></a>
+<a id="error-agbale-render-failed"></a>
+<a id="error-agbale-invalid-report-method"></a>
+<a id="error-agbale-not-acceptable"></a>
+
+| Code | Exception | Typical cause and fix |
+|---|---|---|
+| `AGBALE_TEMPLATE_NOT_FOUND` | `TemplateNotFoundException` | Wrong name or folder. The message lists available templates and suggests the closest one. |
+| `AGBALE_TEMPLATE_SYNTAX` | `TemplateSyntaxException` | Unclosed tag or bad expression; message gives template and line. |
+| `AGBALE_TEMPLATE_EVALUATION` | `RenderException` | Undefined variable, wrong filter input. |
+| `AGBALE_INVALID_TEMPLATE_NAME` | `InvalidTemplateNameException` | `../`, absolute path, forbidden characters. |
+| `AGBALE_RESOURCE_REFUSED` | `ResourceRefusedException` | Remote/file resource not allowed. |
+| `AGBALE_RESOURCE_MISSING` | `ResourceMissingException` | Image/CSS not found or unreadable (switch to `warn` to ignore). |
+| `AGBALE_LIMIT_EXCEEDED` | `LimitExceededException` | Template size, rendered size, pages or time limit; message names the setting. |
+| `AGBALE_RENDER_FAILED` | `RenderException` | Other failure (e.g. `@Report` method returned null). |
+| `AGBALE_INVALID_REPORT_METHOD` | `InvalidReportMethodException` | `@Report` misuse (no template, wrong return type, unknown placeholder). |
+| `AGBALE_NOT_ACCEPTABLE` | `ReportNotAcceptableException` | Client does not accept `application/pdf` (HTTP 406). |
+
+In Spring MVC, these errors become RFC 9457 responses:
+
+```json
+{
+  "type": "https://github.com/Juste120/agbale/blob/main/docs/user-guide.md#error-agbale-template-not-found",
+  "title": "Template not found",
+  "status": 500,
+  "detail": "Template 'invoce' not found in class path folder 'reports'. Available templates: invoice. Did you mean 'invoice'?",
+  "instance": "/api/invoices/1/pdf",
+  "code": "AGBALE_TEMPLATE_NOT_FOUND"
+}
+```
+
+Messages never contain stack traces, absolute paths or your data. Disable with
+`agbale.web.problem-details.enabled=false` to handle errors yourself.
+
+## 10. Security and limits
+
+Agbale is safe by default; see [SECURITY.md](../SECURITY.md) for the full list. Limits:
+
+| Limit | Default | Builder | Property |
+|---|---|---|---|
+| Template file size | 1 MiB | `ResourceLimits.withMaxTemplateBytes` | `agbale.limits.max-template-size` |
+| Rendered HTML size | 8 × template size | (derived) | (derived) |
+| Pages | 500 | `withMaxPages` | `agbale.limits.max-pages` |
+| Render time | 30 s | `withMaxRenderTime` | `agbale.limits.max-render-time` |
+
+A render that exceeds the time limit returns an error to the caller immediately; the JVM cannot
+force the rendering thread to stop, but the page and size limits bound the remaining work.
+
+Templates are trusted code: keep them in your application's resources, never load templates
+written by end users.
+
+## 11. Logging
+
+Agbale logs through SLF4J (no backend imposed):
+
+- `DEBUG io.github.juste120.agbale` — one line per render (template, format, duration, pages).
+- `WARN` — missing resources in `warn` mode, wildcard remote hosts, Agbale errors in `@Report`
+  endpoints.
+- `io.github.juste120.agbale.pdf.engine` — OpenHTMLtoPDF internals at DEBUG/TRACE.
+
+Data values and rendered content are never logged.

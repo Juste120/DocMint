@@ -16,3 +16,6 @@ target/
 *.gpg
 *.asc
 .env
+
+# Node (Angular demo)
+node_modules/

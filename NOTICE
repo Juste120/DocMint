@@ -1,0 +1,16 @@
+Agbale
+Copyright 2026 PAKOU Komi Juste and the Agbale contributors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product bundles the Noto Sans font (Regular, Bold, Italic, Bold Italic, version 2.004),
+Copyright 2015 Google LLC, licensed under the SIL Open Font License, Version 1.1.
+The license text is in agbale-core/src/main/resources/io/github/juste120/agbale/fonts/OFL.txt
+and inside the agbale-core JAR.
+
+Runtime dependencies (not bundled, resolved by your build tool):
+- Pebble (BSD 3-Clause License)
+- OpenHTMLtoPDF (GNU LGPL 2.1 or later), used unmodified as a separate library
+- Apache PDFBox (Apache License 2.0)
+- jsoup (MIT License)
+- SLF4J API (MIT License)

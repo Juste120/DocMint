@@ -282,6 +282,9 @@
         <configuration>
           <updatePomFile>true</updatePomFile>
           <flattenMode>ossrh</flattenMode>
+          <pomElements>
+            <build>remove</build>
+          </pomElements>
         </configuration>
         <executions>
           <execution>
@@ -299,6 +302,23 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <!-- Replaces maven-deploy-plugin; only used by 'deploy' (release workflow). The upload is
+             validated but NOT auto-published: the maintainer publishes it in the Central Portal. -->
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>${central-publishing-maven-plugin.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+          <autoPublish>false</autoPublish>
+          <waitUntil>validated</waitUntil>
+          <excludeArtifacts>
+            <artifact>agbale-parent</artifact>
+            <artifact>agbale-demo-api</artifact>
+          </excludeArtifacts>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
@@ -392,17 +412,6 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.sonatype.central</groupId>
-            <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>${central-publishing-maven-plugin.version}</version>
-            <extensions>true</extensions>
-            <configuration>
-              <publishingServerId>central</publishingServerId>
-              <autoPublish>false</autoPublish>
-              <waitUntil>validated</waitUntil>
-            </configuration>
           </plugin>
         </plugins>
       </build>

@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test (JDK ${{ matrix.java }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['17', '21']
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+      # Tests, JaCoCo (>= 80 % on agbale-core), SpotBugs, Javadoc, architecture rules.
+      # On JDK 21 the 'format' profile also runs the Spotless formatting check.
+      - name: Verify
+        run: ./mvnw -B -ntp verify
+      - name: Upload coverage report
+        if: matrix.java == '21'
+        uses: actions/upload-artifact@v7
+        with:
+          name: jacoco-report
+          path: agbale-core/target/site/jacoco/
+      - name: Upload coverage to Codecov
+        if: matrix.java == '21'
+        uses: codecov/codecov-action@v7
+        continue-on-error: true
+        with:
+          files: agbale-core/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  dependency-check:
+    name: OWASP Dependency-Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      # Fails the build on any vulnerability with CVSS >= 9 (critical).
+      - name: Scan dependencies
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: ./mvnw -B -ntp -DskipTests -DskipExamples -P security-scan verify -Dspotbugs.skip -Dmaven.javadoc.skip -Djacoco.skip
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  demo-angular:
+    name: Angular demo
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agbale-examples/demo-angular
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: agbale-examples/demo-angular/package-lock.json
+      - run: npm ci
+      - run: npm run build

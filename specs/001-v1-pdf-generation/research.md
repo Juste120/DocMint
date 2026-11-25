@@ -137,7 +137,7 @@ release; milestones, betas and release candidates excluded).
 | Tests | JUnit 6.1.3 (BOM), AssertJ 3.27.7, ArchUnit 1.5.1, PDFBox 3.0.8 (text extraction) | JUnit 6 requires Java 17 ✔ |
 | Spring tests | `ApplicationContextRunner`, MockMvc (Boot 4.2 test modules) | |
 | Coverage | JaCoCo 0.8.16, check ≥ 0.80 line coverage on `agbale-core` | build fails below |
-| Format | Spotless 3.12.0 + google-java-format 1.37.0 | runs on JDK 21 (CI quality job and local dev) |
+| Format | Spotless 3.12.0 + google-java-format 1.35.0 | runs on JDK 21+; 1.36+ needs commonmark, missing from the Spotless class path (ADR-0009) |
 | Static analysis | SpotBugs 4.10.5 (plugin 4.10.5.0), effort Max, threshold Medium | Checkstyle not used: formatting is fully delegated to Spotless, avoiding overlapping rule sets (ADR-0009) |
 | Javadoc | maven-javadoc-plugin 3.12.0, doclint on, internal packages excluded | |
 | Security scans | OWASP dependency-check-maven 13.0.0 (`failBuildOnCVSS=9`), CodeQL, Dependabot | NVD API key as CI secret |
